@@ -12,15 +12,15 @@
     }
     input, button, textarea {
       font-size: 16px;
-      margin: 5px 0;
     }
     input {
       padding: 8px;
       width: 300px;
     }
     button {
-      padding: 10px 16px;
+      padding: 8px 12px;
       cursor: pointer;
+      margin-bottom: 5px;
     }
     textarea {
       width: 100%;
@@ -30,24 +30,22 @@
       overflow: auto;
     }
     .preset-wrapper {
-      margin-bottom: 30px;
-    }
-    .preset-label {
-      font-weight: bold;
-      margin-bottom: 2px;
-    }
-    .preset-textarea {
-      margin-bottom: 5px;
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      margin-bottom: 20px;
     }
     .preset-buttons {
       display: flex;
       flex-direction: column;
-      gap: 3px;
+      flex-shrink: 0;
     }
-    .preset-buttons button.copy {
-      padding: 4px 10px;
-      font-size: 13px;
-      opacity: 0.8;
+    .preset-textarea {
+      flex: 1;
+    }
+    .label {
+      font-weight: bold;
+      margin: 20px 0 5px;
     }
     .log {
       margin-top: 15px;
@@ -59,33 +57,39 @@
     hr {
       margin: 30px 0;
     }
+    .small-button {
+      padding: 4px 8px;
+      font-size: 14px;
+    }
   </style>
 </head>
 <body>
   <h1>GTM Playground</h1>
+
   <label for="gtmId">Enter your GTM Container ID:</label><br>
   <input type="text" id="gtmId" placeholder="GTM-XXXXXXX" />
   <button onclick="loadGTM()">Inject GTM</button>
-  <div id="status"></div>
 
   <hr>
 
-  <h3>Free custom JS</h3>
-  <textarea id="customJson" rows="6">// Example:
+  <div class="label">Free custom JS</div>
+  <div class="preset-wrapper">
+    <div class="preset-buttons">
+      <button onclick="runCustom()">Run JS</button>
+      <button class="small-button" onclick="copyCustom()">Copy</button>
+    </div>
+    <textarea id="customJson" rows="6">// Example:
 dataLayer.push({
   event: "custom_event",
   my_value: 123
 });</textarea>
-  <div class="preset-buttons">
-    <button onclick="runCustom()">Run JS</button>
-    <button class="copy" onclick="copyText('customJson')">Copy</button>
   </div>
 
   <div class="log" id="logOutput">Console output will appear here…</div>
 
   <hr>
 
-  <h3>Test Events (editable in <code>datalayer.js</code>)</h3>
+  <div class="label">Test Events (editable in <code>datalayer.js</code>)</div>
   <div id="presetsArea"></div>
   <button onclick="savePresets()">💾 Save All</button>
 
@@ -99,16 +103,12 @@ dataLayer.push({
         alert('Invalid GTM ID');
         return;
       }
-
       localStorage.setItem('gtm_id', id);
-
       const script = document.createElement('script');
       script.src = 'https://www.googletagmanager.com/gtm.js?id=' + id;
       script.async = true;
       document.head.appendChild(script);
-
       dataLayer.push({ 'gtm.start': new Date().getTime(), event: 'gtm.js' });
-
       const iframe = document.createElement('iframe');
       iframe.src = `https://www.googletagmanager.com/ns.html?id=${id}`;
       iframe.height = 0;
@@ -116,8 +116,6 @@ dataLayer.push({
       iframe.style.display = 'none';
       iframe.style.visibility = 'hidden';
       document.body.appendChild(iframe);
-
-      document.getElementById('status').textContent = `✅ GTM container ${id} injected`;
     }
 
     function runCustom() {
@@ -130,16 +128,16 @@ dataLayer.push({
       }
     }
 
+    function copyCustom() {
+      const textarea = document.getElementById('customJson');
+      textarea.select();
+      document.execCommand('copy');
+      log('📋 Copied custom JS');
+    }
+
     function log(msg) {
       document.getElementById('logOutput').textContent = msg;
       console.log(msg);
-    }
-
-    function copyText(id) {
-      const el = document.getElementById(id);
-      navigator.clipboard.writeText(el.value).then(() => {
-        log(`📋 Copied: ${id}`);
-      });
     }
 
     const defaultPresets = window.gtmPresets || [];
@@ -160,22 +158,16 @@ dataLayer.push({
       const wrapper = document.createElement('div');
       wrapper.className = 'preset-wrapper';
 
+      const buttons = document.createElement('div');
+      buttons.className = 'preset-buttons';
+
       const label = document.createElement('div');
-      label.className = 'preset-label';
-      label.innerHTML = `Event: <span style="color: blue">${preset.label || preset.name}</span>`;
-
-      const textarea = document.createElement('textarea');
-      textarea.className = 'preset-textarea';
-      textarea.id = `preset_${index}`;
-      textarea.value = preset.code;
-      textarea.rows = Math.min(12, preset.code.split('\n').length + 1);
-
-      const buttonWrapper = document.createElement('div');
-      buttonWrapper.className = 'preset-buttons';
+      label.className = 'label';
+      label.innerHTML = `Event: <a href="#" onclick="return false">${preset.label || preset.name || 'Event_' + (index + 1)}</a>`;
 
       const runBtn = document.createElement('button');
-      runBtn.textContent = `Push: ${preset.label || preset.name}`;
-      runBtn.onclick = function () {
+      runBtn.textContent = `Push: ${preset.label || preset.name || 'event'}`;
+      runBtn.onclick = () => {
         try {
           new Function(textarea.value)();
           log(`✅ Executed: ${preset.label || preset.name}`);
@@ -186,16 +178,25 @@ dataLayer.push({
 
       const copyBtn = document.createElement('button');
       copyBtn.textContent = 'Copy';
-      copyBtn.className = 'copy';
-      copyBtn.onclick = () => copyText(`preset_${index}`);
+      copyBtn.className = 'small-button';
+      copyBtn.onclick = () => {
+        textarea.select();
+        document.execCommand('copy');
+        log('📋 Copied');
+      };
 
-      buttonWrapper.appendChild(runBtn);
-      buttonWrapper.appendChild(copyBtn);
+      buttons.appendChild(label);
+      buttons.appendChild(runBtn);
+      buttons.appendChild(copyBtn);
 
-      wrapper.appendChild(label);
+      const textarea = document.createElement('textarea');
+      textarea.className = 'preset-textarea';
+      textarea.dataset.index = index;
+      textarea.value = preset.code;
+      textarea.rows = 10;
+
+      wrapper.appendChild(buttons);
       wrapper.appendChild(textarea);
-      wrapper.appendChild(buttonWrapper);
-
       return wrapper;
     }
 
