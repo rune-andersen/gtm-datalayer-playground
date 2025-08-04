@@ -82,6 +82,18 @@ const presetEvents = [
 },
 // ***** END login *****
 
+// ***** START logout *****  
+{
+  name: "logout",
+  code: `dataLayer.push({
+  event: 'logout',
+  auth: {
+    logout_reason: 'timeout'
+  }
+});`
+},
+// ***** END logout *****
+	
 // ***** START login_fail *****  
 {
   name: "login_fail",
