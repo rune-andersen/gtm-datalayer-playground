@@ -1,8 +1,5 @@
 // datalayer.js
-// This file defines the preset events for GTM Playground.
-// Each object contains:
-// - name: the button label
-// - code: full dataLayer.push(...) JavaScript as a string
+// Defines preset events for GTM Playground
 
 const presetEvents = [
   {
@@ -50,37 +47,31 @@ const presetEvents = [
     ]
   }
 });`
-    
-  // page_view
   },
   {
     name: "page_view",
     code: `dataLayer.push({
-          'event': 'page_view'
+  'event': 'page_view'
 });`
   },
-  
-// category_view
   {
     name: "category_view",
     code: `dataLayer.push({
-          'event': 'category_view',
-          'category': {
-            'category_id': 'abc-123',
-            'product_sorting': 'relevance'
-          }
+  'event': 'category_view',
+  'category': {
+    'category_id': 'abc-123',
+    'product_sorting': 'relevance'
+  }
 });`
   },
-  // login
   {
     name: "login",
     code: `dataLayer.push({
-           'event': 'login',
-           'auth': {
-              'login_method': 'MitID'
-  },
-// Custom 5
-});
+  'event': 'login',
+  'auth': {
+    'login_method': 'MitID'
+  }
+});`
   },
   {
     name: "custom_5",
@@ -89,19 +80,20 @@ const presetEvents = [
   'source': 'footer'
 });`
   },
-  // product_view
   {
     name: "product_view",
     code: `dataLayer.push({
-          'event': 'product_view',
-          'product_view': {
-            'product_ean': '4741532901552',
-            'product_id': '12304543',
-            'category_id': '5103',
-            'product_price': 1299.00, 
-            'product_available': true
+  'event': 'product_view',
+  'product_view': {
+    'product_ean': '4741532901552',
+    'product_id': '12304543',
+    'category_id': '5103',
+    'product_price': 1299.00,
+    'product_available': true
   }
 });`
   }
 ];
+
+// 🧠 Important for fallback if localStorage is empty
 window.gtmPresets = presetEvents;
