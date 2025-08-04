@@ -1,8 +1,8 @@
 const presetEvents = [
-  // ***** START data *****  
-  {
-    name: "data",
-    code: `dataLayer.push({
+// ***** START data *****  
+{
+  name: "data",
+  code: `dataLayer.push({
   event: 'data',
   user: {
     user_id_subscriberkey: 'f12cd820-5cd3-4c52-841f-e4263b9e9104',
@@ -45,54 +45,59 @@ const presetEvents = [
     ]
   }
 });`
-  },
-  // ***** END data *****  
-  // ***** START page_view *****  
-  {
-    name: "page_view",
-    code: `dataLayer.push({
+},
+// ***** END data *****
+
+// ***** START page_view *****  
+{
+  name: "page_view",
+  code: `dataLayer.push({
   event: 'page_view'
 });`
-  },
-  // ***** END page_view ***** 
-  // ***** START category_view *****  
-  {
-    name: "category_view",
-    code: `dataLayer.push({
+},
+// ***** END page_view *****
+
+// ***** START category_view *****  
+{
+  name: "category_view",
+  code: `dataLayer.push({
   event: 'category_view',
   category: {
     category_id: 'abc-123',
     product_sorting: 'relevance'
   }
 });`
-  },
-  // ***** END category_view ***** 
-  // ***** START login *****  
-  {
-    name: "login",
-    code: `dataLayer.push({
+},
+// ***** END category_view *****
+
+// ***** START login *****  
+{
+  name: "login",
+  code: `dataLayer.push({
   event: 'login',
   auth: {
     login_method: 'MitID'
   }
 });`
-  },
-// ***** END login ***** 
+},
+// ***** END login *****
+
 // ***** START login_fail *****  
-  {
-    name: "login_fail",
-    code: `dataLayer.push({
+{
+  name: "login_fail",
+  code: `dataLayer.push({
   event: 'login_fail',
   auth: {
     login_method: 'MitID'
   }
 });`
-  },
- // ***** END login_fail ***** 
+},
+// ***** END login_fail *****
+
 // ***** START product_view *****  
-  {
-    name: "product_view",
-    code: `dataLayer.push({
+{
+  name: "product_view",
+  code: `dataLayer.push({
   event: 'product_view',
   product_view: {
     product_ean: '4741532901552',
@@ -102,7 +107,8 @@ const presetEvents = [
     product_available: true
   }
 });`
-  }
+},
+// ***** END product_view *****
 ];
 
 window.gtmPresets = presetEvents;
