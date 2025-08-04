@@ -25,21 +25,29 @@
     textarea {
       width: 100%;
       font-family: monospace;
-      resize: none;
+      resize: vertical;
+      max-height: 300px;
       overflow: auto;
-      background: #f9f9f9;
     }
     .preset-wrapper {
       margin-bottom: 30px;
     }
-    .preset-columns {
-      display: flex;
-      gap: 20px;
-      flex-wrap: wrap;
+    .preset-label {
+      font-weight: bold;
+      margin-bottom: 2px;
     }
-    .preset-box {
-      flex: 1;
-      min-width: 400px;
+    .preset-textarea {
+      margin-bottom: 5px;
+    }
+    .preset-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+    .preset-buttons button.copy {
+      padding: 4px 10px;
+      font-size: 13px;
+      opacity: 0.8;
     }
     .log {
       margin-top: 15px;
@@ -51,19 +59,10 @@
     hr {
       margin: 30px 0;
     }
-    .event-label {
-      color: #1a0dab;
-      font-weight: bold;
-    }
-    .copy-button {
-      margin-left: 8px;
-    }
   </style>
 </head>
 <body>
-
   <h1>GTM Playground</h1>
-
   <label for="gtmId">Enter your GTM Container ID:</label><br>
   <input type="text" id="gtmId" placeholder="GTM-XXXXXXX" />
   <button onclick="loadGTM()">Inject GTM</button>
@@ -77,15 +76,16 @@ dataLayer.push({
   event: "custom_event",
   my_value: 123
 });</textarea>
-  <br>
-  <button onclick="runCustom()">Run JS</button>
-  <button onclick="copyToClipboard('customJson')">Copy</button>
+  <div class="preset-buttons">
+    <button onclick="runCustom()">Run JS</button>
+    <button class="copy" onclick="copyText('customJson')">Copy</button>
+  </div>
 
   <div class="log" id="logOutput">Console output will appear here…</div>
 
   <hr>
 
-  <h3>Quick test events (editable presets from <code>datalayer.js</code>)</h3>
+  <h3>Test Events (editable in <code>datalayer.js</code>)</h3>
   <div id="presetsArea"></div>
   <button onclick="savePresets()">💾 Save All</button>
 
@@ -130,38 +130,19 @@ dataLayer.push({
       }
     }
 
-    function copyToClipboard(id) {
-      const el = document.getElementById(id);
-      el.select();
-      document.execCommand('copy');
-      log('📋 Copied to clipboard');
-    }
-
     function log(msg) {
       document.getElementById('logOutput').textContent = msg;
       console.log(msg);
     }
 
+    function copyText(id) {
+      const el = document.getElementById(id);
+      navigator.clipboard.writeText(el.value).then(() => {
+        log(`📋 Copied: ${id}`);
+      });
+    }
+
     const defaultPresets = window.gtmPresets || [];
-
-    function extractEventName(jsCode) {
-      const match = jsCode.match(/['"]event['"]\s*:\s*['"](.*?)['"]/) || [];
-      return match[1] || 'custom';
-    }
-
-    function autoIndent(code) {
-      try {
-        const pretty = code
-          .replace(/([,{])/g, '$1\n')
-          .replace(/}/g, '\n}')
-          .replace(/;/g, ';\n')
-          .replace(/\n\n+/g, '\n')
-          .replace(/\n /g, '\n');
-        return pretty.trim();
-      } catch {
-        return code;
-      }
-    }
 
     function loadPresets() {
       const saved = localStorage.getItem('presets_full_js');
@@ -170,43 +151,34 @@ dataLayer.push({
       const container = document.getElementById('presetsArea');
       container.innerHTML = '';
 
-      const first = presets[0];
-      const rest = presets.slice(1);
-
-      if (first) container.appendChild(renderPreset(first, 0, false));
-
-      const row = document.createElement('div');
-      row.className = 'preset-columns';
-
-      rest.forEach((preset, i) => {
-        const box = renderPreset(preset, i + 1, true);
-        row.appendChild(box);
+      presets.forEach((preset, i) => {
+        container.appendChild(renderPreset(preset, i));
       });
-
-      container.appendChild(row);
     }
 
-    function renderPreset(preset, index, shrink) {
+    function renderPreset(preset, index) {
       const wrapper = document.createElement('div');
-      wrapper.className = shrink ? 'preset-box' : 'preset-wrapper';
-
-      const eventName = extractEventName(preset.code);
+      wrapper.className = 'preset-wrapper';
 
       const label = document.createElement('div');
-      label.innerHTML = `Event: <span class="event-label">${eventName}</span>`;
+      label.className = 'preset-label';
+      label.innerHTML = `Event: <span style="color: blue">${preset.label || preset.name}</span>`;
 
       const textarea = document.createElement('textarea');
-      textarea.className = 'preset';
-      textarea.dataset.index = index;
-      textarea.value = autoIndent(preset.code);
-      textarea.rows = shrink ? (textarea.value.split('\n').length + 1) : 18;
+      textarea.className = 'preset-textarea';
+      textarea.id = `preset_${index}`;
+      textarea.value = preset.code;
+      textarea.rows = Math.min(12, preset.code.split('\n').length + 1);
+
+      const buttonWrapper = document.createElement('div');
+      buttonWrapper.className = 'preset-buttons';
 
       const runBtn = document.createElement('button');
-      runBtn.textContent = `Push: ${eventName}`;
+      runBtn.textContent = `Push: ${preset.label || preset.name}`;
       runBtn.onclick = function () {
         try {
           new Function(textarea.value)();
-          log(`✅ Executed: ${eventName}`);
+          log(`✅ Executed: ${preset.label || preset.name}`);
         } catch (e) {
           log('❌ Error parsing JS: ' + e.message);
         }
@@ -214,22 +186,21 @@ dataLayer.push({
 
       const copyBtn = document.createElement('button');
       copyBtn.textContent = 'Copy';
-      copyBtn.className = 'copy-button';
-      copyBtn.onclick = () => {
-        navigator.clipboard.writeText(textarea.value);
-        log('📋 Copied event to clipboard');
-      };
+      copyBtn.className = 'copy';
+      copyBtn.onclick = () => copyText(`preset_${index}`);
+
+      buttonWrapper.appendChild(runBtn);
+      buttonWrapper.appendChild(copyBtn);
 
       wrapper.appendChild(label);
       wrapper.appendChild(textarea);
-      wrapper.appendChild(document.createElement('br'));
-      wrapper.appendChild(runBtn);
-      wrapper.appendChild(copyBtn);
+      wrapper.appendChild(buttonWrapper);
+
       return wrapper;
     }
 
     function savePresets() {
-      const all = document.querySelectorAll('.preset');
+      const all = document.querySelectorAll('.preset-textarea');
       const updated = Array.from(all).map((el, i) => ({
         name: `custom_${i + 1}`,
         code: el.value
@@ -247,6 +218,7 @@ dataLayer.push({
   </script>
 </body>
 </html>
+
 
 
 
