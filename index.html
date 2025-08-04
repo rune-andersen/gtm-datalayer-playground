@@ -26,7 +26,6 @@
       width: 100%;
       font-family: monospace;
       resize: vertical;
-      max-height: 300px;
       overflow: auto;
     }
     .preset-wrapper {
@@ -45,11 +44,12 @@
     }
     .preset-textarea {
       flex: 1;
+      min-height: 100px;
     }
     .label {
       font-weight: bold;
       margin: 30px 0 10px;
-      font-size: 28px;
+      font-size: 32px;
     }
     .log {
       margin-top: 15px;
@@ -172,6 +172,29 @@ dataLayer.push({
 
       const runBtn = document.createElement('button');
       runBtn.textContent = 'Push';
+
+      const copyBtn = document.createElement('button');
+      copyBtn.textContent = 'Copy';
+      copyBtn.className = 'small-button';
+
+      const label = document.createElement('div');
+      label.className = 'preset-header';
+
+      const textarea = document.createElement('textarea');
+      textarea.className = 'preset-textarea';
+      textarea.dataset.index = index;
+      textarea.value = preset.code;
+      textarea.rows = 10;
+
+      const updateLabel = () => {
+        const match = textarea.value.match(/event\s*:\s*['"](.+?)['"]/);
+        const name = match ? match[1] : `custom_${index + 1}`;
+        label.textContent = 'Event: ' + name;
+      };
+
+      textarea.addEventListener('input', updateLabel);
+      updateLabel();
+
       runBtn.onclick = () => {
         try {
           new Function(textarea.value)();
@@ -181,27 +204,11 @@ dataLayer.push({
         }
       };
 
-      const copyBtn = document.createElement('button');
-      copyBtn.textContent = 'Copy';
-      copyBtn.className = 'small-button';
       copyBtn.onclick = () => {
         textarea.select();
         document.execCommand('copy');
         log('📋 Copied');
       };
-
-      const textarea = document.createElement('textarea');
-      textarea.className = 'preset-textarea';
-      textarea.dataset.index = index;
-      textarea.value = preset.code;
-      textarea.rows = 10;
-
-      const match = preset.code.match(/event\s*:\s*['"](.+?)['"]/);
-      const eventName = match ? match[1] : `custom_${index + 1}`;
-
-      const label = document.createElement('div');
-      label.className = 'preset-header';
-      label.textContent = 'Event: ' + eventName;
 
       buttons.appendChild(runBtn);
       buttons.appendChild(copyBtn);
@@ -235,7 +242,6 @@ dataLayer.push({
   </script>
 </body>
 </html>
-
 
 
 
