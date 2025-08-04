@@ -1,17 +1,12 @@
 // datalayer.js
-// -------------------------------------
-// This file defines the GTM dataLayer presets for testing.
-// You can edit the existing presets or add new ones.
-// Each preset is a { name, code } object.
-//
-// To add a new preset:
-// - Use full JavaScript syntax (e.g., dataLayer.push(...))
-// - The `name` will be used as button label
-// -------------------------------------
+// This file defines the preset events for GTM Playground.
+// Each object contains:
+// - name: the button label
+// - code: full dataLayer.push(...) JavaScript as a string
 
-window.gtmPresets = [
+const presetEvents = [
   {
-    name: 'data',
+    name: "data",
     code: `dataLayer.push({
   'event': 'data',
   'user': {
@@ -55,30 +50,58 @@ window.gtmPresets = [
     ]
   }
 });`
+    
+  // page_view
   },
-
   {
-    name: 'page_view',
+    name: "page_view",
     code: `dataLayer.push({
-  'event': 'page_view'
+          'event': 'page_view'
 });`
   },
-
+  
+// category_view
   {
-    name: 'category_view',
+    name: "category_view",
     code: `dataLayer.push({
-  'event': 'category_view',
-  'category': {
-    'category_id': 'abc-123',
-    'product_sorting': 'relevance'
+          'event': 'category_view',
+          'category': {
+            'category_id': 'abc-123',
+            'product_sorting': 'relevance'
+          }
+});`
+  },
+  // login
+  {
+    name: "login",
+    code: `dataLayer.push({
+           'event': 'login',
+           'auth': {
+              'login_method': 'MitID'
+  },
+// Custom 5
+});
+  },
+  {
+    name: "custom_5",
+    code: `dataLayer.push({
+  'event': 'test_event',
+  'source': 'footer'
+});`
+  },
+  // product_view
+  {
+    name: "product_view",
+    code: `dataLayer.push({
+          'event': 'product_view',
+          'product_view': {
+            'product_ean': '4741532901552',
+            'product_id': '12304543',
+            'category_id': '5103',
+            'product_price': 1299.00, 
+            'product_available': true
   }
 });`
-  },
-
-  // You can add new presets here:
-  { name: 'custom_1', code: '' },
-  { name: 'custom_2', code: '' },
-  { name: 'custom_3', code: '' }
-
+  }
 ];
 
