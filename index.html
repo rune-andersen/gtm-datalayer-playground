@@ -25,7 +25,14 @@
   <hr>
 
   <h3>Quick test buttons</h3>
-  <button onclick="pushToDataLayer({ event: 'button_click', label: 'A' })">Push: button_click A</button>
+  <textarea class="preset" data-event="form_submit">
+{
+  "event": "form_submit",
+  "form": "newsletter"
+}
+</textarea>
+<button onclick="pushPreset(this)">Push: form_submit</button>
+
   <button onclick="pushToDataLayer({ event: 'form_submit', form: 'newsletter' })">Push: form_submit</button>
 
   <h3>Push custom dataLayer JSON</h3>
