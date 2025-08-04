@@ -2,6 +2,7 @@
 // Defines preset events for GTM Playground
 
 const presetEvents = [
+  // ******** data **********
   {
     name: "data",
     code: `dataLayer.push({
@@ -48,12 +49,14 @@ const presetEvents = [
   }
 });`
   },
+  // ******** page_view **********
   {
     name: "page_view",
     code: `dataLayer.push({
   'event': 'page_view'
 });`
   },
+  // ******** category_view **********
   {
     name: "category_view",
     code: `dataLayer.push({
@@ -64,6 +67,7 @@ const presetEvents = [
   }
 });`
   },
+  // ******** login **********
   {
     name: "login",
     code: `dataLayer.push({
@@ -73,6 +77,7 @@ const presetEvents = [
   }
 });`
   },
+  // ******** LEDIG **********
   {
     name: "custom_5",
     code: `dataLayer.push({
@@ -80,6 +85,16 @@ const presetEvents = [
   'source': 'footer'
 });`
   },
+ // ******** login **********
+  {
+    name: "login_fail",
+    code: `dataLayer.push({
+  'event': 'login_fail',
+  'auth': {
+    'login_method': 'MitID'
+  }
+  
+  // ******** product_view **********
   {
     name: "product_view",
     code: `dataLayer.push({
