@@ -236,10 +236,18 @@ dataLayer.push({
   }
 
   function resetPresets() {
-    localStorage.removeItem('presets_full_js');
-    log('🗑️ Reset to datalayer.js');
-    loadPresets();
-  }
+  localStorage.removeItem('presets_full_js');
+  log('♻️ LocalStorage cleared. Reloading datalayer.js presets…');
+
+  // Hent igen fra original datalayer.js
+  const fallbackPresets = window.gtmPresets || [];
+  const container = document.getElementById('presetsArea');
+  container.innerHTML = '';
+  fallbackPresets.forEach((preset, i) => {
+    container.appendChild(renderPreset(preset, i));
+  });
+}
+
 
   window.addEventListener('load', () => {
     const lastId = localStorage.getItem('gtm_id');
