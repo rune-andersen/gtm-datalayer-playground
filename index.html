@@ -24,8 +24,20 @@
     }
     textarea {
       width: 100%;
-      height: 180px;
       font-family: monospace;
+      resize: vertical;
+    }
+    .preset-wrapper {
+      margin-bottom: 30px;
+    }
+    .preset-columns {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+    .preset-box {
+      flex: 1;
+      min-width: 400px;
     }
     .log {
       margin-top: 15px;
@@ -50,14 +62,14 @@
 
   <hr>
 
-  <h3>Quick test events (full dataLayer.push syntax)</h3>
+  <h3>Quick test events (editable presets from <code>datalayer.js</code>)</h3>
   <div id="presetsArea"></div>
   <button onclick="savePresets()">💾 Save All</button>
 
   <hr>
 
   <h3>Free custom JS</h3>
-  <textarea id="customJson">
+  <textarea id="customJson" rows="6">
 // Example:
 dataLayer.push({
   event: "custom_event",
@@ -68,6 +80,10 @@ dataLayer.push({
 
   <div class="log" id="logOutput">Console output will appear here…</div>
 
+  <!-- 🔽 Load external GTM presets -->
+  <script src="datalayer.js"></script>
+
+  <!-- 🔽 Main script -->
   <script>
     window.dataLayer = window.dataLayer || [];
 
@@ -86,7 +102,6 @@ dataLayer.push({
       document.head.appendChild(script);
 
       dataLayer.push({ 'gtm.start': new Date().getTime(), event: 'gtm.js' });
-      document.getElementById('status').textContent = `✅ GTM container ${id} injected`;
 
       const iframe = document.createElement('iframe');
       iframe.src = `https://www.googletagmanager.com/ns.html?id=${id}`;
@@ -95,6 +110,8 @@ dataLayer.push({
       iframe.style.display = 'none';
       iframe.style.visibility = 'hidden';
       document.body.appendChild(iframe);
+
+      document.getElementById('status').textContent = `✅ GTM container ${id} injected`;
     }
 
     function runCustom() {
@@ -112,107 +129,65 @@ dataLayer.push({
       console.log(msg);
     }
 
-    const defaultPresets = [
-      {
-        name: 'data',
-        code: `dataLayer.push({
-  'event': 'data',
-  'user': {
-    'user_id_subscriberkey': 'f12cd820-5cd3-4c52-841f-e4263b9e9104',
-    'user_id_sfmc': '0034I00002ffwLeQAI',
-    'logged_in': true
-  },
-  'site': {
-    'site_environment': 'dev',
-    'site_version': '1.2.3',
-    'site_language': 'da'
-  },
-  'page': {
-    'page_category': 'category',
-    'page_id': '123-abc-987'
-  },
-  'cart': {
-    'cart_id': '9871234',
-    'cart_product_lines': 2,
-    'cart_quantity': 3,
-    'cart_value': 130.70,
-    'items': [
-      {
-        'product_ean': '4741532901552',
-        'product_id': '3243322',
-        'category_id': '987123',
-        'product_price': 50.10,
-        'product_quantity': 1,
-        'product_value': 100.20,
-        'product_available': true
-      },
-      {
-        'product_ean': '1234567890123',
-        'product_id': '987654321',
-        'category_id': 'sim123',
-        'product_price': 30.50,
-        'product_quantity': 2,
-        'product_value': 30.50,
-        'product_available': false
-      }
-    ]
-  }
-});`
-      },
-      {
-        name: 'page_view',
-        code: `dataLayer.push({
-  'event': 'page_view'
-});`
-      },
-      {
-        name: 'category_view',
-        code: `dataLayer.push({
-  'event': 'category_view',
-  'category': {
-    'category_id': 'abc-123',
-    'product_sorting': 'relevance'
-  }
-});`
-      },
-      { name: 'custom_1', code: '' },
-      { name: 'custom_2', code: '' },
-      { name: 'custom_3', code: '' }
-    ];
+    const defaultPresets = window.gtmPresets || [];
 
     function loadPresets() {
       const saved = localStorage.getItem('presets_full_js');
       const presets = saved ? JSON.parse(saved) : defaultPresets;
+
       const container = document.getElementById('presetsArea');
       container.innerHTML = '';
 
-      presets.forEach((preset, index) => {
-        const label = document.createElement('strong');
-        label.textContent = `Event: ${preset.name}`;
+      const first = presets[0];
+      const rest = presets.slice(1);
 
-        const textarea = document.createElement('textarea');
-        textarea.className = 'preset';
-        textarea.dataset.index = index;
-        textarea.value = preset.code;
+      // First box always full-width
+      if (first) {
+        container.appendChild(renderPreset(first, 0, false));
+      }
 
-        const button = document.createElement('button');
-        button.textContent = `Push: ${preset.name}`;
-        button.onclick = function () {
-          try {
-            new Function(textarea.value)();
-            log(`✅ Executed: ${preset.name}`);
-          } catch (e) {
-            log('❌ Error parsing JS: ' + e.message);
-          }
-        };
+      // Rest in 2-column layout
+      const row = document.createElement('div');
+      row.className = 'preset-columns';
 
-        container.appendChild(label);
-        container.appendChild(document.createElement('br'));
-        container.appendChild(textarea);
-        container.appendChild(document.createElement('br'));
-        container.appendChild(button);
-        container.appendChild(document.createElement('hr'));
+      rest.forEach((preset, i) => {
+        const box = renderPreset(preset, i + 1, true);
+        row.appendChild(box);
       });
+
+      container.appendChild(row);
+    }
+
+    function renderPreset(preset, index, shrink) {
+      const wrapper = document.createElement('div');
+      wrapper.className = shrink ? 'preset-box' : 'preset-wrapper';
+
+      const label = document.createElement('strong');
+      label.textContent = `Event: ${preset.name}`;
+
+      const textarea = document.createElement('textarea');
+      textarea.className = 'preset';
+      textarea.dataset.index = index;
+      textarea.value = preset.code;
+      textarea.rows = shrink ? (preset.code.split('\n').length + 1) : 18;
+
+      const button = document.createElement('button');
+      button.textContent = `Push: ${preset.name}`;
+      button.onclick = function () {
+        try {
+          new Function(textarea.value)();
+          log(`✅ Executed: ${preset.name}`);
+        } catch (e) {
+          log('❌ Error parsing JS: ' + e.message);
+        }
+      };
+
+      wrapper.appendChild(label);
+      wrapper.appendChild(document.createElement('br'));
+      wrapper.appendChild(textarea);
+      wrapper.appendChild(document.createElement('br'));
+      wrapper.appendChild(button);
+      return wrapper;
     }
 
     function savePresets() {
