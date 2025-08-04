@@ -1,5 +1,5 @@
 const presetEvents = [
-  // >>>>> data <<<<<<  
+  // ***** START data *****  
   {
     name: "data",
     code: `dataLayer.push({
@@ -46,16 +46,16 @@ const presetEvents = [
   }
 });`
   },
-  
-    // >>>>> page_view <<<<<<  
+  // ***** END data *****  
+  // ***** START page_view *****  
   {
     name: "page_view",
     code: `dataLayer.push({
   event: 'page_view'
 });`
   },
-  
-   // >>>>> page_view <<<<<<  
+  // ***** END page_view ***** 
+  // ***** START category_view *****  
   {
     name: "category_view",
     code: `dataLayer.push({
@@ -66,8 +66,8 @@ const presetEvents = [
   }
 });`
   },
-  
-   // >>>>> login <<<<<<  
+  // ***** END category_view ***** 
+  // ***** START login *****  
   {
     name: "login",
     code: `dataLayer.push({
@@ -77,8 +77,8 @@ const presetEvents = [
   }
 });`
   },
-  
- // >>>>> login_fail <<<<<<  
+// ***** END login ***** 
+// ***** START login_fail *****  
   {
     name: "login_fail",
     code: `dataLayer.push({
@@ -88,8 +88,8 @@ const presetEvents = [
   }
 });`
   },
-
-  // >>>>> product_view <<<<<<  
+ // ***** END login_fail ***** 
+// ***** START product_view *****  
   {
     name: "product_view",
     code: `dataLayer.push({
