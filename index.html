@@ -7,7 +7,7 @@
     body {
       font-family: sans-serif;
       padding: 20px;
-      max-width: 900px;
+      max-width: 1000px;
       margin: auto;
     }
     input, button, textarea {
@@ -24,12 +24,8 @@
     }
     textarea {
       width: 100%;
-      height: 160px;
+      height: 180px;
       font-family: monospace;
-    }
-    pre, code {
-      background: #f1f1f1;
-      padding: 2px 6px;
     }
     .log {
       margin-top: 15px;
@@ -47,7 +43,6 @@
 
   <h1>GTM Playground</h1>
 
-  <!-- GTM ID injection -->
   <label for="gtmId">Enter your GTM Container ID:</label><br>
   <input type="text" id="gtmId" placeholder="GTM-XXXXXXX" />
   <button onclick="loadGTM()">Inject GTM</button>
@@ -55,23 +50,18 @@
 
   <hr>
 
-  <!-- Quick test presets -->
-  <h3>Quick test events (editable + saved)</h3>
+  <h3>Quick test events (full dataLayer.push syntax)</h3>
   <div id="presetsArea"></div>
   <button onclick="savePresets()">💾 Save All</button>
 
   <hr>
 
-  <!-- Freeform code -->
-  <h3>Custom dataLayer JS</h3>
+  <h3>Free custom JS</h3>
   <textarea id="customJson">
 // Example:
 dataLayer.push({
-  "event": "data",
-  "user": {
-    "user_id": "abc123",
-    "logged_in": true
-  }
+  event: "custom_event",
+  my_value: 123
 });
   </textarea>
   <button onclick="runCustom()">Run JS</button>
@@ -79,7 +69,6 @@ dataLayer.push({
   <div class="log" id="logOutput">Console output will appear here…</div>
 
   <script>
-    // Init dataLayer
     window.dataLayer = window.dataLayer || [];
 
     function loadGTM() {
@@ -91,18 +80,14 @@ dataLayer.push({
 
       localStorage.setItem('gtm_id', id);
 
-      // Inject GTM script
       const script = document.createElement('script');
       script.src = 'https://www.googletagmanager.com/gtm.js?id=' + id;
       script.async = true;
       document.head.appendChild(script);
 
-      // Push gtm.start
       dataLayer.push({ 'gtm.start': new Date().getTime(), event: 'gtm.js' });
-
       document.getElementById('status').textContent = `✅ GTM container ${id} injected`;
 
-      // Inject noscript fallback
       const iframe = document.createElement('iframe');
       iframe.src = `https://www.googletagmanager.com/ns.html?id=${id}`;
       iframe.height = 0;
@@ -112,22 +97,10 @@ dataLayer.push({
       document.body.appendChild(iframe);
     }
 
-    // Auto-fill GTM ID if stored
-    window.onload = function () {
-      const lastId = localStorage.getItem('gtm_id');
-      if (lastId) document.getElementById('gtmId').value = lastId;
-      loadPresets();
-    };
-
-    function pushToDataLayer(obj) {
-      dataLayer.push(obj);
-      log(`✅ Pushed: ${JSON.stringify(obj, null, 2)}`);
-    }
-
     function runCustom() {
       try {
         const raw = document.getElementById('customJson').value;
-        new Function(raw)(); // executes dataLayer.push({...})
+        new Function(raw)();
         log('✅ Ran custom JS');
       } catch (e) {
         log('❌ Error: ' + e.message);
@@ -139,57 +112,102 @@ dataLayer.push({
       console.log(msg);
     }
 
-    // Preset editor
     const defaultPresets = [
       {
-        name: 'button_click',
-        json: {
-          event: 'button_click',
-          label: 'CTA Button'
-        }
+        name: 'data',
+        code: `dataLayer.push({
+  'event': 'data',
+  'user': {
+    'user_id_subscriberkey': 'f12cd820-5cd3-4c52-841f-e4263b9e9104',
+    'user_id_sfmc': '0034I00002ffwLeQAI',
+    'logged_in': true
+  },
+  'site': {
+    'site_environment': 'dev',
+    'site_version': '1.2.3',
+    'site_language': 'da'
+  },
+  'page': {
+    'page_category': 'category',
+    'page_id': '123-abc-987'
+  },
+  'cart': {
+    'cart_id': '9871234',
+    'cart_product_lines': 2,
+    'cart_quantity': 3,
+    'cart_value': 130.70,
+    'items': [
+      {
+        'product_ean': '4741532901552',
+        'product_id': '3243322',
+        'category_id': '987123',
+        'product_price': 50.10,
+        'product_quantity': 1,
+        'product_value': 100.20,
+        'product_available': true
       },
       {
-        name: 'form_submit',
-        json: {
-          event: 'form_submit',
-          form: 'newsletter'
-        }
-      },
-      {
-        name: 'view_item',
-        json: {
-          event: 'view_item',
-          product_id: '12345'
-        }
+        'product_ean': '1234567890123',
+        'product_id': '987654321',
+        'category_id': 'sim123',
+        'product_price': 30.50,
+        'product_quantity': 2,
+        'product_value': 30.50,
+        'product_available': false
       }
+    ]
+  }
+});`
+      },
+      {
+        name: 'page_view',
+        code: `dataLayer.push({
+  'event': 'page_view'
+});`
+      },
+      {
+        name: 'category_view',
+        code: `dataLayer.push({
+  'event': 'category_view',
+  'category': {
+    'category_id': 'abc-123',
+    'product_sorting': 'relevance'
+  }
+});`
+      },
+      { name: 'custom_1', code: '' },
+      { name: 'custom_2', code: '' },
+      { name: 'custom_3', code: '' }
     ];
 
     function loadPresets() {
-      const saved = localStorage.getItem('presets');
-      let presets = saved ? JSON.parse(saved) : defaultPresets;
-
+      const saved = localStorage.getItem('presets_full_js');
+      const presets = saved ? JSON.parse(saved) : defaultPresets;
       const container = document.getElementById('presetsArea');
-      container.innerHTML = ''; // Clear existing
+      container.innerHTML = '';
 
       presets.forEach((preset, index) => {
+        const label = document.createElement('strong');
+        label.textContent = `Event: ${preset.name}`;
+
         const textarea = document.createElement('textarea');
         textarea.className = 'preset';
-        textarea.rows = 5;
         textarea.dataset.index = index;
-        textarea.value = JSON.stringify(preset.json, null, 2);
+        textarea.value = preset.code;
 
         const button = document.createElement('button');
         button.textContent = `Push: ${preset.name}`;
         button.onclick = function () {
           try {
-            const parsed = JSON.parse(textarea.value);
-            dataLayer.push(parsed);
-            log(`✅ Pushed: ${JSON.stringify(parsed, null, 2)}`);
+            new Function(textarea.value)();
+            log(`✅ Executed: ${preset.name}`);
           } catch (e) {
-            log('❌ Error parsing preset: ' + e.message);
+            log('❌ Error parsing JS: ' + e.message);
           }
         };
 
+        container.appendChild(label);
+        container.appendChild(document.createElement('br'));
         container.appendChild(textarea);
         container.appendChild(document.createElement('br'));
         container.appendChild(button);
@@ -199,21 +217,20 @@ dataLayer.push({
 
     function savePresets() {
       const all = document.querySelectorAll('.preset');
-      const updated = Array.from(all).map((el) => {
-        try {
-          return {
-            name: JSON.parse(el.value).event || 'unnamed_event',
-            json: JSON.parse(el.value)
-          };
-        } catch {
-          return null;
-        }
-      }).filter(Boolean);
-
-      localStorage.setItem('presets', JSON.stringify(updated));
+      const updated = Array.from(all).map((el, i) => ({
+        name: `custom_${i + 1}`,
+        code: el.value
+      }));
+      localStorage.setItem('presets_full_js', JSON.stringify(updated));
       log('💾 Presets saved to localStorage');
-      loadPresets(); // re-render with updated names
+      loadPresets();
     }
+
+    window.addEventListener('load', () => {
+      const lastId = localStorage.getItem('gtm_id');
+      if (lastId) document.getElementById('gtmId').value = lastId;
+      loadPresets();
+    });
   </script>
 
 </body>
