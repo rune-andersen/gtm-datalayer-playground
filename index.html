@@ -166,57 +166,74 @@ dataLayer.push({
   }
 
   function renderPreset(preset, index) {
-    const wrapper = document.createElement('div');
-    wrapper.className = 'preset-wrapper';
+  const wrapper = document.createElement('div');
+  wrapper.className = 'preset-wrapper';
 
-    const buttons = document.createElement('div');
-    buttons.className = 'preset-buttons';
+  const buttons = document.createElement('div');
+  buttons.className = 'preset-buttons';
 
-    const runBtn = document.createElement('button');
-    runBtn.textContent = 'Push';
+  const runBtn = document.createElement('button');
+  runBtn.textContent = 'Push Event';
 
-    const copyBtn = document.createElement('button');
-    copyBtn.textContent = 'Copy';
-    copyBtn.className = 'small-button';
+  const copyBtn = document.createElement('button');
+  copyBtn.textContent = 'Copy as dataLayer.push';
+  copyBtn.className = 'small-button';
+  copyBtn.style.minWidth = '180px';
 
-    const label = document.createElement('div');
-    label.className = 'preset-header';
-    label.textContent = 'Event: ' + (preset.name || `custom_${index + 1}`);
+  const copyDLJSBtn = document.createElement('button');
+  copyDLJSBtn.textContent = 'Copy in dataLayer.js format';
+  copyDLJSBtn.className = 'small-button';
+  copyDLJSBtn.style.minWidth = '180px';
 
-    const textarea = document.createElement('textarea');
-    textarea.className = 'preset-textarea';
-    textarea.dataset.index = index;
-    textarea.dataset.name = preset.name || `custom_${index + 1}`;
-    textarea.value = preset.code;
-    textarea.rows = 10;
+  const label = document.createElement('div');
+  label.className = 'preset-header';
+  label.textContent = 'Event: ' + (preset.name || `custom_${index + 1}`);
 
-    runBtn.onclick = () => {
-      try {
-        new Function(textarea.value)();
-        log(`✅ Executed: ${label.textContent}`);
-      } catch (e) {
-        log('❌ Error parsing JS: ' + e.message);
-      }
-    };
+  const textarea = document.createElement('textarea');
+  textarea.className = 'preset-textarea';
+  textarea.dataset.index = index;
+  textarea.dataset.name = preset.name || `custom_${index + 1}`;
+  textarea.value = preset.code;
+  textarea.rows = 10;
 
-    copyBtn.onclick = () => {
-      textarea.select();
-      document.execCommand('copy');
-      log('📋 Copied');
-    };
+  runBtn.onclick = () => {
+    try {
+      new Function(textarea.value)();
+      log(`✅ Executed: ${label.textContent}`);
+    } catch (e) {
+      log('❌ Error parsing JS: ' + e.message);
+    }
+  };
 
-    buttons.appendChild(runBtn);
-    buttons.appendChild(copyBtn);
+  copyBtn.onclick = () => {
+    textarea.select();
+    document.execCommand('copy');
+    log('📋 Copied dataLayer.push');
+  };
 
-    const container = document.createElement('div');
-    container.style.flex = '1';
-    container.appendChild(label);
-    container.appendChild(textarea);
+  copyDLJSBtn.onclick = () => {
+    const name = preset.name || `custom_${index + 1}`;
+    const code = textarea.value;
+    const full = `{\n  name: "${name}",\n  code: \`\n${code}\n\`  \n},`;
+    navigator.clipboard.writeText(full).then(() => {
+      log('📋 Copied dataLayer.js format');
+    });
+  };
 
-    wrapper.appendChild(buttons);
-    wrapper.appendChild(container);
-    return wrapper;
-  }
+  buttons.appendChild(runBtn);
+  buttons.appendChild(copyBtn);
+  buttons.appendChild(copyDLJSBtn);
+
+  const container = document.createElement('div');
+  container.style.flex = '1';
+  container.appendChild(label);
+  container.appendChild(textarea);
+
+  wrapper.appendChild(buttons);
+  wrapper.appendChild(container);
+  return wrapper;
+}
+
 
   function savePresets() {
     const all = document.querySelectorAll('.preset-textarea');
