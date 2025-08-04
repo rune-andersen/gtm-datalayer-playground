@@ -25,7 +25,8 @@
     textarea {
       width: 100%;
       font-family: monospace;
-      resize: vertical;
+      resize: none;
+      overflow: hidden;
     }
     .preset-wrapper {
       margin-bottom: 30px;
@@ -62,28 +63,25 @@
 
   <hr>
 
-  <h3>Quick test events (editable presets from <code>datalayer.js</code>)</h3>
-  <div id="presetsArea"></div>
-  <button onclick="savePresets()">💾 Save All</button>
-
-  <hr>
-
   <h3>Free custom JS</h3>
-  <textarea id="customJson" rows="6">
-// Example:
+  <textarea id="customJson" rows="6">// Example:
 dataLayer.push({
   event: "custom_event",
   my_value: 123
-});
-  </textarea>
+});</textarea>
   <button onclick="runCustom()">Run JS</button>
 
   <div class="log" id="logOutput">Console output will appear here…</div>
 
-  <!-- 🔽 Load external GTM presets -->
+  <hr>
+
+  <h3>Quick test events (editable presets from <code>datalayer.js</code>)</h3>
+  <div id="presetsArea"></div>
+  <button onclick="savePresets()">💾 Save All</button>
+
+  <!-- Load presets file -->
   <script src="datalayer.js"></script>
 
-  <!-- 🔽 Main script -->
   <script>
     window.dataLayer = window.dataLayer || [];
 
@@ -141,12 +139,10 @@ dataLayer.push({
       const first = presets[0];
       const rest = presets.slice(1);
 
-      // First box always full-width
       if (first) {
         container.appendChild(renderPreset(first, 0, false));
       }
 
-      // Rest in 2-column layout
       const row = document.createElement('div');
       row.className = 'preset-columns';
 
@@ -163,7 +159,7 @@ dataLayer.push({
       wrapper.className = shrink ? 'preset-box' : 'preset-wrapper';
 
       const label = document.createElement('strong');
-      label.textContent = `Event: ${preset.name}`;
+      label.textContent = `Event: ${preset.label || preset.name}`;
 
       const textarea = document.createElement('textarea');
       textarea.className = 'preset';
@@ -172,11 +168,11 @@ dataLayer.push({
       textarea.rows = shrink ? (preset.code.split('\n').length + 1) : 18;
 
       const button = document.createElement('button');
-      button.textContent = `Push: ${preset.name}`;
+      button.textContent = `Push: ${preset.label || preset.name}`;
       button.onclick = function () {
         try {
           new Function(textarea.value)();
-          log(`✅ Executed: ${preset.name}`);
+          log(`✅ Executed: ${preset.label || preset.name}`);
         } catch (e) {
           log('❌ Error parsing JS: ' + e.message);
         }
@@ -210,5 +206,6 @@ dataLayer.push({
 
 </body>
 </html>
+
 
 
