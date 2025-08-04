@@ -34,6 +34,8 @@
       gap: 10px;
       align-items: flex-start;
       margin-bottom: 20px;
+      border-bottom: 1px solid #ddd;
+      padding-bottom: 20px;
     }
     .preset-buttons {
       display: flex;
@@ -60,6 +62,11 @@
     .small-button {
       padding: 4px 8px;
       font-size: 14px;
+    }
+    .preset-header {
+      font-size: 18px;
+      font-weight: bold;
+      margin-bottom: 5px;
     }
   </style>
 </head>
@@ -161,16 +168,12 @@ dataLayer.push({
       const buttons = document.createElement('div');
       buttons.className = 'preset-buttons';
 
-      const label = document.createElement('div');
-      label.className = 'label';
-      label.innerHTML = `Event: <a href="#" onclick="return false">${preset.label || preset.name || 'Event_' + (index + 1)}</a>`;
-
       const runBtn = document.createElement('button');
-      runBtn.textContent = `Push: ${preset.label || preset.name || 'event'}`;
+      runBtn.textContent = 'Push';
       runBtn.onclick = () => {
         try {
           new Function(textarea.value)();
-          log(`✅ Executed: ${preset.label || preset.name}`);
+          log(`✅ Executed: ${label.textContent}`);
         } catch (e) {
           log('❌ Error parsing JS: ' + e.message);
         }
@@ -185,18 +188,27 @@ dataLayer.push({
         log('📋 Copied');
       };
 
-      buttons.appendChild(label);
-      buttons.appendChild(runBtn);
-      buttons.appendChild(copyBtn);
-
       const textarea = document.createElement('textarea');
       textarea.className = 'preset-textarea';
       textarea.dataset.index = index;
       textarea.value = preset.code;
       textarea.rows = 10;
 
+      const label = document.createElement('div');
+      label.className = 'preset-header';
+      const match = preset.code.match(/event\s*:\s*['"](.+?)['"]/);
+      label.textContent = 'Event: ' + (match ? match[1] : `custom_${index + 1}`);
+
+      buttons.appendChild(runBtn);
+      buttons.appendChild(copyBtn);
+
+      const container = document.createElement('div');
+      container.style.flex = '1';
+      container.appendChild(label);
+      container.appendChild(textarea);
+
       wrapper.appendChild(buttons);
-      wrapper.appendChild(textarea);
+      wrapper.appendChild(container);
       return wrapper;
     }
 
