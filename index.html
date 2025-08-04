@@ -47,6 +47,10 @@
       border: 1px solid #ddd;
       font-family: monospace;
     }
+    .event-label {
+      color: darkblue;
+      font-weight: bold;
+    }
     hr {
       margin: 30px 0;
     }
@@ -127,39 +131,19 @@ dataLayer.push({
       console.log(msg);
     }
 
-    const defaultPresets = window.gtmPresets || [];
-
-    function loadPresets() {
-      const saved = localStorage.getItem('presets_full_js');
-      const presets = saved ? JSON.parse(saved) : defaultPresets;
-
-      const container = document.getElementById('presetsArea');
-      container.innerHTML = '';
-
-      const first = presets[0];
-      const rest = presets.slice(1);
-
-      if (first) {
-        container.appendChild(renderPreset(first, 0, false));
-      }
-
-      const row = document.createElement('div');
-      row.className = 'preset-columns';
-
-      rest.forEach((preset, i) => {
-        const box = renderPreset(preset, i + 1, true);
-        row.appendChild(box);
-      });
-
-      container.appendChild(row);
+    function extractEventName(codeStr) {
+      const match = codeStr.match(/['"]event['"]\s*:\s*['"]([^'"]+)['"]/);
+      return match ? match[1] : null;
     }
 
     function renderPreset(preset, index, shrink) {
       const wrapper = document.createElement('div');
       wrapper.className = shrink ? 'preset-box' : 'preset-wrapper';
 
+      const eventName = extractEventName(preset.code) || `custom_${index + 1}`;
+
       const label = document.createElement('strong');
-      label.textContent = `Event: ${preset.label || preset.name}`;
+      label.innerHTML = `Event: <span class="event-label">${eventName}</span>`;
 
       const textarea = document.createElement('textarea');
       textarea.className = 'preset';
@@ -168,11 +152,11 @@ dataLayer.push({
       textarea.rows = shrink ? (preset.code.split('\n').length + 1) : 18;
 
       const button = document.createElement('button');
-      button.textContent = `Push: ${preset.label || preset.name}`;
+      button.textContent = `Push: ${eventName}`;
       button.onclick = function () {
         try {
           new Function(textarea.value)();
-          log(`✅ Executed: ${preset.label || preset.name}`);
+          log(`✅ Executed: ${eventName}`);
         } catch (e) {
           log('❌ Error parsing JS: ' + e.message);
         }
@@ -197,6 +181,31 @@ dataLayer.push({
       loadPresets();
     }
 
+    function loadPresets() {
+      const saved = localStorage.getItem('presets_full_js');
+      const presets = saved ? JSON.parse(saved) : window.gtmPresets || [];
+
+      const container = document.getElementById('presetsArea');
+      container.innerHTML = '';
+
+      const first = presets[0];
+      const rest = presets.slice(1);
+
+      if (first) {
+        container.appendChild(renderPreset(first, 0, false));
+      }
+
+      const row = document.createElement('div');
+      row.className = 'preset-columns';
+
+      rest.forEach((preset, i) => {
+        const box = renderPreset(preset, i + 1, true);
+        row.appendChild(box);
+      });
+
+      container.appendChild(row);
+    }
+
     window.addEventListener('load', () => {
       const lastId = localStorage.getItem('gtm_id');
       if (lastId) document.getElementById('gtmId').value = lastId;
@@ -206,6 +215,7 @@ dataLayer.push({
 
 </body>
 </html>
+
 
 
 
