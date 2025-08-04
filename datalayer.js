@@ -104,4 +104,4 @@ const presetEvents = [
 });`
   }
 ];
-
+window.gtmPresets = presetEvents;
