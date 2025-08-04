@@ -88,8 +88,13 @@ const presetEvents = [
   code: `dataLayer.push({
   event: 'login_fail',
   auth: {
-    login_method: 'MitID'
-  }
+    login_method: 'MitID',
+	  login_error_message: 'Unknows user',
+	  login_error_reason: 'abc-123'
+  },
+  user: {
+	  logged_in: false
+	}
 });`
 },
 // ***** END login_fail *****
