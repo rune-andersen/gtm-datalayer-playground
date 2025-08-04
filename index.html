@@ -173,17 +173,15 @@ dataLayer.push({
   buttons.className = 'preset-buttons';
 
   const runBtn = document.createElement('button');
-  runBtn.textContent = 'Push Event';
+  runBtn.textContent = 'Push';
 
   const copyBtn = document.createElement('button');
   copyBtn.textContent = 'Copy as dataLayer.push';
   copyBtn.className = 'small-button';
-  copyBtn.style.minWidth = '180px';
 
-  const copyDLJSBtn = document.createElement('button');
-  copyDLJSBtn.textContent = 'Copy in dataLayer.js format';
-  copyDLJSBtn.className = 'small-button';
-  copyDLJSBtn.style.minWidth = '180px';
+  const copyDLBtn = document.createElement('button');
+  copyDLBtn.textContent = 'Copy as datalayer.js block';
+  copyDLBtn.className = 'small-button';
 
   const label = document.createElement('div');
   label.className = 'preset-header';
@@ -208,21 +206,26 @@ dataLayer.push({
   copyBtn.onclick = () => {
     textarea.select();
     document.execCommand('copy');
-    log('📋 Copied dataLayer.push');
+    log('📋 Copied as dataLayer.push');
   };
 
-  copyDLJSBtn.onclick = () => {
-    const name = preset.name || `custom_${index + 1}`;
-    const code = textarea.value;
-    const full = `{\n  name: "${name}",\n  code: \`\n${code}\n\`  \n},`;
-    navigator.clipboard.writeText(full).then(() => {
-      log('📋 Copied dataLayer.js format');
+  copyDLBtn.onclick = () => {
+    const name = textarea.dataset.name || `custom_${index + 1}`;
+    const fullBlock = 
+`// ***** START ${name} *****  
+{
+  name: "${name}",
+  code: \`${textarea.value}\`
+},
+// ***** END ${name} *****`;
+    navigator.clipboard.writeText(fullBlock).then(() => {
+      log('📋 Copied as datalayer.js block');
     });
   };
 
   buttons.appendChild(runBtn);
   buttons.appendChild(copyBtn);
-  buttons.appendChild(copyDLJSBtn);
+  buttons.appendChild(copyDLBtn);
 
   const container = document.createElement('div');
   container.style.flex = '1';
