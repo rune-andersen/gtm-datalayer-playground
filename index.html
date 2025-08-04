@@ -97,144 +97,155 @@ dataLayer.push({
 
   <div class="label">Test Events (editable in <code>datalayer.js</code>)</div>
   <div id="presetsArea"></div>
-  <button onclick="savePresets()">💾 Save All</button>
+  <button onclick="savePresets()">💾 Save Changes to localStorage</button>
+<p style="margin-top: 0; color: gray;">Gem ændringer, så de bevares ved reload.</p>
+
+<button onclick="resetPresets()">♻️ Reset and use datalayer.js</button>
+<p style="margin-top: 0; color: gray;">Fjerner gemte events og henter igen fra <code>datalayer.js</code>.</p>
 
   <script src="datalayer.js"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
+<script>
+  window.dataLayer = window.dataLayer || [];
 
-    function loadGTM() {
-      const id = document.getElementById('gtmId').value.trim();
-      if (!id.match(/^GTM-[A-Z0-9]+$/i)) {
-        alert('Invalid GTM ID');
-        return;
-      }
-      localStorage.setItem('gtm_id', id);
-      const script = document.createElement('script');
-      script.src = 'https://www.googletagmanager.com/gtm.js?id=' + id;
-      script.async = true;
-      document.head.appendChild(script);
-      dataLayer.push({ 'gtm.start': new Date().getTime(), event: 'gtm.js' });
-      const iframe = document.createElement('iframe');
-      iframe.src = `https://www.googletagmanager.com/ns.html?id=${id}`;
-      iframe.height = 0;
-      iframe.width = 0;
-      iframe.style.display = 'none';
-      iframe.style.visibility = 'hidden';
-      document.body.appendChild(iframe);
+  function loadGTM() {
+    const id = document.getElementById('gtmId').value.trim();
+    if (!id.match(/^GTM-[A-Z0-9]+$/i)) {
+      alert('Invalid GTM ID');
+      return;
     }
+    localStorage.setItem('gtm_id', id);
+    const script = document.createElement('script');
+    script.src = 'https://www.googletagmanager.com/gtm.js?id=' + id;
+    script.async = true;
+    document.head.appendChild(script);
+    dataLayer.push({ 'gtm.start': new Date().getTime(), event: 'gtm.js' });
 
-    function runCustom() {
+    const iframe = document.createElement('iframe');
+    iframe.src = `https://www.googletagmanager.com/ns.html?id=${id}`;
+    iframe.height = 0;
+    iframe.width = 0;
+    iframe.style.display = 'none';
+    iframe.style.visibility = 'hidden';
+    document.body.appendChild(iframe);
+  }
+
+  function runCustom() {
+    try {
+      const raw = document.getElementById('customJson').value;
+      new Function(raw)();
+      log('✅ Ran custom JS');
+    } catch (e) {
+      log('❌ Error: ' + e.message);
+    }
+  }
+
+  function copyCustom() {
+    const textarea = document.getElementById('customJson');
+    textarea.select();
+    document.execCommand('copy');
+    log('📋 Copied custom JS');
+  }
+
+  function log(msg) {
+    document.getElementById('logOutput').textContent = msg;
+    console.log(msg);
+  }
+
+  const defaultPresets = window.gtmPresets || [];
+
+  function loadPresets() {
+    const saved = localStorage.getItem('presets_full_js');
+    const presets = saved ? JSON.parse(saved) : defaultPresets;
+
+    const container = document.getElementById('presetsArea');
+    container.innerHTML = '';
+
+    presets.forEach((preset, i) => {
+      container.appendChild(renderPreset(preset, i));
+    });
+  }
+
+  function renderPreset(preset, index) {
+    const wrapper = document.createElement('div');
+    wrapper.className = 'preset-wrapper';
+
+    const buttons = document.createElement('div');
+    buttons.className = 'preset-buttons';
+
+    const runBtn = document.createElement('button');
+    runBtn.textContent = 'Push';
+
+    const copyBtn = document.createElement('button');
+    copyBtn.textContent = 'Copy';
+    copyBtn.className = 'small-button';
+
+    const label = document.createElement('div');
+    label.className = 'preset-header';
+    label.textContent = 'Event: ' + (preset.name || `custom_${index + 1}`);
+
+    const textarea = document.createElement('textarea');
+    textarea.className = 'preset-textarea';
+    textarea.dataset.index = index;
+    textarea.dataset.name = preset.name || `custom_${index + 1}`;
+    textarea.value = preset.code;
+    textarea.rows = 10;
+
+    runBtn.onclick = () => {
       try {
-        const raw = document.getElementById('customJson').value;
-        new Function(raw)();
-        log('✅ Ran custom JS');
+        new Function(textarea.value)();
+        log(`✅ Executed: ${label.textContent}`);
       } catch (e) {
-        log('❌ Error: ' + e.message);
+        log('❌ Error parsing JS: ' + e.message);
       }
-    }
+    };
 
-    function copyCustom() {
-      const textarea = document.getElementById('customJson');
+    copyBtn.onclick = () => {
       textarea.select();
       document.execCommand('copy');
-      log('📋 Copied custom JS');
-    }
+      log('📋 Copied');
+    };
 
-    function log(msg) {
-      document.getElementById('logOutput').textContent = msg;
-      console.log(msg);
-    }
+    buttons.appendChild(runBtn);
+    buttons.appendChild(copyBtn);
 
-    const defaultPresets = window.gtmPresets || [];
+    const container = document.createElement('div');
+    container.style.flex = '1';
+    container.appendChild(label);
+    container.appendChild(textarea);
 
-    function loadPresets() {
-      const saved = localStorage.getItem('presets_full_js');
-      const presets = saved ? JSON.parse(saved) : defaultPresets;
+    wrapper.appendChild(buttons);
+    wrapper.appendChild(container);
+    return wrapper;
+  }
 
-      const container = document.getElementById('presetsArea');
-      container.innerHTML = '';
+  function savePresets() {
+    const all = document.querySelectorAll('.preset-textarea');
+    const updated = Array.from(all).map((el) => {
+      const wrapper = el.closest('.preset-wrapper');
+      const label = wrapper.querySelector('.preset-header').textContent;
+      const name = label.replace('Event: ', '').trim();
 
-      presets.forEach((preset, i) => {
-        container.appendChild(renderPreset(preset, i));
-      });
-    }
-
-    function renderPreset(preset, index) {
-      const wrapper = document.createElement('div');
-      wrapper.className = 'preset-wrapper';
-
-      const buttons = document.createElement('div');
-      buttons.className = 'preset-buttons';
-
-      const runBtn = document.createElement('button');
-      runBtn.textContent = 'Push';
-
-      const copyBtn = document.createElement('button');
-      copyBtn.textContent = 'Copy';
-      copyBtn.className = 'small-button';
-
-      const label = document.createElement('div');
-      label.className = 'preset-header';
-      label.textContent = 'Event: ' + (preset.name || `custom_${index + 1}`);
-
-      const textarea = document.createElement('textarea');
-      textarea.className = 'preset-textarea';
-      textarea.dataset.index = index;
-      textarea.value = preset.code;
-      textarea.rows = 10;
-
-      runBtn.onclick = () => {
-        try {
-          new Function(textarea.value)();
-          log(`✅ Executed: ${label.textContent}`);
-        } catch (e) {
-          log('❌ Error parsing JS: ' + e.message);
-        }
-      };
-
-      copyBtn.onclick = () => {
-        textarea.select();
-        document.execCommand('copy');
-        log('📋 Copied');
-      };
-
-      buttons.appendChild(runBtn);
-      buttons.appendChild(copyBtn);
-
-      const container = document.createElement('div');
-      container.style.flex = '1';
-      container.appendChild(label);
-      container.appendChild(textarea);
-
-      wrapper.appendChild(buttons);
-      wrapper.appendChild(container);
-      return wrapper;
-    }
-
-    function savePresets() {
-      const all = document.querySelectorAll('.preset-textarea');
-      const updated = Array.from(all).map((el, i) => ({
-        name: `custom_${i + 1}`,
+      return {
+        name: name,
         code: el.value
-      }));
-      localStorage.setItem('presets_full_js', JSON.stringify(updated));
-      log('💾 Presets saved to localStorage');
-      loadPresets();
-    }
-
-    window.addEventListener('load', () => {
-      const lastId = localStorage.getItem('gtm_id');
-      if (lastId) document.getElementById('gtmId').value = lastId;
-      loadPresets();
+      };
     });
-  </script>
+    localStorage.setItem('presets_full_js', JSON.stringify(updated));
+    log('💾 Presets saved to localStorage');
+    loadPresets();
+  }
+
+  function resetPresets() {
+    localStorage.removeItem('presets_full_js');
+    log('🗑️ Reset to datalayer.js');
+    loadPresets();
+  }
+
+  window.addEventListener('load', () => {
+    const lastId = localStorage.getItem('gtm_id');
+    if (lastId) document.getElementById('gtmId').value = lastId;
+    loadPresets();
+  });
+</script>
 </body>
 </html>
-
-
-
-
-
-
-
