@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>GTM Playground</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; max-width: 800px; margin: auto; }
+    input, button, textarea { font-size: 16px; margin: 5px 0; }
+    input { padding: 8px; width: 300px; }
+    button { padding: 10px 16px; cursor: pointer; }
+    textarea { width: 100%; height: 160px; font-family: monospace; }
+    pre, code { background: #f1f1f1; padding: 2px 6px; }
+    .log { margin-top: 15px; background: #f9f9f9; padding: 10px; border: 1px solid #ddd; font-family: monospace; }
+  </style>
+</head>
+<body>
+
+  <h1>GTM Playground</h1>
+
+  <label for="gtmId">Enter your GTM Container ID:</label><br>
+  <input type="text" id="gtmId" placeholder="GTM-XXXXXXX" />
+  <button onclick="loadGTM()">Inject GTM</button>
+  <div id="status"></div>
+
+  <hr>
+
+  <h3>Quick test buttons</h3>
+  <button onclick="pushToDataLayer({ event: 'button_click', label: 'A' })">Push: button_click A</button>
+  <button onclick="pushToDataLayer({ event: 'form_submit', form: 'newsletter' })">Push: form_submit</button>
+
+  <h3>Push custom dataLayer JSON</h3>
+  <textarea id="customJson">
+// Example:
+dataLayer.push({
+  "event": "data",
+  "user": {
+    "user_id": "abc123",
+    "logged_in": true
+  }
+});
+  </textarea>
+  <button onclick="runCustom()">Run JS</button>
+
+  <div class="log" id="logOutput">Console output will appear here…</div>
+
+  <script>
+    // Init dataLayer
+    window.dataLayer = window.dataLayer || [];
+
+    // Load GTM from input
+    function loadGTM() {
+      const id = document.getElementById('gtmId').value.trim();
+      if (!id.match(/^GTM-[A-Z0-9]+$/i)) {
+        alert('Invalid GTM ID');
+        return;
+      }
+
+      localStorage.setItem('gtm_id', id);
+
+      // Inject GTM <script>
+      const script = document.createElement('script');
+      script.src = 'https://www.googletagmanager.com/gtm.js?id=' + id;
+      script.async = true;
+      document.head.appendChild(script);
+
+      // Push gtm.start event
+      window.dataLayer.push({
+        'gtm.start': new Date().getTime(),
+        event: 'gtm.js'
+      });
+
+      document.getElementById('status').textContent = `✅ GTM container ${id} injected`;
+
+      // Inject <noscript> fallback
+      const iframe = document.createElement('iframe');
+      iframe.src = `https://www.googletagmanager.com/ns.html?id=${id}`;
+      iframe.height = 0;
+      iframe.width = 0;
+      iframe.style.display = 'none';
+      iframe.style.visibility = 'hidden';
+      document.body.appendChild(iframe);
+    }
+
+    // Restore GTM ID from localStorage
+    window.onload = function () {
+      const lastId = localStorage.getItem('gtm_id');
+      if (lastId) {
+        document.getElementById('gtmId').value = lastId;
+      }
+    };
+
+    function pushToDataLayer(obj) {
+      window.dataLayer.push(obj);
+      log(`✅ Pushed: ${JSON.stringify(obj, null, 2)}`);
+    }
+
+    function runCustom() {
+      try {
+        const raw = document.getElementById('customJson').value;
+        new Function(raw)(); // executes dataLayer.push({...})
+        log('✅ Ran custom JS');
+      } catch (e) {
+        log('❌ Error: ' + e.message);
+      }
+    }
+
+    function log(msg) {
+      document.getElementById('logOutput').textContent = msg;
+      console.log(msg);
+    }
+  </script>
+
+</body>
+</html>
+
