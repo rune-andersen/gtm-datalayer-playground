@@ -99,7 +99,8 @@ dataLayer.push({
   <div id="presetsArea"></div>
   <button onclick="savePresets()">💾 Save Changes to localStorage</button>
 <p style="margin-top: 0; color: gray;">Gem ændringer, så de bevares ved reload.</p>
-
+<button onclick="copyAllAsDataLayer()">📋 Copy ALL as datalayer.js file</button>
+<p style="margin-top: 0; color: gray;">Kopierer alle events i formatet klar til <code>datalayer.js</code>.</p>
 <button onclick="resetPresets()">♻️ Reset and use datalayer.js</button>
 <p style="margin-top: 0; color: gray;">Fjerner gemte events og henter igen fra <code>datalayer.js</code>.</p>
 
@@ -265,6 +266,28 @@ dataLayer.push({
   container.innerHTML = '';
   fallbackPresets.forEach((preset, i) => {
     container.appendChild(renderPreset(preset, i));
+  });
+}
+
+  function copyAllAsDataLayer() {
+  const all = document.querySelectorAll('.preset-textarea');
+
+  const eventBlocks = Array.from(all).map((el, i) => {
+    const name = el.dataset.name || `custom_${i + 1}`;
+    const code = el.value;
+
+    return `// ***** START ${name} *****  
+{
+  name: "${name}",
+  code: \`${code}\`
+},
+// ***** END ${name} *****`;
+  });
+
+  const finalCode = `const presetEvents = [\n${eventBlocks.join('\n\n')}\n];\n\nwindow.gtmPresets = presetEvents;`;
+
+  navigator.clipboard.writeText(finalCode).then(() => {
+    log('📋 All events copied as datalayer.js file');
   });
 }
 
