@@ -4,19 +4,50 @@
   <meta charset="UTF-8" />
   <title>GTM Playground</title>
   <style>
-    body { font-family: sans-serif; padding: 20px; max-width: 800px; margin: auto; }
-    input, button, textarea { font-size: 16px; margin: 5px 0; }
-    input { padding: 8px; width: 300px; }
-    button { padding: 10px 16px; cursor: pointer; }
-    textarea { width: 100%; height: 160px; font-family: monospace; }
-    pre, code { background: #f1f1f1; padding: 2px 6px; }
-    .log { margin-top: 15px; background: #f9f9f9; padding: 10px; border: 1px solid #ddd; font-family: monospace; }
+    body {
+      font-family: sans-serif;
+      padding: 20px;
+      max-width: 900px;
+      margin: auto;
+    }
+    input, button, textarea {
+      font-size: 16px;
+      margin: 5px 0;
+    }
+    input {
+      padding: 8px;
+      width: 300px;
+    }
+    button {
+      padding: 10px 16px;
+      cursor: pointer;
+    }
+    textarea {
+      width: 100%;
+      height: 160px;
+      font-family: monospace;
+    }
+    pre, code {
+      background: #f1f1f1;
+      padding: 2px 6px;
+    }
+    .log {
+      margin-top: 15px;
+      background: #f9f9f9;
+      padding: 10px;
+      border: 1px solid #ddd;
+      font-family: monospace;
+    }
+    hr {
+      margin: 30px 0;
+    }
   </style>
 </head>
 <body>
 
   <h1>GTM Playground</h1>
 
+  <!-- GTM ID injection -->
   <label for="gtmId">Enter your GTM Container ID:</label><br>
   <input type="text" id="gtmId" placeholder="GTM-XXXXXXX" />
   <button onclick="loadGTM()">Inject GTM</button>
@@ -24,18 +55,15 @@
 
   <hr>
 
-  <h3>Quick test buttons</h3>
-  <textarea class="preset" data-event="form_submit">
-{
-  "event": "form_submit",
-  "form": "newsletter"
-}
-</textarea>
-<button onclick="pushPreset(this)">Push: form_submit</button>
+  <!-- Quick test presets -->
+  <h3>Quick test events (editable + saved)</h3>
+  <div id="presetsArea"></div>
+  <button onclick="savePresets()">💾 Save All</button>
 
-  <button onclick="pushToDataLayer({ event: 'form_submit', form: 'newsletter' })">Push: form_submit</button>
+  <hr>
 
-  <h3>Push custom dataLayer JSON</h3>
+  <!-- Freeform code -->
+  <h3>Custom dataLayer JS</h3>
   <textarea id="customJson">
 // Example:
 dataLayer.push({
@@ -54,7 +82,6 @@ dataLayer.push({
     // Init dataLayer
     window.dataLayer = window.dataLayer || [];
 
-    // Load GTM from input
     function loadGTM() {
       const id = document.getElementById('gtmId').value.trim();
       if (!id.match(/^GTM-[A-Z0-9]+$/i)) {
@@ -64,21 +91,18 @@ dataLayer.push({
 
       localStorage.setItem('gtm_id', id);
 
-      // Inject GTM <script>
+      // Inject GTM script
       const script = document.createElement('script');
       script.src = 'https://www.googletagmanager.com/gtm.js?id=' + id;
       script.async = true;
       document.head.appendChild(script);
 
-      // Push gtm.start event
-      window.dataLayer.push({
-        'gtm.start': new Date().getTime(),
-        event: 'gtm.js'
-      });
+      // Push gtm.start
+      dataLayer.push({ 'gtm.start': new Date().getTime(), event: 'gtm.js' });
 
       document.getElementById('status').textContent = `✅ GTM container ${id} injected`;
 
-      // Inject <noscript> fallback
+      // Inject noscript fallback
       const iframe = document.createElement('iframe');
       iframe.src = `https://www.googletagmanager.com/ns.html?id=${id}`;
       iframe.height = 0;
@@ -88,16 +112,15 @@ dataLayer.push({
       document.body.appendChild(iframe);
     }
 
-    // Restore GTM ID from localStorage
+    // Auto-fill GTM ID if stored
     window.onload = function () {
       const lastId = localStorage.getItem('gtm_id');
-      if (lastId) {
-        document.getElementById('gtmId').value = lastId;
-      }
+      if (lastId) document.getElementById('gtmId').value = lastId;
+      loadPresets();
     };
 
     function pushToDataLayer(obj) {
-      window.dataLayer.push(obj);
+      dataLayer.push(obj);
       log(`✅ Pushed: ${JSON.stringify(obj, null, 2)}`);
     }
 
@@ -115,8 +138,85 @@ dataLayer.push({
       document.getElementById('logOutput').textContent = msg;
       console.log(msg);
     }
+
+    // Preset editor
+    const defaultPresets = [
+      {
+        name: 'button_click',
+        json: {
+          event: 'button_click',
+          label: 'CTA Button'
+        }
+      },
+      {
+        name: 'form_submit',
+        json: {
+          event: 'form_submit',
+          form: 'newsletter'
+        }
+      },
+      {
+        name: 'view_item',
+        json: {
+          event: 'view_item',
+          product_id: '12345'
+        }
+      }
+    ];
+
+    function loadPresets() {
+      const saved = localStorage.getItem('presets');
+      let presets = saved ? JSON.parse(saved) : defaultPresets;
+
+      const container = document.getElementById('presetsArea');
+      container.innerHTML = ''; // Clear existing
+
+      presets.forEach((preset, index) => {
+        const textarea = document.createElement('textarea');
+        textarea.className = 'preset';
+        textarea.rows = 5;
+        textarea.dataset.index = index;
+        textarea.value = JSON.stringify(preset.json, null, 2);
+
+        const button = document.createElement('button');
+        button.textContent = `Push: ${preset.name}`;
+        button.onclick = function () {
+          try {
+            const parsed = JSON.parse(textarea.value);
+            dataLayer.push(parsed);
+            log(`✅ Pushed: ${JSON.stringify(parsed, null, 2)}`);
+          } catch (e) {
+            log('❌ Error parsing preset: ' + e.message);
+          }
+        };
+
+        container.appendChild(textarea);
+        container.appendChild(document.createElement('br'));
+        container.appendChild(button);
+        container.appendChild(document.createElement('hr'));
+      });
+    }
+
+    function savePresets() {
+      const all = document.querySelectorAll('.preset');
+      const updated = Array.from(all).map((el) => {
+        try {
+          return {
+            name: JSON.parse(el.value).event || 'unnamed_event',
+            json: JSON.parse(el.value)
+          };
+        } catch {
+          return null;
+        }
+      }).filter(Boolean);
+
+      localStorage.setItem('presets', JSON.stringify(updated));
+      log('💾 Presets saved to localStorage');
+      loadPresets(); // re-render with updated names
+    }
   </script>
 
 </body>
 </html>
+
 
