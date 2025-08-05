@@ -3,7 +3,6 @@
 <head>
   <meta charset="UTF-8" />
   <title>GTM Playground</title>
-
   <style>
     body {
       font-family: sans-serif;
@@ -11,7 +10,7 @@
       max-width: 1000px;
       margin: auto;
     }
-    input, button, textarea {
+    input, button {
       font-size: 16px;
     }
     input {
@@ -22,12 +21,6 @@
       padding: 8px 12px;
       cursor: pointer;
       margin-bottom: 5px;
-    }
-    textarea {
-      width: 100%;
-      font-family: monospace;
-      resize: both;
-      overflow: auto;
     }
     .preset-wrapper {
       display: flex;
@@ -68,61 +61,17 @@
       font-weight: bold;
       margin-bottom: 5px;
     }
-    .editor-container {
+
+    /* ACE Editor container */
+    #customJson {
+      height: 200px;
+      width: 100%;
       border: 1px solid #ccc;
-      background: #272822;
-      color: white;
     }
   </style>
-
-  <!-- CodeMirror 6 + Monokai + JS -->
-  <script type="module">
-    import { EditorView, basicSetup } from "https://cdn.jsdelivr.net/npm/@codemirror/basic-setup@0.20.1/+esm";
-    import { javascript } from "https://cdn.jsdelivr.net/npm/@codemirror/lang-javascript@0.20.1/+esm";
-    import { oneDark } from "https://cdn.jsdelivr.net/npm/@codemirror/theme-one-dark@0.20.0/+esm";
-    import { linter } from "https://cdn.jsdelivr.net/npm/@codemirror/lint@0.20.0/+esm";
-    import jshint from "https://cdn.jsdelivr.net/npm/jshint@2.13.6/+esm";
-
-    const jshintLinter = () => {
-      return linter(view => {
-        const errors = [];
-        jshint(view.state.doc.toString());
-        const data = jshint.data();
-        if (data && data.errors) {
-          for (const err of data.errors) {
-            if (err) {
-              errors.push({
-                from: view.state.doc.line(err.line).from + (err.character - 1),
-                to: view.state.doc.line(err.line).from + (err.character),
-                severity: "error",
-                message: err.reason
-              });
-            }
-          }
-        }
-        return errors;
-      });
-    };
-
-    window.initEditor = () => {
-      const startCode = `// Example:\ndataLayer.push({\n  event: "custom_event",\n  my_value: 123\n});`;
-
-      window.customEditor = new EditorView({
-        doc: startCode,
-        extensions: [
-          basicSetup,
-          javascript(),
-          oneDark,
-          jshintLinter()
-        ],
-        parent: document.getElementById("editor")
-      });
-    };
-
-    window.getCustomCode = () => customEditor.state.doc.toString();
-  </script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.32.3/ace.js" integrity="sha512-Q7Ty8Qw+7sbA40Zz66u6U6jvIO64RDXR2ZsKACaWYb/5X9I6V5+MRXxK3XU/oH0Bh3rYFVQ6v9mWZzZzoe+3Uw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 </head>
-<body onload="initEditor(); loadPresets();">
+<body>
   <h1>GTM Playground</h1>
 
   <label for="gtmId">Enter your GTM Container ID:</label><br>
@@ -137,9 +86,11 @@
       <button onclick="runCustom()">Run JS</button>
       <button class="small-button" onclick="copyCustom()">Copy</button>
     </div>
-    <div class="editor-container" style="flex: 1;">
-      <div id="editor" style="min-height: 160px;"></div>
-    </div>
+    <div id="customJson">// Example:
+dataLayer.push({
+  event: "custom_event",
+  my_value: 123
+});</div>
   </div>
 
   <div class="log" id="logOutput">Console output will appear here…</div>
@@ -181,9 +132,11 @@
       document.body.appendChild(iframe);
     }
 
+    let editor;
+
     function runCustom() {
       try {
-        const raw = getCustomCode();
+        const raw = editor.getValue();
         new Function(raw)();
         log('✅ Ran custom JS');
       } catch (e) {
@@ -192,7 +145,8 @@
     }
 
     function copyCustom() {
-      navigator.clipboard.writeText(getCustomCode()).then(() => {
+      const text = editor.getValue();
+      navigator.clipboard.writeText(text).then(() => {
         log('📋 Copied custom JS');
       });
     }
@@ -205,14 +159,15 @@
     const defaultPresets = window.gtmPresets || [];
 
     function loadPresets() {
-      const lastId = localStorage.getItem('gtm_id');
-      if (lastId) document.getElementById('gtmId').value = lastId;
-
       const saved = localStorage.getItem('presets_full_js');
       const presets = saved ? JSON.parse(saved) : defaultPresets;
+
       const container = document.getElementById('presetsArea');
       container.innerHTML = '';
-      presets.forEach((preset, i) => container.appendChild(renderPreset(preset, i)));
+
+      presets.forEach((preset, i) => {
+        container.appendChild(renderPreset(preset, i));
+      });
     }
 
     function renderPreset(preset, index) {
@@ -289,11 +244,15 @@
 
     function savePresets() {
       const all = document.querySelectorAll('.preset-textarea');
-      const updated = Array.from(all).map(el => {
+      const updated = Array.from(all).map((el) => {
         const wrapper = el.closest('.preset-wrapper');
         const label = wrapper.querySelector('.preset-header').textContent;
         const name = label.replace('Event: ', '').trim();
-        return { name: name, code: el.value };
+
+        return {
+          name: name,
+          code: el.value
+        };
       });
       localStorage.setItem('presets_full_js', JSON.stringify(updated));
       log('💾 Presets saved to localStorage');
@@ -303,6 +262,7 @@
     function resetPresets() {
       localStorage.removeItem('presets_full_js');
       log('♻️ LocalStorage cleared. Reloading datalayer.js presets…');
+
       const fallbackPresets = window.gtmPresets || [];
       const container = document.getElementById('presetsArea');
       container.innerHTML = '';
@@ -313,9 +273,11 @@
 
     function copyAllAsDataLayer() {
       const all = document.querySelectorAll('.preset-textarea');
+
       const eventBlocks = Array.from(all).map((el, i) => {
         const name = el.dataset.name || `custom_${i + 1}`;
         const code = el.value;
+
         return `// ***** START ${name} *****  
 {
   name: "${name}",
@@ -323,15 +285,27 @@
 },
 // ***** END ${name} *****`;
       });
+
       const finalCode = `const presetEvents = [\n${eventBlocks.join('\n\n')}\n];\n\nwindow.gtmPresets = presetEvents;`;
+
       navigator.clipboard.writeText(finalCode).then(() => {
         log('📋 All events copied as datalayer.js file');
       });
     }
+
+    window.addEventListener('load', () => {
+      const lastId = localStorage.getItem('gtm_id');
+      if (lastId) document.getElementById('gtmId').value = lastId;
+      loadPresets();
+
+      // Init ACE editor
+      editor = ace.edit("customJson");
+      editor.setTheme("ace/theme/monokai");
+      editor.session.setMode("ace/mode/javascript");
+      editor.setOptions({ fontSize: "14px", wrap: true });
+    });
   </script>
 </body>
-</html>
-
 </html>
 
 
