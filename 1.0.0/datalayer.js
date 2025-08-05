@@ -126,6 +126,31 @@ const presetEvents = [
 });`
 },
 // ===== END product_view =====
+
+// ===== START search =====  
+{
+  name: "search",
+  code: `dataLayer.push({
+  event: 'search',
+   'search': {
+    'product_sorting': 'Relevance',
+    'search_term': 'panik',
+    'search_term_lenght': 5,
+     'search_results': 34
+  }
+});`
+},
+// ===== END search =====
+
+// ===== START cart_view =====  
+{
+  name: "cart_view",
+  code: `dataLayer.push({
+  event: 'cart_view'
+});`
+},
+// ===== END cart_view =====
+	
 ];
 
 window.gtmPresets = presetEvents;
