@@ -1,290 +1,236 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
   <title>GTM Playground</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/codemirror.min.css">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/codemirror.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/mode/javascript/javascript.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.12/codemirror.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.12/mode/javascript/javascript.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.12/codemirror.min.css">
   <style>
     body {
-      font-family: sans-serif;
-      padding: 20px;
-      max-width: 1000px;
-      margin: auto;
+      font-family: Arial, sans-serif;
+      margin: 2em;
     }
-    input, button {
-      font-size: 16px;
+
+    h1, h2 {
+      margin-bottom: 0.5em;
     }
-    input {
-      padding: 8px;
-      width: 300px;
+
+    input[type="text"] {
+      width: 250px;
     }
-    button {
-      padding: 8px 12px;
-      cursor: pointer;
-      margin-bottom: 5px;
+
+    textarea {
+      width: 100%;
+      height: 120px;
     }
+
+    .preset-block {
+      margin-bottom: 3em;
+    }
+
     .CodeMirror {
       border: 1px solid #ccc;
-      font-size: 14px;
       height: auto;
-    }
-    .preset-wrapper {
-      display: flex;
-      gap: 10px;
-      align-items: flex-start;
-      margin-bottom: 20px;
-      border-bottom: 1px solid #ddd;
-      padding-bottom: 20px;
-    }
-    .preset-buttons {
-      display: flex;
-      flex-direction: column;
-      flex-shrink: 0;
-      margin-top: 0;
-    }
-    .label {
-      font-weight: bold;
-      margin: 30px 0 10px;
-      font-size: 36px;
-    }
-    .log {
-      margin-top: 15px;
-      background: #f9f9f9;
-      padding: 10px;
-      border: 1px solid #ddd;
-      font-family: monospace;
-    }
-    .small-button {
-      padding: 4px 8px;
+      background: #f8f8f8;
       font-size: 14px;
+      width: 100%;
     }
-    .preset-header {
-      font-size: 18px;
-      font-weight: bold;
-      margin-bottom: 5px;
+
+    .editor-wrapper {
+      margin-top: 0.5em;
+    }
+
+    .custom-editor-wrapper {
+      max-width: 640px;
+    }
+
+    .btn {
+      margin: 0.2em 0.5em 0.2em 0;
+      padding: 6px 12px;
+      font-size: 14px;
     }
   </style>
 </head>
 <body>
-  <h1>GTM Playground</h1>
 
-  <label for="gtmId">Enter your GTM Container ID:</label><br>
-  <input type="text" id="gtmId" placeholder="GTM-XXXXXXX" />
-  <button onclick="loadGTM()">Inject GTM</button>
+<h1>GTM Playground</h1>
 
-  <hr>
+<label>Enter your GTM Container ID:</label>
+<input type="text" id="gtmIdInput" placeholder="GTM-XXXXXXX">
+<button class="btn" onclick="injectGTM()">Inject GTM</button>
 
-  <div class="label">Free custom JS</div>
-  <div class="preset-wrapper">
-    <div class="preset-buttons">
-      <button onclick="runCustom()">Run JS</button>
-      <button class="small-button" onclick="copyCustom()">Copy</button>
-    </div>
-    <textarea id="customJson">// Example:
+<h2>Free custom JS</h2>
+<div class="custom-editor-wrapper">
+  <button class="btn" onclick="runCustomJS()">Run JS</button>
+  <button class="btn" onclick="copyCustomJS()">Copy</button>
+  <textarea id="customInput">// Example:
 dataLayer.push({
   event: "custom_event",
   my_value: 123
 });</textarea>
-  </div>
+</div>
 
-  <div class="log" id="logOutput">Console output will appear here…</div>
+<pre id="output" style="border:1px solid #ccc; padding:1em; margin-top:1em;">Console output will appear here…</pre>
 
-  <hr>
+<h2>Test Events (editable in <code>datalayer.js</code>)</h2>
+<button class="btn" onclick="savePresets()">💾 Save Changes to localStorage</button>
+<p>Gem ændringer, så de bevares ved reload.</p>
+<button class="btn" onclick="copyAll()">📋 Copy ALL as datalayer.js file</button>
+<p>Kopierer alle events i formatet klar til <code>datalayer.js</code>.</p>
+<button class="btn" onclick="resetPresets()">🔄 Reset and use datalayer.js</button>
+<p>Fjerner gemte events og henter igen fra <code>datalayer.js</code></p>
 
-  <div class="label">Test Events (editable in <code>datalayer.js</code>)</div>
-  <div id="presetsArea"></div>
-  <button onclick="savePresets()">💾 Save Changes to localStorage</button>
-  <p style="margin-top: 0; color: gray;">Gem ændringer, så de bevares ved reload.</p>
-  <button onclick="copyAllAsDataLayer()">📋 Copy ALL as datalayer.js file</button>
-  <p style="margin-top: 0; color: gray;">Kopierer alle events i formatet klar til <code>datalayer.js</code>.</p>
-  <button onclick="resetPresets()">♻️ Reset and use datalayer.js</button>
-  <p style="margin-top: 0; color: gray;">Fjerner gemte events og henter igen fra <code>datalayer.js</code>.</p>
+<div id="presets"></div>
 
-  <script src="datalayer.js"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
+<script src="datalayer.js"></script>
+<script>
+  const log = (msg) => {
+    document.getElementById('output').textContent += msg + '\n';
+  };
 
-    function loadGTM() {
-      const id = document.getElementById('gtmId').value.trim();
-      if (!id.match(/^GTM-[A-Z0-9]+$/i)) {
-        alert('Invalid GTM ID');
-        return;
-      }
-      localStorage.setItem('gtm_id', id);
-      const script = document.createElement('script');
-      script.src = 'https://www.googletagmanager.com/gtm.js?id=' + id;
-      script.async = true;
-      document.head.appendChild(script);
-      dataLayer.push({ 'gtm.start': new Date().getTime(), event: 'gtm.js' });
-
-      const iframe = document.createElement('iframe');
-      iframe.src = `https://www.googletagmanager.com/ns.html?id=${id}`;
-      iframe.height = 0;
-      iframe.width = 0;
-      iframe.style.display = 'none';
-      iframe.style.visibility = 'hidden';
-      document.body.appendChild(iframe);
+  const injectGTM = () => {
+    const id = document.getElementById('gtmIdInput').value.trim();
+    if (!id.startsWith('GTM-')) {
+      alert('Please enter a valid GTM Container ID');
+      return;
     }
+    const script = document.createElement('script');
+    script.src = `https://www.googletagmanager.com/gtm.js?id=${id}`;
+    document.head.appendChild(script);
+    log('✅ GTM injected: ' + id);
+  };
 
-    function runCustom() {
-      try {
-        const code = customEditor.getValue();
-        new Function(code)();
-        log('✅ Ran custom JS');
-      } catch (e) {
-        log('❌ Error: ' + e.message);
-      }
+  const runCustomJS = () => {
+    const code = document.getElementById('customInput').value;
+    try {
+      new Function(code)();
+      log('▶️ Custom JS executed');
+    } catch (e) {
+      log('❌ Error in custom JS: ' + e.message);
     }
+  };
 
-    function copyCustom() {
-      navigator.clipboard.writeText(customEditor.getValue()).then(() => {
-        log('📋 Copied custom JS');
-      });
-    }
+  const copyCustomJS = () => {
+    const text = document.getElementById('customInput').value;
+    navigator.clipboard.writeText(text).then(() => log('📋 Copied custom JS'));
+  };
 
-    function log(msg) {
-      document.getElementById('logOutput').textContent = msg;
-      console.log(msg);
-    }
+  const defaultPresets = window.gtmPresets || [];
 
-    const defaultPresets = window.gtmPresets || [];
-    let presetEditors = [];
-    let customEditor;
+  let presetEditors = [];
 
-    function loadPresets() {
-      const saved = localStorage.getItem('presets_full_js');
-      const presets = saved ? JSON.parse(saved) : defaultPresets;
-      const container = document.getElementById('presetsArea');
-      container.innerHTML = '';
-      presetEditors = [];
+  const renderPresets = () => {
+    const container = document.getElementById('presets');
+    container.innerHTML = '';
+    presetEditors = [];
 
-      presets.forEach((preset, i) => {
-        container.appendChild(renderPreset(preset, i));
-      });
-
-      customEditor = CodeMirror.fromTextArea(document.getElementById('customJson'), {
-        mode: 'javascript',
-        lineNumbers: true,
-        tabSize: 2
-      });
-    }
-
-    function renderPreset(preset, index) {
+    defaultPresets.forEach((preset, index) => {
       const wrapper = document.createElement('div');
-      wrapper.className = 'preset-wrapper';
+      wrapper.className = 'preset-block';
 
-      const buttons = document.createElement('div');
-      buttons.className = 'preset-buttons';
-
-      const runBtn = document.createElement('button');
-      runBtn.textContent = 'Push';
-
-      const copyBtn = document.createElement('button');
-      copyBtn.textContent = 'Copy as dataLayer.push';
-      copyBtn.className = 'small-button';
-
-      const copyDLBtn = document.createElement('button');
-      copyDLBtn.textContent = 'Copy as datalayer.js block';
-      copyDLBtn.className = 'small-button';
-
-      const label = document.createElement('div');
-      label.className = 'preset-header';
-      label.textContent = 'Event: ' + (preset.name || `custom_${index + 1}`);
+      const label = document.createElement('strong');
+      label.textContent = 'Event: ' + preset.name;
 
       const textarea = document.createElement('textarea');
       textarea.value = preset.code;
 
-      const container = document.createElement('div');
-      container.style.flex = '1';
-      container.appendChild(label);
-      container.appendChild(textarea);
-
-      wrapper.appendChild(buttons);
-      wrapper.appendChild(container);
-
       const editor = CodeMirror.fromTextArea(textarea, {
         mode: 'javascript',
         lineNumbers: true,
+        lineWrapping: true,
         tabSize: 2
       });
 
-      presetEditors[index] = editor;
-
-      runBtn.onclick = () => {
+      const pushBtn = document.createElement('button');
+      pushBtn.className = 'btn';
+      pushBtn.textContent = 'Push';
+      pushBtn.onclick = () => {
         try {
           new Function(editor.getValue())();
-          log(`✅ Executed: ${label.textContent}`);
+          log('▶️ Ran ' + preset.name);
         } catch (e) {
           log('❌ Error parsing JS: ' + e.message);
         }
       };
 
-      copyBtn.onclick = () => {
+      const copyBtn1 = document.createElement('button');
+      copyBtn1.className = 'btn';
+      copyBtn1.textContent = 'Copy as dataLayer.push';
+      copyBtn1.onclick = () => {
         navigator.clipboard.writeText(editor.getValue()).then(() => {
           log('📋 Copied as dataLayer.push');
         });
       };
 
-      copyDLBtn.onclick = () => {
+      const copyBtn2 = document.createElement('button');
+      copyBtn2.className = 'btn';
+      copyBtn2.textContent = 'Copy as datalayer.js block';
+      copyBtn2.onclick = () => {
         const name = preset.name || `custom_${index + 1}`;
-        const fullBlock = `// --- EVENT START: ${name} ---\n{
-  name: "${name}",
-  code: \`${editor.getValue()}\`
-},\n// --- EVENT END: ${name} ---`;
+        const fullBlock = `/* === START ${name} === */\n{\n  name: "${name}",\n  code: \`${editor.getValue()}\`\n},\n/* === END ${name} === */`;
         navigator.clipboard.writeText(fullBlock).then(() => {
           log('📋 Copied as datalayer.js block');
         });
       };
 
-      buttons.appendChild(runBtn);
-      buttons.appendChild(copyBtn);
-      buttons.appendChild(copyDLBtn);
+      wrapper.appendChild(label);
+      wrapper.appendChild(document.createElement('br'));
+      wrapper.appendChild(pushBtn);
+      wrapper.appendChild(copyBtn1);
+      wrapper.appendChild(copyBtn2);
+      wrapper.appendChild(editor.getWrapperElement());
 
-      return wrapper;
-    }
-
-    function savePresets() {
-      const updated = presetEditors.map((editor, index) => {
-        const name = defaultPresets[index]?.name || `custom_${index + 1}`;
-        return {
-          name: name,
-          code: editor.getValue()
-        };
-      });
-      localStorage.setItem('presets_full_js', JSON.stringify(updated));
-      log('💾 Presets saved to localStorage');
-      loadPresets();
-    }
-
-    function resetPresets() {
-      localStorage.removeItem('presets_full_js');
-      log('♻️ LocalStorage cleared. Reloading datalayer.js presets…');
-      loadPresets();
-    }
-
-    function copyAllAsDataLayer() {
-      const eventBlocks = presetEditors.map((editor, i) => {
-        const name = defaultPresets[i]?.name || `custom_${i + 1}`;
-        const code = editor.getValue();
-        return `// --- EVENT START: ${name} ---\n{
-  name: "${name}",
-  code: \`${code}\`
-},\n// --- EVENT END: ${name} ---`;
-      });
-      const finalCode = `const presetEvents = [\n${eventBlocks.join('\n\n')}\n];\n\nwindow.gtmPresets = presetEvents;`;
-      navigator.clipboard.writeText(finalCode).then(() => {
-        log('📋 All events copied as datalayer.js file');
-      });
-    }
-
-    window.addEventListener('load', () => {
-      const lastId = localStorage.getItem('gtm_id');
-      if (lastId) document.getElementById('gtmId').value = lastId;
-      loadPresets();
+      container.appendChild(wrapper);
+      presetEditors.push(editor);
     });
-  </script>
+  };
+
+  const savePresets = () => {
+    const updated = presetEditors.map((editor, index) => ({
+      name: defaultPresets[index].name || `custom_${index + 1}`,
+      code: editor.getValue()
+    }));
+    localStorage.setItem('presets_full_js', JSON.stringify(updated));
+    log('💾 Presets saved to localStorage');
+  };
+
+  const loadPresets = () => {
+    const raw = localStorage.getItem('presets_full_js');
+    if (raw) {
+      try {
+        const parsed = JSON.parse(raw);
+        window.gtmPresets = parsed;
+        log('📥 Loaded presets from localStorage');
+      } catch (e) {
+        log('⚠️ Failed to load saved presets: ' + e.message);
+      }
+    }
+    renderPresets();
+  };
+
+  const resetPresets = () => {
+    localStorage.removeItem('presets_full_js');
+    window.gtmPresets = defaultPresets;
+    renderPresets();
+    log('🔁 Reset to original datalayer.js');
+  };
+
+  const copyAll = () => {
+    const blocks = presetEditors.map((editor, index) => {
+      const name = defaultPresets[index].name || `custom_${index + 1}`;
+      return `/* === START ${name} === */\n{\n  name: "${name}",\n  code: \`${editor.getValue()}\`\n},\n/* === END ${name} === */`;
+    });
+    const finalOutput = `const presetEvents = [\n${blocks.join('\n\n')}\n];\n\nwindow.gtmPresets = presetEvents;`;
+    navigator.clipboard.writeText(finalOutput).then(() => {
+      log('📋 Copied ALL as datalayer.js');
+    });
+  };
+
+  loadPresets();
+</script>
+
 </body>
 </html>
+
 
