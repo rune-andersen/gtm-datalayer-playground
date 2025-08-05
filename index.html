@@ -256,8 +256,7 @@ function copyAllAsDataLayer() {
   navigator.clipboard.writeText(full).then(function() {
     log('✅ All events copied as datalayer.js format');
   });
-}
-];
+},
 
 window.gtmPresets = presetEvents;`;
       navigator.clipboard.writeText(full).then(() => log('📋 All events copied'));
