@@ -120,10 +120,11 @@
 
     copyDLBtn.onclick = () => {
       const name = preset.name || `custom_${index + 1}`;
-      const fullBlock = `// ***** START ${name} *****  \n{
+     const fullBlock = `// ***** START ${name} *****  \n{
   name: "${name}",
-  code: \\`${editor.getValue()}\\`
+  code: \`${editor.getValue()}\`
 },\n// ***** END ${name} *****`;
+
       navigator.clipboard.writeText(fullBlock).then(() => {
         log('📋 Copied as datalayer.js block');
       });
