@@ -258,10 +258,6 @@ function copyAllAsDataLayer() {
   });
 }
 
-window.gtmPresets = presetEvents;`;
-      navigator.clipboard.writeText(full).then(() => log('📋 All events copied'));
-    }
-
 let customEditor;
 
 window.addEventListener('load', () => {
@@ -275,7 +271,7 @@ window.addEventListener('load', () => {
     matchBrackets: true
   });
 });
-  </script>
+</script>
 </body>
 </html>
 
