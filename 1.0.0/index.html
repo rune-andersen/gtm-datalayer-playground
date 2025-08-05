@@ -213,12 +213,12 @@ dataLayer.push({
   copyDLBtn.onclick = () => {
     const name = textarea.dataset.name || `custom_${index + 1}`;
     const fullBlock = 
-`// ***** START ${name} *****  
+`// ===== START ${name} =====  
 {
   name: "${name}",
   code: \`${textarea.value}\`
 },
-// ***** END ${name} *****`;
+// ===== END ${name} =====`;
     navigator.clipboard.writeText(fullBlock).then(() => {
       log('📋 Copied as datalayer.js block');
     });
@@ -276,12 +276,12 @@ dataLayer.push({
     const name = el.dataset.name || `custom_${i + 1}`;
     const code = el.value;
 
-    return `// ***** START ${name} *****  
+    return `// ===== START ${name} =====  
 {
   name: "${name}",
   code: \`${code}\`
 },
-// ***** END ${name} *****`;
+// ===== END ${name} =====`;
   });
 
   const finalCode = `const presetEvents = [\n${eventBlocks.join('\n\n')}\n];\n\nwindow.gtmPresets = presetEvents;`;
