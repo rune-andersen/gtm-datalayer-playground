@@ -184,24 +184,30 @@ dataLayer.push({
   copyDLBtn.textContent = 'Copy as datalayer.js block';
   copyDLBtn.className = 'small-button';
 
-  const label = document.createElement('div');
-  label.className = 'preset-header';
-  label.textContent = 'Event: ' + (preset.name || `custom_${index + 1}`);
-    if (preset.comment) {
-      const comment = document.createElement('div');
-      comment.style.marginBottom = '5px';
-      comment.style.fontSize = '14px';
-      comment.style.color = '#555';
-      comment.textContent = preset.comment;
-      container.appendChild(comment);
-  }
- 
-  const textarea = document.createElement('textarea');
-  textarea.className = 'preset-textarea';
-  textarea.dataset.index = index;
-  textarea.dataset.name = preset.name || `custom_${index + 1}`;
-  textarea.value = preset.code;
-  textarea.rows = 10;
+const container = document.createElement('div');
+
+const label = document.createElement('div');
+label.className = 'preset-header';
+label.textContent = 'Event: ' + (preset.name || `custom_${index + 1}`);
+container.appendChild(label);
+
+if (preset.comment) {
+  const comment = document.createElement('div');
+  comment.style.marginBottom = '5px';
+  comment.style.fontSize = '14px';
+  comment.style.color = '#555';
+  comment.textContent = preset.comment;
+  container.appendChild(comment);
+}
+
+const textarea = document.createElement('textarea');
+textarea.className = 'preset-textarea';
+textarea.dataset.index = index;
+textarea.dataset.name = preset.name || `custom_${index + 1}`;
+textarea.value = preset.code;
+textarea.rows = 10;
+container.appendChild(textarea);
+
 
   runBtn.onclick = () => {
     try {
