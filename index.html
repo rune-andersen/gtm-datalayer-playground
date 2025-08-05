@@ -1,13 +1,11 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <title>GTM Playground</title>
-
-  <!-- CodeMirror CSS & Theme -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/eclipse.min.css" />
-
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/eclipse.min.css">
   <style>
     body {
       font-family: sans-serif;
@@ -27,11 +25,6 @@
       cursor: pointer;
       margin-bottom: 5px;
     }
-    .CodeMirror {
-      font-size: 18px;
-      border: 1px solid #ddd;
-      height: auto;
-    }
     .preset-wrapper {
       display: flex;
       gap: 10px;
@@ -44,6 +37,7 @@
       display: flex;
       flex-direction: column;
       flex-shrink: 0;
+      margin-top: 0;
     }
     .label {
       font-weight: bold;
@@ -66,6 +60,10 @@
       font-weight: bold;
       margin-bottom: 5px;
     }
+    .CodeMirror {
+      height: auto;
+      font-size: 16px;
+    }
   </style>
 </head>
 <body>
@@ -83,13 +81,8 @@
       <button onclick="runCustom()">Run JS</button>
       <button class="small-button" onclick="copyCustom()">Copy</button>
     </div>
-    <div style="flex: 1;">
-      <textarea id="customJson">// Example:
-dataLayer.push({
-  event: "custom_event",
-  my_value: 123
-});</textarea>
-    </div>
+    <textarea id="customJson" rows="8">// Example:
+dataLayer.push({event: "custom_event", my_value: 123});</textarea>
   </div>
 
   <div class="log" id="logOutput">Console output will appear here…</div>
@@ -102,27 +95,18 @@ dataLayer.push({
   <button onclick="copyAllAsDataLayer()">📋 Copy ALL as datalayer.js file</button>
   <button onclick="resetPresets()">♻️ Reset and use datalayer.js</button>
 
-  <!-- CodeMirror JS -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/javascript/javascript.min.js"></script>
-
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/edit/matchbrackets.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/comment/comment.min.js"></script>
   <script src="datalayer.js"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
 
-    let customEditor;
-    window.addEventListener('load', () => {
-      customEditor = CodeMirror.fromTextArea(document.getElementById('customJson'), {
-        lineNumbers: true,
-        mode: 'javascript',
-        theme: 'eclipse',
-        tabSize: 2,
-        viewportMargin: Infinity
-      });
-      const lastId = localStorage.getItem('gtm_id');
-      if (lastId) document.getElementById('gtmId').value = lastId;
-      loadPresets();
-    });
+    function log(msg) {
+      document.getElementById('logOutput').textContent = msg;
+      console.log(msg);
+    }
 
     function loadGTM() {
       const id = document.getElementById('gtmId').value.trim();
@@ -132,12 +116,19 @@ dataLayer.push({
       script.src = 'https://www.googletagmanager.com/gtm.js?id=' + id;
       script.async = true;
       document.head.appendChild(script);
-      dataLayer.push({ 'gtm.start': new Date().getTime(), event: 'gtm.js' });
+      const iframe = document.createElement('iframe');
+      iframe.src = `https://www.googletagmanager.com/ns.html?id=${id}`;
+      iframe.height = 0;
+      iframe.width = 0;
+      iframe.style.display = 'none';
+      iframe.style.visibility = 'hidden';
+      document.body.appendChild(iframe);
     }
 
     function runCustom() {
       try {
-        new Function(customEditor.getValue())();
+        const raw = customEditor.getValue();
+        new Function(raw)();
         log('✅ Ran custom JS');
       } catch (e) {
         log('❌ Error: ' + e.message);
@@ -145,14 +136,17 @@ dataLayer.push({
     }
 
     function copyCustom() {
-      navigator.clipboard.writeText(customEditor.getValue()).then(() => {
-        log('📋 Copied custom JS');
-      });
+      navigator.clipboard.writeText(customEditor.getValue()).then(() => log('📋 Copied custom JS'));
     }
 
-    function log(msg) {
-      document.getElementById('logOutput').textContent = msg;
-      console.log(msg);
+    const defaultPresets = window.gtmPresets || [];
+
+    function loadPresets() {
+      const saved = localStorage.getItem('presets_full_js');
+      const presets = saved ? JSON.parse(saved) : defaultPresets;
+      const container = document.getElementById('presetsArea');
+      container.innerHTML = '';
+      presets.forEach((preset, i) => container.appendChild(renderPreset(preset, i)));
     }
 
     function renderPreset(preset, index) {
@@ -177,89 +171,83 @@ dataLayer.push({
       label.className = 'preset-header';
       label.textContent = 'Event: ' + (preset.name || `custom_${index + 1}`);
 
-      const editorContainer = document.createElement('div');
-      editorContainer.style.flex = '1';
-
       const textarea = document.createElement('textarea');
-      editorContainer.appendChild(label);
-      editorContainer.appendChild(textarea);
+      textarea.value = preset.code;
+      textarea.rows = 8;
 
       const editor = CodeMirror.fromTextArea(textarea, {
+        mode: "javascript",
+        theme: "eclipse",
         lineNumbers: true,
-        mode: 'javascript',
-        theme: 'eclipse',
-        tabSize: 2,
-        viewportMargin: Infinity
+        matchBrackets: true
       });
-      editor.setValue(preset.code);
-      editor.setSize("100%", "150px");
 
       runBtn.onclick = () => {
         try {
           new Function(editor.getValue())();
           log(`✅ Executed: ${label.textContent}`);
         } catch (e) {
-          log('❌ Error parsing JS: ' + e.message);
+          log('❌ Error: ' + e.message);
         }
       };
 
       copyBtn.onclick = () => {
-        navigator.clipboard.writeText(editor.getValue()).then(() => {
-          log('📋 Copied as dataLayer.push');
-        });
+        navigator.clipboard.writeText(editor.getValue()).then(() => log('📋 Copied as dataLayer.push'));
       };
 
       copyDLBtn.onclick = () => {
         const name = preset.name || `custom_${index + 1}`;
-        const block = `// --- ${name} START ---
+        const fullBlock = `// --- ${name} START ---
 {
   name: "${name}",
   code: \`${editor.getValue()}\`
 },
 // --- ${name} END ---`;
-        navigator.clipboard.writeText(block).then(() => {
-          log('📋 Copied as datalayer.js block');
-        });
+        navigator.clipboard.writeText(fullBlock).then(() => log('📋 Copied as datalayer.js block'));
       };
 
       buttons.appendChild(runBtn);
       buttons.appendChild(copyBtn);
       buttons.appendChild(copyDLBtn);
 
-      wrapper.appendChild(buttons);
-      wrapper.appendChild(editorContainer);
-      return wrapper;
-    }
+      const container = document.createElement('div');
+      container.style.flex = '1';
+      container.appendChild(label);
+      container.appendChild(editor.getWrapperElement());
 
-    function loadPresets() {
-      const saved = localStorage.getItem('presets_full_js');
-      const presets = saved ? JSON.parse(saved) : window.gtmPresets || [];
-      const container = document.getElementById('presetsArea');
-      container.innerHTML = '';
-      presets.forEach((preset, i) => {
-        container.appendChild(renderPreset(preset, i));
-      });
+      wrapper.appendChild(buttons);
+      wrapper.appendChild(container);
+      return wrapper;
     }
 
     function savePresets() {
       const editors = document.querySelectorAll('.CodeMirror');
       const updated = Array.from(editors).map((cm, i) => {
-        const name = document.querySelectorAll('.preset-header')[i].textContent.replace('Event: ', '').trim();
-        return { name, code: cm.CodeMirror.getValue() };
+        const name = document.querySelectorAll('.preset-header')[i].textContent.replace('Event: ', '');
+        const code = cm.CodeMirror.getValue();
+        return { name, code };
       });
       localStorage.setItem('presets_full_js', JSON.stringify(updated));
       log('💾 Presets saved to localStorage');
       loadPresets();
     }
 
+    function resetPresets() {
+      localStorage.removeItem('presets_full_js');
+      log('♻️ LocalStorage cleared. Reloading…');
+      loadPresets();
+    }
+
     function copyAllAsDataLayer() {
       const editors = document.querySelectorAll('.CodeMirror');
+      const names = document.querySelectorAll('.preset-header');
       const blocks = Array.from(editors).map((cm, i) => {
-        const name = document.querySelectorAll('.preset-header')[i].textContent.replace('Event: ', '').trim();
+        const name = names[i].textContent.replace('Event: ', '');
+        const code = cm.CodeMirror.getValue();
         return `// --- ${name} START ---
 {
   name: "${name}",
-  code: \`${cm.CodeMirror.getValue()}\`
+  code: \`${code}\`
 },
 // --- ${name} END ---`;
       });
@@ -270,18 +258,25 @@ ${blocks.join('
 ];
 
 window.gtmPresets = presetEvents;`;
-      navigator.clipboard.writeText(full).then(() => {
-        log('📋 All events copied as datalayer.js file');
-      });
+      navigator.clipboard.writeText(full).then(() => log('📋 All events copied'));
     }
 
-    function resetPresets() {
-      localStorage.removeItem('presets_full_js');
-      log('♻️ LocalStorage cleared. Reloading datalayer.js presets…');
+    let customEditor;
+
+    window.addEventListener('load', () => {
+      const lastId = localStorage.getItem('gtm_id');
+      if (lastId) document.getElementById('gtmId').value = lastId;
       loadPresets();
-    }
+      customEditor = CodeMirror.fromTextArea(document.getElementById('customJson'), {
+        mode: "javascript",
+        theme: "eclipse",
+        lineNumbers: true,
+        matchBrackets: true
+      });
+    });
   </script>
 </body>
 </html>
+
 
 
