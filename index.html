@@ -3,6 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <title>GTM Playground</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/codemirror.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/theme/monokai.min.css" />
   <style>
     body {
       font-family: sans-serif;
@@ -22,24 +24,6 @@
       cursor: pointer;
       margin-bottom: 5px;
     }
-    .preset-wrapper {
-      display: flex;
-      gap: 10px;
-      align-items: flex-start;
-      margin-bottom: 20px;
-      border-bottom: 1px solid #ddd;
-      padding-bottom: 20px;
-    }
-    .preset-buttons {
-      display: flex;
-      flex-direction: column;
-      flex-shrink: 0;
-      margin-top: 0;
-    }
-    .preset-textarea {
-      flex: 1;
-      min-height: 100px;
-    }
     .label {
       font-weight: bold;
       margin: 30px 0 10px;
@@ -56,20 +40,25 @@
       padding: 4px 8px;
       font-size: 14px;
     }
+    .preset-wrapper {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      margin-bottom: 20px;
+      border-bottom: 1px solid #ddd;
+      padding-bottom: 20px;
+    }
+    .preset-buttons {
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+    }
     .preset-header {
       font-size: 18px;
       font-weight: bold;
       margin-bottom: 5px;
     }
-
-    /* ACE Editor container */
-    #customJson {
-      height: 200px;
-      width: 100%;
-      border: 1px solid #ccc;
-    }
   </style>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.32.3/ace.js" integrity="sha512-Q7Ty8Qw+7sbA40Zz66u6U6jvIO64RDXR2ZsKACaWYb/5X9I6V5+MRXxK3XU/oH0Bh3rYFVQ6v9mWZzZzoe+3Uw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 </head>
 <body>
   <h1>GTM Playground</h1>
@@ -86,11 +75,9 @@
       <button onclick="runCustom()">Run JS</button>
       <button class="small-button" onclick="copyCustom()">Copy</button>
     </div>
-    <div id="customJson">// Example:
-dataLayer.push({
-  event: "custom_event",
-  my_value: 123
-});</div>
+    <div style="flex: 1;">
+      <div id="customEditor" style="height: 200px; border: 1px solid #ccc;"></div>
+    </div>
   </div>
 
   <div class="log" id="logOutput">Console output will appear here…</div>
@@ -106,9 +93,13 @@ dataLayer.push({
   <button onclick="resetPresets()">♻️ Reset and use datalayer.js</button>
   <p style="margin-top: 0; color: gray;">Fjerner gemte events og henter igen fra <code>datalayer.js</code>.</p>
 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/codemirror.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/mode/javascript/javascript.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/addon/edit/matchbrackets.min.js"></script>
   <script src="datalayer.js"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
+    let cmEditor;
 
     function loadGTM() {
       const id = document.getElementById('gtmId').value.trim();
@@ -132,11 +123,9 @@ dataLayer.push({
       document.body.appendChild(iframe);
     }
 
-    let editor;
-
     function runCustom() {
       try {
-        const raw = editor.getValue();
+        const raw = cmEditor.getValue();
         new Function(raw)();
         log('✅ Ran custom JS');
       } catch (e) {
@@ -145,8 +134,7 @@ dataLayer.push({
     }
 
     function copyCustom() {
-      const text = editor.getValue();
-      navigator.clipboard.writeText(text).then(() => {
+      navigator.clipboard.writeText(cmEditor.getValue()).then(() => {
         log('📋 Copied custom JS');
       });
     }
@@ -217,12 +205,12 @@ dataLayer.push({
       copyDLBtn.onclick = () => {
         const name = textarea.dataset.name || `custom_${index + 1}`;
         const fullBlock =
-`// ***** START ${name} *****  
+`// --- ${name} START ---
 {
   name: "${name}",
   code: \`${textarea.value}\`
 },
-// ***** END ${name} *****`;
+// --- ${name} END ---`;
         navigator.clipboard.writeText(fullBlock).then(() => {
           log('📋 Copied as datalayer.js block');
         });
@@ -248,11 +236,7 @@ dataLayer.push({
         const wrapper = el.closest('.preset-wrapper');
         const label = wrapper.querySelector('.preset-header').textContent;
         const name = label.replace('Event: ', '').trim();
-
-        return {
-          name: name,
-          code: el.value
-        };
+        return { name, code: el.value };
       });
       localStorage.setItem('presets_full_js', JSON.stringify(updated));
       log('💾 Presets saved to localStorage');
@@ -262,7 +246,6 @@ dataLayer.push({
     function resetPresets() {
       localStorage.removeItem('presets_full_js');
       log('♻️ LocalStorage cleared. Reloading datalayer.js presets…');
-
       const fallbackPresets = window.gtmPresets || [];
       const container = document.getElementById('presetsArea');
       container.innerHTML = '';
@@ -273,39 +256,34 @@ dataLayer.push({
 
     function copyAllAsDataLayer() {
       const all = document.querySelectorAll('.preset-textarea');
-
       const eventBlocks = Array.from(all).map((el, i) => {
         const name = el.dataset.name || `custom_${i + 1}`;
         const code = el.value;
-
-        return `// ***** START ${name} *****  
-{
-  name: "${name}",
-  code: \`${code}\`
-},
-// ***** END ${name} *****`;
+        return `// --- ${name} START ---\n{\n  name: "${name}",\n  code: \`${code}\`\n},\n// --- ${name} END ---`;
       });
-
       const finalCode = `const presetEvents = [\n${eventBlocks.join('\n\n')}\n];\n\nwindow.gtmPresets = presetEvents;`;
-
       navigator.clipboard.writeText(finalCode).then(() => {
         log('📋 All events copied as datalayer.js file');
       });
     }
 
     window.addEventListener('load', () => {
+      cmEditor = CodeMirror(document.getElementById("customEditor"), {
+        value: `// Example:\ndataLayer.push({\n  event: "custom_event",\n  my_value: 123\n});`,
+        mode: "javascript",
+        theme: "monokai",
+        lineNumbers: true,
+        lineWrapping: true,
+        matchBrackets: true
+      });
+
       const lastId = localStorage.getItem('gtm_id');
       if (lastId) document.getElementById('gtmId').value = lastId;
       loadPresets();
-
-      // Init ACE editor
-      editor = ace.edit("customJson");
-      editor.setTheme("ace/theme/monokai");
-      editor.session.setMode("ace/mode/javascript");
-      editor.setOptions({ fontSize: "14px", wrap: true });
     });
   </script>
 </body>
 </html>
+
 
 
