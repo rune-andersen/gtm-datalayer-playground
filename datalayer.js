@@ -1,5 +1,5 @@
 const presetEvents = [
-// ***** START data *****  
+// --- data START ---
 {
   name: "data",
   code: `dataLayer.push({
@@ -46,18 +46,18 @@ const presetEvents = [
   }
 });`
 },
-// ***** END data *****
+// --- data END ---
 
-// ***** START page_view *****  
+// --- page_view START ---
 {
   name: "page_view",
   code: `dataLayer.push({
   event: 'page_view'
 });`
 },
-// ***** END page_view *****
+// --- page_view END ---
 
-// ***** START category_view *****  
+// --- category_view START ---
 {
   name: "category_view",
   code: `dataLayer.push({
@@ -68,9 +68,9 @@ const presetEvents = [
   }
 });`
 },
-// ***** END category_view *****
+// --- category_view END ---
 
-// ***** START login *****  
+// --- login START ---
 {
   name: "login",
   code: `dataLayer.push({
@@ -80,9 +80,9 @@ const presetEvents = [
   }
 });`
 },
-// ***** END login *****
+// --- login END ---
 
-// ***** START logout *****  
+// --- logout START ---
 {
   name: "logout",
   code: `dataLayer.push({
@@ -92,26 +92,26 @@ const presetEvents = [
   }
 });`
 },
-// ***** END logout *****
-	
-// ***** START login_fail *****  
+// --- logout END ---
+
+// --- login_fail START ---
 {
   name: "login_fail",
   code: `dataLayer.push({
   event: 'login_fail',
   auth: {
     login_method: 'MitID',
-	  login_error_message: 'Unknows user',
-	  login_error_reason: 'abc-123'
+    login_error_message: 'Unknows user',
+    login_error_reason: 'abc-123'
   },
   user: {
-	  logged_in: false
-	}
+    logged_in: false
+  }
 });`
 },
-// ***** END login_fail *****
+// --- login_fail END ---
 
-// ***** START product_view *****  
+// --- product_view START ---
 {
   name: "product_view",
   code: `dataLayer.push({
@@ -125,7 +125,7 @@ const presetEvents = [
   }
 });`
 },
-// ***** END product_view *****
+// --- product_view END ---
 ];
 
 window.gtmPresets = presetEvents;
