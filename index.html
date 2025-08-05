@@ -241,22 +241,36 @@ dataLayer.push({event: "custom_event", my_value: 123});</textarea>
 function copyAllAsDataLayer() {
   var editors = document.querySelectorAll('.CodeMirror');
   var names = document.querySelectorAll('.preset-header');
-  var blocks = Array.prototype.map.call(editors, function(cm, i) {
+
+  var presetEvents = Array.prototype.map.call(editors, function(cm, i) {
     var name = names[i].textContent.replace('Event: ', '');
     var code = cm.CodeMirror.getValue();
-    return '// --- ' + name + ' START ---\n' +
-      '{\n' +
-      '  name: "' + name + '",\n' +
-      '  code: `' + code + '`\n' +
-      '},\n' +
-      '// --- ' + name + ' END ---';
+    return {
+      name: name,
+      code: code
+    };
+  });
+
+  var blocks = presetEvents.map(preset => {
+    return '// --- ' + preset.name + ' START ---\n' +
+           '{\n' +
+           '  name: "' + preset.name + '",\n' +
+           '  code: `' + preset.code + '`\n' +
+           '},\n' +
+           '// --- ' + preset.name + ' END ---';
   });
 
   var full = 'const presetEvents = [\n' + blocks.join('\n\n') + '\n];\n\nwindow.gtmPresets = presetEvents;';
+
+  // ✅ Gem til clipboard
   navigator.clipboard.writeText(full).then(function() {
     log('✅ All events copied as datalayer.js format');
   });
+
+  // ✅ Gem i memory
+  window.gtmPresets = presetEvents;
 }
+
 
 let customEditor;
 
