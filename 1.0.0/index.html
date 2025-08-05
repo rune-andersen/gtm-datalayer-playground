@@ -187,7 +187,15 @@ dataLayer.push({
   const label = document.createElement('div');
   label.className = 'preset-header';
   label.textContent = 'Event: ' + (preset.name || `custom_${index + 1}`);
-
+    if (preset.comment) {
+      const comment = document.createElement('div');
+      comment.style.marginBottom = '5px';
+      comment.style.fontSize = '14px';
+      comment.style.color = '#555';
+      comment.textContent = preset.comment;
+      container.appendChild(comment);
+  }
+ 
   const textarea = document.createElement('textarea');
   textarea.className = 'preset-textarea';
   textarea.dataset.index = index;
