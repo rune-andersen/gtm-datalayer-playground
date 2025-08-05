@@ -184,30 +184,16 @@ dataLayer.push({
   copyDLBtn.textContent = 'Copy as datalayer.js block';
   copyDLBtn.className = 'small-button';
 
-const container = document.createElement('div');
+  const label = document.createElement('div');
+  label.className = 'preset-header';
+  label.textContent = 'Event: ' + (preset.name || `custom_${index + 1}`);
 
-const label = document.createElement('div');
-label.className = 'preset-header';
-label.textContent = 'Event: ' + (preset.name || `custom_${index + 1}`);
-container.appendChild(label);
-
-if (preset.comment) {
-  const comment = document.createElement('div');
-  comment.style.marginBottom = '5px';
-  comment.style.fontSize = '14px';
-  comment.style.color = '#555';
-  comment.textContent = preset.comment;
-  container.appendChild(comment);
-}
-
-const textarea = document.createElement('textarea');
-textarea.className = 'preset-textarea';
-textarea.dataset.index = index;
-textarea.dataset.name = preset.name || `custom_${index + 1}`;
-textarea.value = preset.code;
-textarea.rows = 10;
-container.appendChild(textarea);
-
+  const textarea = document.createElement('textarea');
+  textarea.className = 'preset-textarea';
+  textarea.dataset.index = index;
+  textarea.dataset.name = preset.name || `custom_${index + 1}`;
+  textarea.value = preset.code;
+  textarea.rows = 10;
 
   runBtn.onclick = () => {
     try {
@@ -254,22 +240,21 @@ container.appendChild(textarea);
 
 
   function savePresets() {
-  const editors = document.querySelectorAll('.CodeMirror');
-  const updated = Array.from(editors).map((cm, i) => {
-    const name = document.querySelectorAll('.preset-header')[i].textContent.replace('Event: ', '');
-    const code = cm.CodeMirror.getValue();
+    const all = document.querySelectorAll('.preset-textarea');
+    const updated = Array.from(all).map((el) => {
+      const wrapper = el.closest('.preset-wrapper');
+      const label = wrapper.querySelector('.preset-header').textContent;
+      const name = label.replace('Event: ', '').trim();
 
-    // Find original comment from gtmPresets if it exists
-    const match = (window.gtmPresets || []).find(p => p.name === name);
-    const comment = match?.comment || '';
-
-    return { name, comment, code };
-  });
-
-  localStorage.setItem('presets_full_js', JSON.stringify(updated));
-  log('💾 Presets saved to localStorage');
-  loadPresets();
-}
+      return {
+        name: name,
+        code: el.value
+      };
+    });
+    localStorage.setItem('presets_full_js', JSON.stringify(updated));
+    log('💾 Presets saved to localStorage');
+    loadPresets();
+  }
 
   function resetPresets() {
   localStorage.removeItem('presets_full_js');
