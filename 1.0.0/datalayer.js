@@ -145,6 +145,7 @@ const presetEvents = [
 // ===== START cart_view =====  
 {
   name: "cart_view",
+  comment: "Always push a data event BEFORE a cart_view",
   code: `dataLayer.push({
   event: 'cart_view'
 });`
