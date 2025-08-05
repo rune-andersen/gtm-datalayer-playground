@@ -130,6 +130,7 @@ const presetEvents = [
 // ===== START search =====  
 {
   name: "search",
+  comment: "test the comment feature",
   code: `dataLayer.push({
   event: 'search',
    'search': {
