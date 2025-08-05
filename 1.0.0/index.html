@@ -248,21 +248,22 @@ dataLayer.push({
 
 
   function savePresets() {
-    const all = document.querySelectorAll('.preset-textarea');
-    const updated = Array.from(all).map((el) => {
-      const wrapper = el.closest('.preset-wrapper');
-      const label = wrapper.querySelector('.preset-header').textContent;
-      const name = label.replace('Event: ', '').trim();
+  const editors = document.querySelectorAll('.CodeMirror');
+  const updated = Array.from(editors).map((cm, i) => {
+    const name = document.querySelectorAll('.preset-header')[i].textContent.replace('Event: ', '');
+    const code = cm.CodeMirror.getValue();
 
-      return {
-        name: name,
-        code: el.value
-      };
-    });
-    localStorage.setItem('presets_full_js', JSON.stringify(updated));
-    log('💾 Presets saved to localStorage');
-    loadPresets();
-  }
+    // Find original comment from gtmPresets if it exists
+    const match = (window.gtmPresets || []).find(p => p.name === name);
+    const comment = match?.comment || '';
+
+    return { name, comment, code };
+  });
+
+  localStorage.setItem('presets_full_js', JSON.stringify(updated));
+  log('💾 Presets saved to localStorage');
+  loadPresets();
+}
 
   function resetPresets() {
   localStorage.removeItem('presets_full_js');
