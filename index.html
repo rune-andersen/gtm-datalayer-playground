@@ -262,19 +262,19 @@ window.gtmPresets = presetEvents;`;
       navigator.clipboard.writeText(full).then(() => log('📋 All events copied'));
     }
 
-    let customEditor;
+let customEditor;
 
-    window.addEventListener('load', () => {
-      const lastId = localStorage.getItem('gtm_id');
-      if (lastId) document.getElementById('gtmId').value = lastId;
-      loadPresets();
-      customEditor = CodeMirror.fromTextArea(document.getElementById('customJson'), {
-        mode: "javascript",
-        theme: "eclipse",
-        lineNumbers: true,
-        matchBrackets: true
-      });
-    });
+window.addEventListener('load', () => {
+  const lastId = localStorage.getItem('gtm_id');
+  if (lastId) document.getElementById('gtmId').value = lastId;
+  loadPresets();
+  customEditor = CodeMirror.fromTextArea(document.getElementById('customJson'), {
+    mode: "javascript",
+    theme: "eclipse",
+    lineNumbers: true,
+    matchBrackets: true
+  });
+});
   </script>
 </body>
 </html>
