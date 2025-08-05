@@ -1,5 +1,5 @@
 const presetEvents = [
-// ***** START data *****  
+// ===== START data =====  
 {
   name: "data",
   code: `dataLayer.push({
@@ -46,18 +46,18 @@ const presetEvents = [
   }
 });`
 },
-// ***** END data *****
+// ===== END data =====
 
-// ***** START page_view *****  
+// ===== START page_view =====  
 {
   name: "page_view",
   code: `dataLayer.push({
   event: 'page_view'
 });`
 },
-// ***** END page_view *****
+// ===== END page_view =====
 
-// ***** START category_view *****  
+// ===== START category_view =====  
 {
   name: "category_view",
   code: `dataLayer.push({
@@ -68,9 +68,9 @@ const presetEvents = [
   }
 });`
 },
-// ***** END category_view *****
+// ===== END category_view =====
 
-// ***** START login *****  
+// ===== START login =====  
 {
   name: "login",
   code: `dataLayer.push({
@@ -80,9 +80,9 @@ const presetEvents = [
   }
 });`
 },
-// ***** END login *****
+// ===== END login =====
 
-// ***** START logout *****  
+// ===== START logout =====  
 {
   name: "logout",
   code: `dataLayer.push({
@@ -92,9 +92,9 @@ const presetEvents = [
   }
 });`
 },
-// ***** END logout *****
+// ===== END logout =====
 	
-// ***** START login_fail *****  
+// ===== START login_fail =====  
 {
   name: "login_fail",
   code: `dataLayer.push({
@@ -109,9 +109,9 @@ const presetEvents = [
 	}
 });`
 },
-// ***** END login_fail *****
+// ===== END login_fail =====
 
-// ***** START product_view *****  
+// ===== START product_view =====  
 {
   name: "product_view",
   code: `dataLayer.push({
@@ -125,7 +125,7 @@ const presetEvents = [
   }
 });`
 },
-// ***** END product_view *****
+// ===== END product_view =====
 ];
 
 window.gtmPresets = presetEvents;
