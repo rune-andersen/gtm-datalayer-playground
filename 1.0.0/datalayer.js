@@ -5,7 +5,7 @@ const presetEvents = [
   code: `dataLayer.push({
   event: 'data',
   user: {
-    user_id_subscriberkey: 'f12cd820-5cd3-4c52-841f-e4263b9e9104',
+    user_id_subscriberkey: '70f60375-3c6e-4856-8e72-6d9943485249',
     user_id_sfmc: '0034I00002ffwLeQAI',
     logged_in: true
   },
