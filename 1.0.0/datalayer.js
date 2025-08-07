@@ -57,18 +57,29 @@ const presetEvents = [
 },
 // ===== END page_view =====
 
-// ===== START category_view =====  
+// ===== START product_listing_view =====  
 {
-  name: "category_view",
+  name: "product_listing_view",
   code: `dataLayer.push({
-  event: 'category_view',
-  category: {
-    category_id: 'abc-123',
-    product_sorting: 'relevance'
-  }
+  event: 'product_listing_view',
+  product_listing: {  
+    product_listing_id: '123-abc',
+    product_listing_name: 'Mobiltelefoner',
+    product_sorting: 'Mest populære',
+    product_count: 43,
+    	filters: [{
+      filter_name: 'brand',
+      filter_value: 'samsung'
+    },
+    {
+      filter_name: 'color',
+      filter_value: 'red'
+    }
+  ],
+},
 });`
 },
-// ===== END category_view =====
+// ===== END product_listing_view =====
 
 // ===== START login =====  
 {
