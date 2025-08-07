@@ -69,11 +69,19 @@ const presetEvents = [
     product_count: 43,
     	filters: [{
       filter_name: 'brand',
-      filter_value: 'samsung'
+      filter_value: 'nokia'
     },
     {
       filter_name: 'color',
-      filter_value: 'red'
+      filter_value: 'black'
+    },
+    {
+      filter_name: 'offer',
+      filter_value: false
+    },
+    {
+      filter_name: 'InStock',
+      filter_value: true
     }
   ],
 },
