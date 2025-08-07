@@ -67,6 +67,8 @@ const presetEvents = [
     product_listing_name: 'Mobiltelefoner',
     product_sorting: 'Mest populære',
     product_count: 43,
+    pagination_current: 1,
+    pagination_total: 10,
     	filters: [{
       filter_name: 'brand',
       filter_value: 'nokia'
