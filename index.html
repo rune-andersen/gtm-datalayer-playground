@@ -202,15 +202,15 @@
   <div class="top-buttons">
     <div class="button-group">
       <button onclick="savePresets()">💾 Save Changes to localStorage</button>
-      <p style="margin-top: 0; color: gray;">Gem ændringer, så de bevares ved reload.</p>
+      <p style="margin-top: 0; color: gray;">Save changes, so they are preserved at reload</p>
     </div>
     <div class="button-group">
       <button onclick="copyAllAsDataLayer()">📋 Copy ALL as datalayer.js file</button>
-      <p style="margin-top: 0; color: gray;">Kopierer alle events i formatet klar til <code>datalayer.js</code>.</p>
+      <p style="margin-top: 0; color: gray;">Copy all events in the format used in <code>datalayer.js</code>.</p>
     </div>
     <div class="button-group">
       <button onclick="resetPresets()">♻️ Reset and use datalayer.js</button>
-      <p style="margin-top: 0; color: gray;">Fjerner gemte events og henter igen fra <code>datalayer.js</code>.</p>
+      <p style="margin-top: 0; color: gray;">Remove loacl saved events and fetch from <code>datalayer.js</code>.</p>
     </div>
   </div>
 
@@ -244,7 +244,7 @@ dataLayer.push({
   <div class="event-nav-title">Go to event:</div>
   <div id="eventNav" class="event-nav"></div>
 
-  <div class="label">Test Events (editable in <code>datalayer.js</code>)</div>
+  <div class="label">Loaded Events (editable in <code>datalayer.js</code>)</div>
   <div id="presetsArea"></div>
   <!-- The preset action buttons have been moved to the top of the page.  The
        original buttons and descriptions were removed from this location. -->
