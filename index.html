@@ -6,8 +6,8 @@
   <!-- Application version metadata.  Update these values when you commit new versions.
        app-version holds a simple version string, e.g. 1.2.3, and app-changelog holds
        a short description of what changed. -->
-  <meta name="app-version" content="1.2.4">
-  <meta name="app-changelog" content="Fix trim button">
+  <meta name="app-version" content="1.1.4">
+  <meta name="app-changelog" content="Fix trim button again">
   <style>
     /*
      * Base layout styling.  A subtle background colour and modern
@@ -634,7 +634,10 @@ dataLayer.push({
         const updateButtonState = () => {
           // Determine if any syntax errors are present
           const anns = session.getAnnotations() || [];
+          // Ace may mark some parse issues as warnings rather than errors.  We
+          // consider any annotation an issue that could benefit from trimming.
           const hasError = anns.some(a => a.type === 'error');
+          const hasAnyIssue = anns.length > 0;
           // Detect trailing whitespace by scanning each line of the editor contents.
           const code = editorInstance.getValue();
           const lines = code.split('\n');
@@ -642,11 +645,11 @@ dataLayer.push({
           // Apply visual states: red for errors, yellow for only trailing whitespace.
           runBtn.classList.toggle('error-button', hasError);
           runBtn.classList.toggle('warn-button', !hasError && hasTrailing);
-          // Show the trim button whenever there is trailing whitespace or a syntax error.
-          if (hasTrailing || hasError) {
+          // Show the trim button whenever there is trailing whitespace or any annotation.
+          if (hasTrailing || hasAnyIssue) {
             trimBtn.style.visibility = 'visible';
             // Highlight as primary only when the issue is just trailing whitespace (no syntax error).
-            if (hasTrailing && !hasError) {
+            if (hasTrailing && anns.length === 0) {
               trimBtn.classList.add('primary-button');
             } else {
               trimBtn.classList.remove('primary-button');
@@ -800,6 +803,7 @@ dataLayer.push({
         const updatePlaygroundButton = () => {
           const anns = session.getAnnotations() || [];
           const hasError = anns.some(a => a.type === 'error');
+          const hasAnyIssue = anns.length > 0;
           // Detect trailing whitespace in custom editor
           const code = customEditor.getValue();
           const lines = code.split('\n');
@@ -807,11 +811,11 @@ dataLayer.push({
           // Apply button styles: red for errors, yellow for warnings
           customRunBtn.classList.toggle('error-button', hasError);
           customRunBtn.classList.toggle('warn-button', !hasError && hasTrailing);
-          // Show trim button whenever there is trailing whitespace or a syntax error
-          if (hasTrailing || hasError) {
+          // Show trim button whenever there is trailing whitespace or any annotation
+          if (hasTrailing || hasAnyIssue) {
             customTrimBtn.style.visibility = 'visible';
             // Highlight the trim button only when the issue is just trailing whitespace
-            if (hasTrailing && !hasError) {
+            if (hasTrailing && !hasAnyIssue) {
               customTrimBtn.classList.add('primary-button');
             } else {
               customTrimBtn.classList.remove('primary-button');
@@ -838,3 +842,6 @@ dataLayer.push({
 </script>
 </body>
 </html>
+
+
+
