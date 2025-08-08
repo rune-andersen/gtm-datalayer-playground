@@ -176,6 +176,36 @@
       resize: vertical;
       width: 100%;
     }
+
+    /*
+     * Event navigation bar styling.  Displays a row of buttons to
+     * quickly scroll to each event section.  Buttons use a neutral
+     * colour palette similar to secondary actions.
+     */
+    .event-nav {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin: 20px 0;
+    }
+    .event-nav .nav-btn {
+      background-color: #e2e6ea;
+      border: none;
+      border-radius: 4px;
+      padding: 6px 12px;
+      color: #333;
+      cursor: pointer;
+      transition: background-color 0.15s ease;
+      font-size: 14px;
+    }
+    .event-nav .nav-btn:hover {
+      background-color: #d4dadd;
+    }
+
+    .event-nav-title {
+      font-weight: 600;
+      margin: 10px 0 5px;
+    }
   </style>
 </head>
 <body>
@@ -225,6 +255,11 @@ dataLayer.push({
   <div class="log" id="logOutput">Console output will appear here…</div>
 
   <hr>
+
+  <!-- Navigation bar for quickly jumping to individual events.  Buttons
+       are generated dynamically based on the loaded presets. -->
+  <div class="event-nav-title">Go to event:</div>
+  <div id="eventNav" class="event-nav"></div>
 
   <div class="label">Test Events (editable in <code>datalayer.js</code>)</div>
   <div id="presetsArea"></div>
@@ -291,6 +326,10 @@ dataLayer.push({
     presets.forEach((preset, i) => {
       container.appendChild(renderPreset(preset, i));
     });
+
+    // After presets have been rendered, rebuild the navigation bar.  This
+    // ensures that each event is represented by a navigation button.
+    renderNavigation();
   }
 
   function renderPreset(preset, index) {
@@ -418,6 +457,46 @@ dataLayer.push({
   });
 }
 
+  /*
+   * Create a URL‑friendly slug from a string.  Lowercases and
+   * replaces non‑alphanumeric characters with underscores.  Used to
+   * generate element IDs based on event names.
+   */
+  function slugify(str) {
+    return str
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '_')
+      .replace(/^_+|_+$/g, '');
+  }
+
+  /*
+   * Build the navigation bar of event links.  Each button will scroll
+   * smoothly to the corresponding event card when clicked.
+   */
+  function renderNavigation() {
+    const nav = document.getElementById('eventNav');
+    if (!nav) return;
+    nav.innerHTML = '';
+    const wrappers = document.querySelectorAll('.preset-wrapper');
+    wrappers.forEach((wrapper) => {
+      const header = wrapper.querySelector('.preset-header');
+      if (!header) return;
+      const rawName = header.textContent.replace('Event:', '').trim();
+      const name = rawName.startsWith('Event') ? rawName : rawName;
+      const id = 'event_' + slugify(name);
+      wrapper.id = id;
+
+      const btn = document.createElement('button');
+      btn.className = 'nav-btn';
+      btn.textContent = name;
+      btn.onclick = () => {
+        const target = document.getElementById(id);
+        if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      };
+      nav.appendChild(btn);
+    });
+  }
+
 
   window.addEventListener('load', () => {
     const lastId = localStorage.getItem('gtm_id');
@@ -427,10 +506,6 @@ dataLayer.push({
 </script>
 </body>
 </html>
-
-
-
-
 
 
 
