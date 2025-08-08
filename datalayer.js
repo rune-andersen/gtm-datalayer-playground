@@ -1,11 +1,11 @@
 const presetEvents = [
-// --- data START ---
+// ===== START data =====  
 {
   name: "data",
   code: `dataLayer.push({
   event: 'data',
   user: {
-    user_id_subscriberkey: 'f12cd820-5cd3-4c52-841f-e4263b9e9104',
+    user_id_subscriberkey: '70f60375-3c6e-4856-8e72-6d9943485249',
     user_id_sfmc: '0034I00002ffwLeQAI',
     logged_in: true
   },
@@ -46,31 +46,52 @@ const presetEvents = [
   }
 });`
 },
-// --- data END ---
+// ===== END data =====
 
-// --- page_view START ---
+// ===== START page_view =====  
 {
   name: "page_view",
   code: `dataLayer.push({
   event: 'page_view'
 });`
 },
-// --- page_view END ---
+// ===== END page_view =====
 
-// --- category_view START ---
+// ===== START product_listing_view =====  
 {
-  name: "category_view",
+  name: "product_listing_view",
   code: `dataLayer.push({
-  event: 'category_view',
-  category: {
-    category_id: 'abc-123',
-    product_sorting: 'relevance'
-  }
+  event: 'product_listing_view',
+  product_listing: {  
+    product_listing_id: '123-abc',
+    product_listing_name: 'Mobiltelefoner',
+    product_sorting: 'Mest populære',
+    product_count: 43,
+    pagination_current: 1,
+    pagination_total: 10,
+    	filters: [{
+      filter_name: 'brand',
+      filter_value: 'nokia'
+    },
+    {
+      filter_name: 'color',
+      filter_value: 'black'
+    },
+    {
+      filter_name: 'offer',
+      filter_value: false
+    },
+    {
+      filter_name: 'InStock',
+      filter_value: true
+    }
+  ],
+},
 });`
 },
-// --- category_view END ---
+// ===== END product_listing_view =====
 
-// --- login START ---
+// ===== START login =====  
 {
   name: "login",
   code: `dataLayer.push({
@@ -80,9 +101,9 @@ const presetEvents = [
   }
 });`
 },
-// --- login END ---
+// ===== END login =====
 
-// --- logout START ---
+// ===== START logout =====  
 {
   name: "logout",
   code: `dataLayer.push({
@@ -92,26 +113,26 @@ const presetEvents = [
   }
 });`
 },
-// --- logout END ---
-
-// --- login_fail START ---
+// ===== END logout =====
+	
+// ===== START login_fail =====  
 {
   name: "login_fail",
   code: `dataLayer.push({
   event: 'login_fail',
   auth: {
     login_method: 'MitID',
-    login_error_message: 'Unknows user',
-    login_error_reason: 'abc-123'
+	  login_error_message: 'Unknows user',
+	  login_error_reason: 'abc-123'
   },
   user: {
-    logged_in: false
-  }
+	  logged_in: false
+	}
 });`
 },
-// --- login_fail END ---
+// ===== END login_fail =====
 
-// --- product_view START ---
+// ===== START product_view =====  
 {
   name: "product_view",
   code: `dataLayer.push({
@@ -125,7 +146,32 @@ const presetEvents = [
   }
 });`
 },
-// --- product_view END ---
+// ===== END product_view =====
+
+// ===== START search =====  
+{
+  name: "search",
+  code: `dataLayer.push({
+  event: 'search',
+   'search': {
+    'product_sorting': 'Relevance',
+    'search_term': 'panik',
+    'search_term_lenght': 5,
+     'search_results': 34
+  }
+});`
+},
+// ===== END search =====
+
+// ===== START cart_view =====  
+{
+  name: "cart_view",
+  code: `dataLayer.push({
+  event: 'cart_view'
+});`
+},
+// ===== END cart_view =====
+	
 ];
 
 window.gtmPresets = presetEvents;
