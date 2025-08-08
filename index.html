@@ -91,8 +91,18 @@
       padding: 12px 16px;
       font-weight: 600;
     }
+
+    /* Left side of the preset header holds the primary action and the event name. */
+    .preset-header-left {
+      display: flex;
+      align-items: center;
+    }
+    .preset-header-left button {
+      margin-right: 10px;
+    }
     .preset-header-title {
-      font-size: 16px;
+      font-size: 17px;
+      margin-left: 0;
     }
     .preset-header-actions button {
       margin-left: 10px;
@@ -104,6 +114,8 @@
       min-height: 120px;
       resize: vertical;
       width: 100%;
+      /* Ensure padding is included in the width to align with header */
+      box-sizing: border-box;
     }
     /* Headings use a modern size/weight and extra spacing around
        sections. */
@@ -186,6 +198,14 @@
       font-weight: 600;
       margin: 10px 0 5px;
     }
+
+    /* Sub-label styling used below section headers for explanatory notes. */
+    .sub-label {
+      color: gray;
+      font-size: 14px;
+      margin-top: -10px;
+      margin-bottom: 20px;
+    }
   </style>
 </head>
 <body>
@@ -202,28 +222,36 @@
   <div class="top-buttons">
     <div class="button-group">
       <button onclick="savePresets()">💾 Save Changes to localStorage</button>
-      <p style="margin-top: 0; color: gray;">Save changes, so they are preserved at reload</p>
+      <p style="margin-top: 0; color: gray;">Gem ændringer, så de bevares ved reload.</p>
     </div>
     <div class="button-group">
       <button onclick="copyAllAsDataLayer()">📋 Copy ALL as datalayer.js file</button>
-      <p style="margin-top: 0; color: gray;">Copy all events in the format used in <code>datalayer.js</code>.</p>
+      <p style="margin-top: 0; color: gray;">Kopierer alle events i formatet klar til <code>datalayer.js</code>.</p>
     </div>
     <div class="button-group">
       <button onclick="resetPresets()">♻️ Reset and use datalayer.js</button>
-      <p style="margin-top: 0; color: gray;">Remove loacl saved events and fetch from <code>datalayer.js</code>.</p>
+      <p style="margin-top: 0; color: gray;">Fjerner gemte events og henter igen fra <code>datalayer.js</code>.</p>
     </div>
   </div>
 
   <hr>
 
-  <!-- dataLayer Playground: behaves like a preset card with its own header
-       and actions.  Users can experiment with custom code and push it
-       to the dataLayer or copy it in various formats. -->
+  <!-- A card where users can write arbitrary code and push it to the dataLayer.
+       This section appears after the log output for quick access. -->
+
+  <!-- Log output card.  Displays the result of running events or copying code.
+       Positioned above the playground for better visibility. -->
+  <div class="log" id="logOutput">Console output will appear here…</div>
+
+  <hr>
+
   <div class="custom-js-section preset-wrapper" data-ignore-nav="true">
     <div class="preset-header-bar">
-      <span class="preset-header-title">dataLayer Playground</span>
-      <div class="preset-header-actions">
+      <div class="preset-header-left">
         <button onclick="runCustom()">Push</button>
+        <span class="preset-header-title">dataLayer Playground</span>
+      </div>
+      <div class="preset-header-actions">
         <button class="small-button" onclick="copyCustom()">Copy as dataLayer.push</button>
         <button class="small-button" onclick="copyCustomDL()">Copy as datalayer.js block</button>
       </div>
@@ -235,16 +263,14 @@ dataLayer.push({
 });</textarea>
   </div>
 
-  <div class="log" id="logOutput">Console output will appear here…</div>
-
-  <hr>
 
   <!-- Navigation bar for quickly jumping to individual events.  Buttons
        are generated dynamically based on the loaded presets. -->
   <div class="event-nav-title">Go to event:</div>
   <div id="eventNav" class="event-nav"></div>
 
-  <div class="label">Loaded Events (editable in <code>datalayer.js</code>)</div>
+  <div class="label">Loaded Events</div>
+  <p class="sub-label">(editable in <code>datalayer.js</code>)</p>
   <div id="presetsArea"></div>
   <!-- The preset action buttons have been moved to the top of the page.  The
        original buttons and descriptions were removed from this location. -->
@@ -336,19 +362,26 @@ dataLayer.push({
     const header = document.createElement('div');
     header.className = 'preset-header-bar';
 
+    const headerLeft = document.createElement('div');
+    headerLeft.className = 'preset-header-left';
+
     const title = document.createElement('span');
     title.className = 'preset-header-title';
     const eventName = preset.name || `custom_${index + 1}`;
     title.textContent = eventName;
 
-    const actions = document.createElement('div');
-    actions.className = 'preset-header-actions';
-
     // Primary action: push/run the event code
     const runBtn = document.createElement('button');
     runBtn.textContent = 'Push';
 
-    // Secondary actions: copy as dataLayer.push and as datalayer.js block
+    // Build left part: run button followed by event name
+    headerLeft.appendChild(runBtn);
+    headerLeft.appendChild(title);
+
+    // Right part: copy as dataLayer.push and as datalayer.js block
+    const actions = document.createElement('div');
+    actions.className = 'preset-header-actions';
+
     const copyBtn = document.createElement('button');
     copyBtn.textContent = 'Copy as dataLayer.push';
     copyBtn.className = 'small-button';
@@ -357,13 +390,22 @@ dataLayer.push({
     copyDLBtn.textContent = 'Copy as datalayer.js block';
     copyDLBtn.className = 'small-button';
 
-    // Attach click handlers
+    actions.appendChild(copyBtn);
+    actions.appendChild(copyDLBtn);
+
+    // Construct header
+    header.appendChild(headerLeft);
+    header.appendChild(actions);
+
+    // Textarea for event code
     const textarea = document.createElement('textarea');
     textarea.dataset.index = index;
     textarea.dataset.name = eventName;
     textarea.value = preset.code;
     textarea.rows = 10;
+    textarea.className = 'preset-textarea';
 
+    // Click handlers
     runBtn.onclick = () => {
       try {
         new Function(textarea.value)();
@@ -390,16 +432,6 @@ dataLayer.push({
         log('📋 Copied as datalayer.js block');
       });
     };
-
-    actions.appendChild(runBtn);
-    actions.appendChild(copyBtn);
-    actions.appendChild(copyDLBtn);
-
-    header.appendChild(title);
-    header.appendChild(actions);
-
-    // Assign dataset for nav generation
-    textarea.className = 'preset-textarea';
 
     wrapper.appendChild(header);
     wrapper.appendChild(textarea);
