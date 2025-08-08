@@ -6,8 +6,8 @@
   <!-- Application version metadata.  Update these values when you commit new versions.
        app-version holds a simple version string, e.g. 1.2.3, and app-changelog holds
        a short description of what changed. -->
-  <meta name="app-version" content="1.1.4">
-  <meta name="app-changelog" content="Fix trim button again">
+  <meta name="app-version" content="2.1.0">
+  <meta name="app-changelog" content="Prepare for the use of local file">
   <style>
     /*
      * Base layout styling.  A subtle background colour and modern
@@ -217,6 +217,30 @@
       margin-top: -10px;
       margin-bottom: 20px;
     }
+
+    /* Layout for the GTM ID and local file row.  Places the GTM ID input and
+       local file picker side by side on wider screens.  Allows wrapping on
+       narrow screens. */
+    .gtm-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 20px;
+      margin: 10px 0;
+    }
+    .gtm-id-group input {
+      margin-right: 8px;
+    }
+    .local-file-group input[type="file"] {
+      /* Reset margin so the file input aligns vertically with the adjacent button */
+      margin: 0;
+    }
+    /* Align the file input and the local loader button horizontally. */
+    .local-file-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
     /* Ace editor uses its own themes; ensure fonts align with the rest of the app. */
     .ace_editor {
       font-family: monospace;
@@ -307,30 +331,38 @@
   <div class="version-label" id="versionLabel">Version: —</div>
   <h1>GTM Playground</h1>
 
-  <label for="gtmId">Enter your GTM Container ID:</label><br>
-  <input type="text" id="gtmId" placeholder="GTM-XXXXXXX" />
-  <button onclick="loadGTM()">Inject GTM</button>
+  <!-- Combined row for GTM ID entry and optional local datalayer.js loader -->
+  <div class="gtm-row">
+    <div class="gtm-id-group">
+      <!-- Input for GTM Container ID.  The explanatory text is provided via a tooltip instead of an always‑visible label. -->
+      <input type="text" id="gtmId" placeholder="GTM-XXXXXXX" title="Enter your GTM Container ID" />
+      <button onclick="loadGTM()">Inject GTM</button>
+    </div>
+    <div class="local-file-group">
+      <input type="file" id="localFileInput" accept=".js" />
+      <!-- A tertiary button style keeps the control subtle but aligns height with primary buttons -->
+      <button class="small-button" onclick="loadLocalFile()" title="Use a local file instead of the built‑in datalayer.js">Use local datalayer.js</button>
+    </div>
+  </div>
 
-  
   <!-- Top action buttons: save, copy all and reset.  These were previously
        located beneath the presets section but have been moved here for
        quicker access.  Each button is accompanied by a short description. -->
   <div class="top-buttons">
     <div class="button-group">
-      <button onclick="savePresets()">💾 Save Changes to localStorage</button>
-      <p style="margin-top: 0; color: gray;">Gem ændringer, så de bevares ved reload.</p>
+      <!-- Save button with tooltip explaining its purpose. -->
+      <button onclick="savePresets()" title="Save changes so they persist on reload">💾 Save Changes to localStorage</button>
     </div>
     <div class="button-group">
-      <button onclick="copyAllAsDataLayer()">📋 Copy ALL as datalayer.js file</button>
-      <p style="margin-top: 0; color: gray;">Kopierer alle events i formatet klar til <code>datalayer.js</code>.</p>
+      <!-- Copy all events button with tooltip in English. -->
+      <button onclick="copyAllAsDataLayer()" title="Copy all events in the format used by datalayer.js">📋 Copy ALL as datalayer.js file</button>
     </div>
     <div class="button-group">
-      <button onclick="resetPresets()">♻️ Reset and use datalayer.js</button>
-      <p style="margin-top: 0; color: gray;">Fjerner gemte events og henter igen fra <code>datalayer.js</code>.</p>
+      <!-- Reset button with tooltip for English help. -->
+      <button onclick="resetPresets()" title="Remove saved events and reload from datalayer.js">♻️ Reset and use datalayer.js</button>
     </div>
   </div>
 
-  <hr>
 
   <!-- A card where users can write arbitrary code and push it to the dataLayer.
        This section appears after the log output for quick access. -->
@@ -365,11 +397,18 @@ dataLayer.push({
     <div id="customEditor" class="ace-editor-container" style="height: 150px;"></div>
   </div>
 
+  <!-- Divider after the dataLayer Playground section -->
+  <hr>
+
+
 
   <!-- Navigation bar for quickly jumping to individual events.  Buttons
        are generated dynamically based on the loaded presets. -->
   <div class="event-nav-title">Go to event:</div>
   <div id="eventNav" class="event-nav"></div>
+
+  <!-- Divider after the Go to event navigation -->
+  <hr>
 
   <div class="label">Loaded Events</div>
   <p class="sub-label">(editable in <code>datalayer.js</code>)</p>
@@ -704,6 +743,43 @@ dataLayer.push({
   });
 }
 
+  // Load events from a user‑selected local datalayer.js file.  The file must
+  // assign an array of event definitions to either `window.gtmPresets` or
+  // `window.presetEvents` with elements of the form { name: "eventName", code: "..." }.
+  // When loaded successfully, the events will replace the current presets and
+  // persist in localStorage under `presets_full_js`.  An informational
+  // message is displayed in the log.
+  function loadLocalFile() {
+    const input = document.getElementById('localFileInput');
+    if (!input || !input.files || input.files.length === 0) {
+      alert('Please select a .js file first.');
+      return;
+    }
+    const file = input.files[0];
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const content = e.target.result;
+      try {
+        // Execute the file in a sandboxed context.  Use a dummy window object so
+        // that assignments to `window.gtmPresets` or `window.presetEvents` are
+        // captured in the sandbox.
+        const sandbox = {};
+        const wrapper = new Function('window', content + '\n; return window.gtmPresets || window.presetEvents || []');
+        const events = wrapper(sandbox);
+        if (Array.isArray(events) && events.length > 0) {
+          const processed = events.map(ev => ({ name: ev.name, code: ev.code }));
+          localStorage.setItem('presets_full_js', JSON.stringify(processed));
+          log('📁 Loaded events from local file');
+          loadPresets();
+        } else {
+          log('⚠️ The selected file does not define any events (gtmPresets/presetEvents).');
+        }
+      } catch (err) {
+        log('❌ Failed to load local datalayer.js: ' + err.message);
+      }
+    };
+    reader.readAsText(file);
+  }
   function copyAllAsDataLayer() {
   const all = document.querySelectorAll('.preset-textarea');
 
