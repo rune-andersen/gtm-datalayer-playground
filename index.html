@@ -244,6 +244,16 @@
       background-color: #e0a800 !important;
     }
 
+    /* Primary style for trim buttons when they are active.  Uses the main button
+       colour to draw attention while retaining small-button sizing. */
+    .primary-button {
+      background-color: #007bff !important;
+      color: #fff !important;
+    }
+    .primary-button:hover {
+      background-color: #0056b3 !important;
+    }
+
     /* Lighten the appearance of error highlights in Ace to reduce visual noise. */
     .ace_editor .ace_error {
       background-color: #fee2e2 !important;
@@ -256,12 +266,12 @@
       background-color: #fecaca !important;
     }
 
-    /* Lighten warning annotations (e.g., trailing whitespace) and make them less intrusive. */
+    /* Lighten warning annotations (e.g., trailing whitespace) but keep them visible. */
     .ace_editor .ace_warning {
-      background-color: #fff7e6 !important;
+      background-color: #fff3cd !important;
     }
     .ace_editor .ace_gutter-cell.ace_warning {
-      background-color: #fff7e6 !important;
+      background-color: #fff3cd !important;
       color: #856404 !important;
     }
     .ace_editor .ace_marker-layer .ace_warning {
@@ -331,10 +341,10 @@
         <span class="preset-header-title">dataLayer Playground</span>
       </div>
       <div class="preset-header-actions">
+        <!-- Trim spaces button is hidden via visibility to preserve layout.  It is placed first so copy buttons stay in place. -->
+        <button class="small-button" id="customTrimBtn" onclick="trimCustom()" style="visibility:hidden;">Trim spaces</button>
         <button class="small-button" onclick="copyCustom()">Copy as dataLayer.push</button>
         <button class="small-button" onclick="copyCustomDL()">Copy as datalayer.js block</button>
-        <!-- Trim spaces button is hidden by default and will appear only when trailing whitespace exists -->
-        <button class="small-button" id="customTrimBtn" onclick="trimCustom()" style="display:none;">Trim spaces</button>
       </div>
     </div>
     <!-- Hidden textarea to hold the raw code for persistence.  Ace will sync
@@ -512,17 +522,20 @@ dataLayer.push({
     copyDLBtn.textContent = 'Copy as datalayer.js block';
     copyDLBtn.className = 'small-button';
 
-    // Utility to trim trailing whitespace from the editor content
+    // Utility to trim trailing whitespace from the editor content.  This button
+    // begins hidden (via visibility) to preserve layout and will be shown
+    // when trailing whitespace is detected.  A primary-button class is
+    // toggled on demand to emphasise its importance when active.
     const trimBtn = document.createElement('button');
     trimBtn.textContent = 'Trim spaces';
     trimBtn.className = 'small-button';
-    // Hidden by default; will be toggled on editor state changes.
-    trimBtn.style.display = 'none';
+    trimBtn.style.visibility = 'hidden';
 
 
+    // Insert trim button first so the copy buttons remain fixed in place
+    actions.appendChild(trimBtn);
     actions.appendChild(copyBtn);
     actions.appendChild(copyDLBtn);
-    actions.appendChild(trimBtn);
 
     // Construct header
     header.appendChild(headerLeft);
@@ -618,8 +631,15 @@ dataLayer.push({
           // Apply visual states: red for errors, yellow for only trailing whitespace.
           runBtn.classList.toggle('error-button', hasError);
           runBtn.classList.toggle('warn-button', !hasError && hasTrailing);
-          // Show the trim button only when trailing whitespace exists and no syntax error.
-          trimBtn.style.display = (hasTrailing && !hasError) ? 'inline-block' : 'none';
+          // Show the trim button whenever trailing whitespace exists (regardless of syntax errors).
+          if (hasTrailing) {
+            trimBtn.style.visibility = 'visible';
+            // Emphasise the trim button with primary styling when active.
+            trimBtn.classList.add('primary-button');
+          } else {
+            trimBtn.style.visibility = 'hidden';
+            trimBtn.classList.remove('primary-button');
+          }
         };
         updateButtonState();
         // Listen for changes in annotations (errors/warnings) and editor text
@@ -764,11 +784,17 @@ dataLayer.push({
           const code = customEditor.getValue();
           const lines = code.split('\n');
           const hasTrailing = lines.some(l => /[ \t]+$/.test(l));
-          // Apply button styles
+          // Apply button styles: red for errors, yellow for warnings
           customRunBtn.classList.toggle('error-button', hasError);
           customRunBtn.classList.toggle('warn-button', !hasError && hasTrailing);
-          // Show the custom trim button only when there is trailing whitespace and no syntax error
-          customTrimBtn.style.display = (hasTrailing && !hasError) ? 'inline-block' : 'none';
+          // Show trim button whenever there is trailing whitespace regardless of syntax errors
+          if (hasTrailing) {
+            customTrimBtn.style.visibility = 'visible';
+            customTrimBtn.classList.add('primary-button');
+          } else {
+            customTrimBtn.style.visibility = 'hidden';
+            customTrimBtn.classList.remove('primary-button');
+          }
         };
         updatePlaygroundButton();
         session.on('changeAnnotation', updatePlaygroundButton);
