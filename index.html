@@ -6,8 +6,8 @@
   <!-- Application version metadata.  Update these values when you commit new versions.
        app-version holds a simple version string, e.g. 1.2.3, and app-changelog holds
        a short description of what changed. -->
-  <meta name="app-version" content="1.1.2">
-  <meta name="app-changelog" content="add version text option">
+  <meta name="app-version" content="1.2.4">
+  <meta name="app-changelog" content="Fix trim button">
   <style>
     /*
      * Base layout styling.  A subtle background colour and modern
@@ -642,11 +642,15 @@ dataLayer.push({
           // Apply visual states: red for errors, yellow for only trailing whitespace.
           runBtn.classList.toggle('error-button', hasError);
           runBtn.classList.toggle('warn-button', !hasError && hasTrailing);
-          // Show the trim button whenever trailing whitespace exists (regardless of syntax errors).
-          if (hasTrailing) {
+          // Show the trim button whenever there is trailing whitespace or a syntax error.
+          if (hasTrailing || hasError) {
             trimBtn.style.visibility = 'visible';
-            // Emphasise the trim button with primary styling when active.
-            trimBtn.classList.add('primary-button');
+            // Highlight as primary only when the issue is just trailing whitespace (no syntax error).
+            if (hasTrailing && !hasError) {
+              trimBtn.classList.add('primary-button');
+            } else {
+              trimBtn.classList.remove('primary-button');
+            }
           } else {
             trimBtn.style.visibility = 'hidden';
             trimBtn.classList.remove('primary-button');
@@ -803,10 +807,15 @@ dataLayer.push({
           // Apply button styles: red for errors, yellow for warnings
           customRunBtn.classList.toggle('error-button', hasError);
           customRunBtn.classList.toggle('warn-button', !hasError && hasTrailing);
-          // Show trim button whenever there is trailing whitespace regardless of syntax errors
-          if (hasTrailing) {
+          // Show trim button whenever there is trailing whitespace or a syntax error
+          if (hasTrailing || hasError) {
             customTrimBtn.style.visibility = 'visible';
-            customTrimBtn.classList.add('primary-button');
+            // Highlight the trim button only when the issue is just trailing whitespace
+            if (hasTrailing && !hasError) {
+              customTrimBtn.classList.add('primary-button');
+            } else {
+              customTrimBtn.classList.remove('primary-button');
+            }
           } else {
             customTrimBtn.style.visibility = 'hidden';
             customTrimBtn.classList.remove('primary-button');
@@ -829,6 +838,3 @@ dataLayer.push({
 </script>
 </body>
 </html>
-
-
-
