@@ -455,12 +455,17 @@ dataLayer.push({
   function trimCustom() {
     const editor = window.customEditor;
     const raw = editor ? editor.getValue() : document.getElementById('customJson').value;
-    const trimmed = raw.replace(/[ \t]+$/gm, '');
+    // Remove trailing spaces at line ends and normalise whitespace
+    let trimmed = raw.replace(/[ \t]+$/gm, '');
+    // Replace non‑breaking or zero‑width spaces with normal spaces
+    trimmed = trimmed.replace(/[\u00a0\u200b]+/g, ' ');
+    // Remove extraneous commas immediately before closing braces or brackets
+    trimmed = trimmed.replace(/,\s*([}\]])/g, '$1');
     if (editor) {
       editor.setValue(trimmed, -1);
     }
     document.getElementById('customJson').value = trimmed;
-    log('🧹 Trailing spaces removed');
+    log('🧹 Trailing spaces and extra punctuation removed');
   }
 
   function log(msg) {
@@ -585,15 +590,19 @@ dataLayer.push({
       });
     };
 
-    // Trim trailing spaces when requested
+    // Trim trailing spaces and extraneous punctuation when requested
     trimBtn.onclick = () => {
       const code = editorInstance ? editorInstance.getValue() : textarea.value;
-      const trimmed = code.replace(/[ \t]+$/gm, '');
+      let trimmed = code.replace(/[ \t]+$/gm, '');
+      // Replace non‑breaking or zero‑width spaces with normal spaces
+      trimmed = trimmed.replace(/[\u00a0\u200b]+/g, ' ');
+      // Remove extraneous commas immediately before closing braces or brackets
+      trimmed = trimmed.replace(/,\s*([}\]])/g, '$1');
       if (editorInstance) {
         editorInstance.setValue(trimmed, -1);
       }
       textarea.value = trimmed;
-      log('🧹 Trailing spaces removed');
+      log('🧹 Trailing spaces and extra punctuation removed');
     };
 
     wrapper.appendChild(header);
@@ -616,6 +625,11 @@ dataLayer.push({
         editorInstance.session.on('change', () => {
           textarea.value = editorInstance.getValue();
         });
+
+        // Set JSHint options on the worker to allow modern syntax, including trailing commas in function calls
+        if (editorInstance.session.$worker) {
+          editorInstance.session.$worker.call('setOptions', [{ esversion: 10 }]);
+        }
 
         // Monitor annotations and content to toggle the run button colour
         // and display a trim‑spaces button when trailing whitespace is present.
@@ -770,6 +784,11 @@ dataLayer.push({
         tabSize: 2,
         useSoftTabs: true
       });
+      // Configure the JavaScript worker to support modern syntax, including trailing commas
+      const customSess = customEditor.getSession();
+      if (customSess.$worker) {
+        customSess.$worker.call('setOptions', [{ esversion: 10 }]);
+      }
       window.customEditor = customEditor;
 
       // Attach state styling and trailing whitespace detection to the playground push button
