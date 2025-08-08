@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>GTM & dataLayer Playground</title>
+  <style>
+    /*
+     * Base layout styling.  A subtle background colour and modern
+     * typography give the app a more contemporary feel.  The
+     * content is centred with a maximum width to improve readability.
+     */
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
+        Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+      background: #f7f9fb;
+      color: #333;
+      padding: 20px;
+      max-width: 1000px;
+      margin: auto;
+    }
+
+    /* Form controls adopt a consistent height, border radius and
+       light border. */
+    input,
+    textarea {
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      padding: 8px;
+    }
+    input {
+      width: 300px;
+    }
+    textarea {
+      width: 100%;
+      font-family: monospace;
+      resize: both;
+      overflow: auto;
+      background: #fff;
+    }
+
+    /* General button styling with a primary colour palette and
+       transitions for hover effects.  A small border radius softens
+       corners. */
+    button {
+      font-size: 16px;
+      padding: 8px 14px;
+      cursor: pointer;
+      border: none;
+      border-radius: 4px;
+      background-color: #007bff;
+      color: #fff;
+      transition: background-color 0.15s ease;
+      display: inline-block;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    /*
+       Small buttons represent secondary actions.  They have a more neutral
+       colour palette compared with primary buttons and subtle hover
+       feedback.  Use margin to separate them when stacked.
+    */
+    .small-button {
+      font-size: 14px;
+      padding: 6px 10px;
+      background-color: #e2e6ea;
+      color: #333;
+    }
+    .small-button:hover {
+      background-color: #d4dadd;
+    }
+    /*
+       Preset event card styling.  Each event is a card with a grey
+       header bar containing the event name and action buttons.  The
+       textarea aligns with the header and occupies the rest of the
+       card. */
+    .preset-wrapper {
+      border: 1px solid #eceff3;
+      border-radius: 4px;
+      background: #fff;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+      margin-bottom: 20px;
+    }
+    .preset-header-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #f5f7fa;
+      border-bottom: 1px solid #eceff3;
+      padding: 12px 16px;
+      font-weight: 600;
+    }
+
+    /* Left side of the preset header holds the primary action and the event name. */
+    .preset-header-left {
+      display: flex;
+      align-items: center;
+    }
+    .preset-header-left button {
+      margin-right: 10px;
+    }
+    .preset-header-title {
+      font-size: 17px;
+      margin-left: 0;
+    }
+    .preset-header-actions button {
+      margin-left: 10px;
+    }
+    .preset-wrapper textarea {
+      border: none;
+      border-radius: 0 0 4px 4px;
+      padding: 12px 16px;
+      min-height: 120px;
+      resize: vertical;
+      width: 100%;
+      /* Ensure padding is included in the width to align with header */
+      box-sizing: border-box;
+    }
+    /* Headings use a modern size/weight and extra spacing around
+       sections. */
+    .label {
+      font-weight: 600;
+      margin: 40px 0 15px;
+      font-size: 28px;
+    }
+    /* Log output adopts a card-like style similar to presets. */
+    .log {
+      margin-top: 15px;
+      background: #fff;
+      padding: 10px;
+      border: 1px solid #eceff3;
+      border-radius: 4px;
+      font-family: monospace;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+    }
+
+    /*
+     * Layout helpers for the top action buttons.  These classes group the three
+     * preset actions (save, copy all and reset) together near the top of the
+     * page and arrange them horizontally.  Each group contains the primary
+     * button and its descriptive caption stacked vertically.  The flex
+     * container allows the groups to sit side‑by‑side and wrap on narrow
+     * screens.
+     */
+    .top-buttons {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+      align-items: flex-start;
+      margin: 20px 0;
+    }
+    .button-group {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    /*
+     * Custom JS section styling inspired by Google Tag Manager.  The
+     * section uses a card with a light header bar containing the title
+     * and action buttons.  The textarea occupies the remainder of
+     * the card without its own border, giving a cohesive look.
+     */
+    /* The playground section inherits card styles from .preset-wrapper.
+       Only a larger bottom margin is applied here to separate it
+       visually from the navigation and test events. */
+    .custom-js-section {
+      margin-bottom: 40px;
+    }
+
+    /*
+     * Event navigation bar styling.  Displays a row of buttons to
+     * quickly scroll to each event section.  Buttons use a neutral
+     * colour palette similar to secondary actions.
+     */
+    .event-nav {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin: 20px 0;
+    }
+    .event-nav .nav-btn {
+      background-color: #e2e6ea;
+      border: none;
+      border-radius: 4px;
+      padding: 6px 12px;
+      color: #333;
+      cursor: pointer;
+      transition: background-color 0.15s ease;
+      font-size: 14px;
+    }
+    .event-nav .nav-btn:hover {
+      background-color: #d4dadd;
+    }
+
+    .event-nav-title {
+      font-weight: 600;
+      margin: 10px 0 5px;
+    }
+
+    /* Sub-label styling used below section headers for explanatory notes. */
+    .sub-label {
+      color: gray;
+      font-size: 14px;
+      margin-top: -10px;
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h1>GTM Playground</h1>
+
+  <label for="gtmId">Enter your GTM Container ID:</label><br>
+  <input type="text" id="gtmId" placeholder="GTM-XXXXXXX" />
+  <button onclick="loadGTM()">Inject GTM</button>
+
+  
+  <!-- Top action buttons: save, copy all and reset.  These were previously
+       located beneath the presets section but have been moved here for
+       quicker access.  Each button is accompanied by a short description. -->
+  <div class="top-buttons">
+    <div class="button-group">
+      <button onclick="savePresets()">💾 Save Changes to localStorage</button>
+      <p style="margin-top: 0; color: gray;">Will preserve changes when reloading.</p>
+    </div>
+    <div class="button-group">
+      <button onclick="copyAllAsDataLayer()">📋 Copy ALL as datalayer.js file</button>
+      <p style="margin-top: 0; color: gray;">To be used in <code>datalayer.js</code>.</p>
+    </div>
+    <div class="button-group">
+      <button onclick="resetPresets()">♻️ Reset and use datalayer.js</button>
+      <p style="margin-top: 0; color: gray;">Remove edits and load from <code>datalayer.js</code>.</p>
+    </div>
+  </div>
+
+  <hr>
+
+  <!-- A card where users can write arbitrary code and push it to the dataLayer.
+       This section appears after the log output for quick access. -->
+
+  <!-- Log output card.  Displays the result of running events or copying code.
+       Positioned above the playground for better visibility. -->
+  <div class="log" id="logOutput">Console output will appear here…</div>
+
+  <hr>
+
+  <div class="custom-js-section preset-wrapper" data-ignore-nav="true">
+    <div class="preset-header-bar">
+      <div class="preset-header-left">
+        <button onclick="runCustom()">Push</button>
+        <span class="preset-header-title">dataLayer Playground</span>
+      </div>
+      <div class="preset-header-actions">
+        <button class="small-button" onclick="copyCustom()">Copy as dataLayer.push</button>
+        <button class="small-button" onclick="copyCustomDL()">Copy as datalayer.js block</button>
+      </div>
+    </div>
+    <textarea id="customJson" rows="10">
+dataLayer.push({
+  event: 'custom_event',
+  object_name: {
+    property_string: 'MitID',
+	property_number: 123,
+	property_bolean: true,
+  }
+});
+    </textarea>
+  </div>
+
+
+  <!-- Navigation bar for quickly jumping to individual events.  Buttons
+       are generated dynamically based on the loaded presets. -->
+  <div class="event-nav-title">Go to event:</div>
+  <div id="eventNav" class="event-nav"></div>
+
+  <div class="label">Loaded Events</div>
+  <p class="sub-label">(editable in <code>datalayer.js</code>)</p>
+  <div id="presetsArea"></div>
+  <!-- The preset action buttons have been moved to the top of the page.  The
+       original buttons and descriptions were removed from this location. -->
+
+  <script src="datalayer.js"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+
+  function loadGTM() {
+    const id = document.getElementById('gtmId').value.trim();
+    if (!id.match(/^GTM-[A-Z0-9]+$/i)) {
+      alert('Invalid GTM ID');
+      return;
+    }
+    localStorage.setItem('gtm_id', id);
+    const script = document.createElement('script');
+    script.src = 'https://www.googletagmanager.com/gtm.js?id=' + id;
+    script.async = true;
+    document.head.appendChild(script);
+    dataLayer.push({ 'gtm.start': new Date().getTime(), event: 'gtm.js' });
+
+    const iframe = document.createElement('iframe');
+    iframe.src = `https://www.googletagmanager.com/ns.html?id=${id}`;
+    iframe.height = 0;
+    iframe.width = 0;
+    iframe.style.display = 'none';
+    iframe.style.visibility = 'hidden';
+    document.body.appendChild(iframe);
+  }
+
+  function runCustom() {
+    try {
+      const raw = document.getElementById('customJson').value;
+      new Function(raw)();
+      log('✅ Ran custom JS');
+    } catch (e) {
+      log('❌ Error: ' + e.message);
+    }
+  }
+
+  function copyCustom() {
+    const textarea = document.getElementById('customJson');
+    textarea.select();
+    document.execCommand('copy');
+    log('📋 Copied custom JS');
+  }
+
+  // Copy the custom JS from the playground as a datalayer.js block.  A
+  // generic name is assigned since the playground code does not have
+  // an explicit event name.
+  function copyCustomDL() {
+    const textarea = document.getElementById('customJson');
+    const code = textarea.value;
+    const name = 'custom_js';
+    const fullBlock = `// ===== START ${name} =====  \n{\n  name: "${name}",\n  code: \`${code}\`\n},\n// ===== END ${name} =====`;
+    navigator.clipboard.writeText(fullBlock).then(() => {
+      log('📋 Copied custom JS as datalayer.js block');
+    });
+  }
+
+  function log(msg) {
+    document.getElementById('logOutput').textContent = msg;
+    console.log(msg);
+  }
+
+  const defaultPresets = window.gtmPresets || [];
+
+  function loadPresets() {
+    const saved = localStorage.getItem('presets_full_js');
+    const presets = saved ? JSON.parse(saved) : defaultPresets;
+
+    const container = document.getElementById('presetsArea');
+    container.innerHTML = '';
+
+    presets.forEach((preset, i) => {
+      container.appendChild(renderPreset(preset, i));
+    });
+
+    // After presets have been rendered, rebuild the navigation bar.  This
+    // ensures that each event is represented by a navigation button.
+    renderNavigation();
+  }
+
+  function renderPreset(preset, index) {
+    const wrapper = document.createElement('div');
+    wrapper.className = 'preset-wrapper';
+
+    // Build a header bar containing the event title and action buttons
+    const header = document.createElement('div');
+    header.className = 'preset-header-bar';
+
+    const headerLeft = document.createElement('div');
+    headerLeft.className = 'preset-header-left';
+
+    const title = document.createElement('span');
+    title.className = 'preset-header-title';
+    const eventName = preset.name || `custom_${index + 1}`;
+    title.textContent = eventName;
+
+    // Primary action: push/run the event code
+    const runBtn = document.createElement('button');
+    runBtn.textContent = 'Push';
+
+    // Build left part: run button followed by event name
+    headerLeft.appendChild(runBtn);
+    headerLeft.appendChild(title);
+
+    // Right part: copy as dataLayer.push and as datalayer.js block
+    const actions = document.createElement('div');
+    actions.className = 'preset-header-actions';
+
+    const copyBtn = document.createElement('button');
+    copyBtn.textContent = 'Copy as dataLayer.push';
+    copyBtn.className = 'small-button';
+
+    const copyDLBtn = document.createElement('button');
+    copyDLBtn.textContent = 'Copy as datalayer.js block';
+    copyDLBtn.className = 'small-button';
+
+    actions.appendChild(copyBtn);
+    actions.appendChild(copyDLBtn);
+
+    // Construct header
+    header.appendChild(headerLeft);
+    header.appendChild(actions);
+
+    // Textarea for event code
+    const textarea = document.createElement('textarea');
+    textarea.dataset.index = index;
+    textarea.dataset.name = eventName;
+    textarea.value = preset.code;
+    textarea.rows = 10;
+    textarea.className = 'preset-textarea';
+
+    // Click handlers
+    runBtn.onclick = () => {
+      try {
+        new Function(textarea.value)();
+        log(`✅ Executed: ${eventName}`);
+      } catch (e) {
+        log('❌ Error parsing JS: ' + e.message);
+      }
+    };
+    copyBtn.onclick = () => {
+      textarea.select();
+      document.execCommand('copy');
+      log('📋 Copied as dataLayer.push');
+    };
+    copyDLBtn.onclick = () => {
+      const name = textarea.dataset.name || `custom_${index + 1}`;
+      const fullBlock = 
+`// ===== START ${name} =====  
+{
+  name: "${name}",
+  code: \`${textarea.value}\`
+},
+// ===== END ${name} =====`;
+      navigator.clipboard.writeText(fullBlock).then(() => {
+        log('📋 Copied as datalayer.js block');
+      });
+    };
+
+    wrapper.appendChild(header);
+    wrapper.appendChild(textarea);
+    return wrapper;
+  }
+
+
+  function savePresets() {
+    const all = document.querySelectorAll('.preset-textarea');
+    const updated = Array.from(all).map((el) => {
+      // Use the dataset attribute on the textarea to determine the
+      // event name rather than parsing from a header.
+      const name = el.dataset.name || '';
+      return {
+        name: name,
+        code: el.value
+      };
+    });
+    localStorage.setItem('presets_full_js', JSON.stringify(updated));
+    log('💾 Presets saved to localStorage');
+    loadPresets();
+  }
+
+  function resetPresets() {
+  localStorage.removeItem('presets_full_js');
+  log('♻️ LocalStorage cleared. Reloading datalayer.js presets…');
+
+  // Hent igen fra original datalayer.js
+  const fallbackPresets = window.gtmPresets || [];
+  const container = document.getElementById('presetsArea');
+  container.innerHTML = '';
+  fallbackPresets.forEach((preset, i) => {
+    container.appendChild(renderPreset(preset, i));
+  });
+}
+
+  function copyAllAsDataLayer() {
+  const all = document.querySelectorAll('.preset-textarea');
+
+  const eventBlocks = Array.from(all).map((el, i) => {
+    const name = el.dataset.name || `custom_${i + 1}`;
+    const code = el.value;
+
+    return `// ===== START ${name} =====  
+{
+  name: "${name}",
+  code: \`${code}\`
+},
+// ===== END ${name} =====`;
+  });
+
+  const finalCode = `const presetEvents = [\n${eventBlocks.join('\n\n')}\n];\n\nwindow.gtmPresets = presetEvents;`;
+
+  navigator.clipboard.writeText(finalCode).then(() => {
+    log('📋 All events copied as datalayer.js file');
+  });
+}
+
+  /*
+   * Create a URL‑friendly slug from a string.  Lowercases and
+   * replaces non‑alphanumeric characters with underscores.  Used to
+   * generate element IDs based on event names.
+   */
+  function slugify(str) {
+    return str
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '_')
+      .replace(/^_+|_+$/g, '');
+  }
+
+  /*
+   * Build the navigation bar of event links.  Each button will scroll
+   * smoothly to the corresponding event card when clicked.
+   */
+  function renderNavigation() {
+    const nav = document.getElementById('eventNav');
+    if (!nav) return;
+    nav.innerHTML = '';
+    const wrappers = document.querySelectorAll('.preset-wrapper');
+    wrappers.forEach((wrapper) => {
+      // Skip wrappers flagged to be ignored by the navigation bar
+      if (wrapper.getAttribute('data-ignore-nav') === 'true') return;
+      const titleEl = wrapper.querySelector('.preset-header-title');
+      if (!titleEl) return;
+      const name = titleEl.textContent.trim();
+      const id = 'event_' + slugify(name);
+      wrapper.id = id;
+
+      const btn = document.createElement('button');
+      btn.className = 'nav-btn';
+      btn.textContent = name;
+      btn.onclick = () => {
+        const target = document.getElementById(id);
+        if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      };
+      nav.appendChild(btn);
+    });
+  }
+
+
+  window.addEventListener('load', () => {
+    const lastId = localStorage.getItem('gtm_id');
+    if (lastId) document.getElementById('gtmId').value = lastId;
+    loadPresets();
+  });
+</script>
+</body>
+</html>
+
+
+
