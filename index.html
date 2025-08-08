@@ -6,8 +6,8 @@
   <!-- Application version metadata.  Update these values when you commit new versions.
        app-version holds a simple version string, e.g. 1.2.3, and app-changelog holds
        a short description of what changed. -->
-  <meta name="app-version" content="2.1.0">
-  <meta name="app-changelog" content="Prepare for the use of local file">
+  <meta name="app-version" content="2.2.0">
+  <meta name="app-changelog" content="When using loacal file change header">
   <style>
     /*
      * Base layout styling.  A subtle background colour and modern
@@ -410,8 +410,11 @@ dataLayer.push({
   <!-- Divider after the Go to event navigation -->
   <hr>
 
-  <div class="label">Loaded Events</div>
-  <p class="sub-label">(editable in <code>datalayer.js</code>)</p>
+  <!-- The header for the loaded events section changes depending on whether
+       presets are loaded from GitHub or from a local file.  The text is
+       updated programmatically via updateLoadedEventsHeader(). -->
+  <div id="loadedEventsLabel" class="label">Loaded Events</div>
+  <p id="loadedEventsSubLabel" class="sub-label">(editable in <code>datalayer.js</code>)</p>
   <div id="presetsArea"></div>
   <!-- The preset action buttons have been moved to the top of the page.  The
        original buttons and descriptions were removed from this location. -->
@@ -419,6 +422,11 @@ dataLayer.push({
   <script src="datalayer.js"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
+
+    // Holds a reference to the currently selected local file so it can be reloaded
+    // without prompting the user to pick a file again.  This variable is set
+    // when a file is successfully loaded via loadLocalFile().
+    let currentLocalFile = null;
 
   // Display the static version defined in the meta tags.  To update, modify the
   // meta[name="app-version"] and meta[name="app-changelog"] values in the head.
@@ -504,6 +512,21 @@ dataLayer.push({
     log('🧹 Trailing spaces and extra punctuation removed');
   }
 
+  // Update the header for the loaded events section based on the source
+  // of presets.  When currentLocalFile is set, the header indicates
+  // that events come from a local file and includes the file name.  Otherwise,
+  // it states that events are loaded from GitHub.  The sub-label text
+  // remains unchanged.
+  function updateLoadedEventsHeader() {
+    const labelEl = document.getElementById('loadedEventsLabel');
+    if (!labelEl) return;
+    if (currentLocalFile) {
+      labelEl.textContent = `Loaded Events from local file ${currentLocalFile.name}`;
+    } else {
+      labelEl.textContent = 'Loaded Events from GitHub';
+    }
+  }
+
   function log(msg) {
     document.getElementById('logOutput').textContent = msg;
     console.log(msg);
@@ -525,6 +548,9 @@ dataLayer.push({
     // After presets have been rendered, rebuild the navigation bar.  This
     // ensures that each event is represented by a navigation button.
     renderNavigation();
+
+    // Update the header to indicate the source of the loaded events
+    updateLoadedEventsHeader();
   }
 
   function renderPreset(preset, index) {
@@ -731,17 +757,29 @@ dataLayer.push({
   }
 
   function resetPresets() {
-  localStorage.removeItem('presets_full_js');
-  log('♻️ LocalStorage cleared. Reloading datalayer.js presets…');
-
-  // Hent igen fra original datalayer.js
-  const fallbackPresets = window.gtmPresets || [];
-  const container = document.getElementById('presetsArea');
-  container.innerHTML = '';
-  fallbackPresets.forEach((preset, i) => {
-    container.appendChild(renderPreset(preset, i));
-  });
-}
+    localStorage.removeItem('presets_full_js');
+    log('♻️ LocalStorage cleared. Reloading datalayer.js presets…');
+    // Clear any reference to a previously loaded local file
+    currentLocalFile = null;
+    // Reset the local loader button back to its original state
+    const localBtn = document.querySelector('.local-file-group button');
+    if (localBtn) {
+      localBtn.textContent = 'Use local datalayer.js';
+      // Restore small-button styling so it appears neutral
+      localBtn.classList.remove('primary-button');
+      localBtn.classList.add('small-button');
+      localBtn.title = 'Use a local file instead of the built‑in datalayer.js';
+    }
+    // Fetch presets again from the original datalayer.js
+    const fallbackPresets = window.gtmPresets || [];
+    const container = document.getElementById('presetsArea');
+    container.innerHTML = '';
+    fallbackPresets.forEach((preset, i) => {
+      container.appendChild(renderPreset(preset, i));
+    });
+    // Update header to show that events are from GitHub
+    updateLoadedEventsHeader();
+  }
 
   // Load events from a user‑selected local datalayer.js file.  The file must
   // assign an array of event definitions to either `window.gtmPresets` or
@@ -751,18 +789,26 @@ dataLayer.push({
   // message is displayed in the log.
   function loadLocalFile() {
     const input = document.getElementById('localFileInput');
-    if (!input || !input.files || input.files.length === 0) {
+    // If a file is explicitly provided (user just chose one via the input), load that file.
+    if (input && input.files && input.files.length > 0) {
+      const file = input.files[0];
+      loadLocalFileFromFile(file);
+    } else if (currentLocalFile) {
+      // If no file is chosen but we have a previously selected file, reload it.
+      loadLocalFileFromFile(currentLocalFile);
+    } else {
       alert('Please select a .js file first.');
-      return;
     }
-    const file = input.files[0];
+  }
+
+  // Load a local datalayer.js from a File object.  Updates the global
+  // currentLocalFile reference, stores the processed events in localStorage,
+  // updates the local loader button text/style, and renders the presets.
+  function loadLocalFileFromFile(file) {
     const reader = new FileReader();
     reader.onload = function(e) {
       const content = e.target.result;
       try {
-        // Execute the file in a sandboxed context.  Use a dummy window object so
-        // that assignments to `window.gtmPresets` or `window.presetEvents` are
-        // captured in the sandbox.
         const sandbox = {};
         const wrapper = new Function('window', content + '\n; return window.gtmPresets || window.presetEvents || []');
         const events = wrapper(sandbox);
@@ -770,7 +816,23 @@ dataLayer.push({
           const processed = events.map(ev => ({ name: ev.name, code: ev.code }));
           localStorage.setItem('presets_full_js', JSON.stringify(processed));
           log('📁 Loaded events from local file');
+          // Remember this file so we can reload it later without asking the user
+          currentLocalFile = file;
+          // Update the local loader button to indicate a local file is in use
+          const localBtn = document.querySelector('.local-file-group button');
+          if (localBtn) {
+            localBtn.textContent = `Reload local ${file.name}`;
+            // Remove previous small-button class and apply a primary style.  We
+            // deliberately keep the small-button sizing so the control remains
+            // consistent with the other auxiliary buttons, but apply a
+            // primary-button class to colour it blue.
+            localBtn.classList.remove('small-button');
+            localBtn.classList.add('small-button', 'primary-button');
+            localBtn.title = `Reload the locally loaded file (${file.name})`;
+          }
           loadPresets();
+          // Update the header to reflect that presets are from a local file
+          updateLoadedEventsHeader();
         } else {
           log('⚠️ The selected file does not define any events (gtmPresets/presetEvents).');
         }
