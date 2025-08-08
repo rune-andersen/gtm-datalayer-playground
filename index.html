@@ -117,6 +117,12 @@
       /* Ensure padding is included in the width to align with header */
       box-sizing: border-box;
     }
+
+    /* Ace editor container inherits similar styling to the textarea it replaces. */
+    .ace-editor-container {
+      width: 100%;
+      min-height: 120px;
+    }
     /* Headings use a modern size/weight and extra spacing around
        sections. */
     .label {
@@ -206,7 +212,27 @@
       margin-top: -10px;
       margin-bottom: 20px;
     }
+    /* Ace editor uses its own themes; ensure fonts align with the rest of the app. */
+    .ace_editor {
+      font-family: monospace;
+      font-size: 14px;
+      border-radius: 0 0 4px 4px;
+      border: none;
+    }
+
   </style>
+
+  <!-- Include Ace Editor locally for lightweight code editing with syntax highlighting.
+       The core library and required mode/theme scripts are stored alongside this file. -->
+  <script src="ace.js"></script>
+  <script>
+    // Configure Ace to load additional scripts from the current directory.
+    if (window.ace) {
+      ace.config.set('basePath', '.');
+    }
+  </script>
+  <script src="mode-javascript.js"></script>
+  <script src="theme-chrome.js"></script>
 </head>
 <body>
   <h1>GTM Playground</h1>
@@ -256,11 +282,15 @@
         <button class="small-button" onclick="copyCustomDL()">Copy as datalayer.js block</button>
       </div>
     </div>
-    <textarea id="customJson" rows="6">// Example:
+    <!-- Hidden textarea to hold the raw code for persistence.  Ace will sync
+         its value into this element on change. -->
+    <textarea id="customJson" style="display:none;">// Example:
 dataLayer.push({
   event: "custom_event",
   my_value: 123
 });</textarea>
+    <!-- Visible editor for writing custom JS.  Ace will be instantiated on this container. -->
+    <div id="customEditor" class="ace-editor-container" style="height: 150px;"></div>
   </div>
 
 
@@ -303,7 +333,8 @@ dataLayer.push({
 
   function runCustom() {
     try {
-      const raw = document.getElementById('customJson').value;
+      const editor = window.customEditor;
+      const raw = editor ? editor.getValue() : document.getElementById('customJson').value;
       new Function(raw)();
       log('✅ Ran custom JS');
     } catch (e) {
@@ -312,18 +343,19 @@ dataLayer.push({
   }
 
   function copyCustom() {
-    const textarea = document.getElementById('customJson');
-    textarea.select();
-    document.execCommand('copy');
-    log('📋 Copied custom JS');
+    const editor = window.customEditor;
+    const code = editor ? editor.getValue() : document.getElementById('customJson').value;
+    navigator.clipboard.writeText(code).then(() => {
+      log('📋 Copied custom JS');
+    });
   }
 
   // Copy the custom JS from the playground as a datalayer.js block.  A
   // generic name is assigned since the playground code does not have
   // an explicit event name.
   function copyCustomDL() {
-    const textarea = document.getElementById('customJson');
-    const code = textarea.value;
+    const editor = window.customEditor;
+    const code = editor ? editor.getValue() : document.getElementById('customJson').value;
     const name = 'custom_js';
     const fullBlock = `// ===== START ${name} =====  \n{\n  name: "${name}",\n  code: \`${code}\`\n},\n// ===== END ${name} =====`;
     navigator.clipboard.writeText(fullBlock).then(() => {
@@ -397,44 +429,73 @@ dataLayer.push({
     header.appendChild(headerLeft);
     header.appendChild(actions);
 
-    // Textarea for event code
+    // Hidden textarea to store the event code for persistence and localStorage
     const textarea = document.createElement('textarea');
     textarea.dataset.index = index;
     textarea.dataset.name = eventName;
     textarea.value = preset.code;
     textarea.rows = 10;
     textarea.className = 'preset-textarea';
+    textarea.style.display = 'none';
 
-    // Click handlers
+    // Visible Ace editor container
+    const editorDiv = document.createElement('div');
+    editorDiv.id = `preset_editor_${index}`;
+    editorDiv.className = 'ace-editor-container';
+    editorDiv.style.height = '150px';
+
+    // Placeholder for the editor instance
+    let editorInstance;
+
+    // Click handlers referencing the Ace editor when available
     runBtn.onclick = () => {
       try {
-        new Function(textarea.value)();
+        const code = editorInstance ? editorInstance.getValue() : textarea.value;
+        new Function(code)();
         log(`✅ Executed: ${eventName}`);
       } catch (e) {
         log('❌ Error parsing JS: ' + e.message);
       }
     };
     copyBtn.onclick = () => {
-      textarea.select();
-      document.execCommand('copy');
-      log('📋 Copied as dataLayer.push');
+      const code = editorInstance ? editorInstance.getValue() : textarea.value;
+      navigator.clipboard.writeText(code).then(() => {
+        log('📋 Copied as dataLayer.push');
+      });
     };
     copyDLBtn.onclick = () => {
       const name = textarea.dataset.name || `custom_${index + 1}`;
+      const code = editorInstance ? editorInstance.getValue() : textarea.value;
       const fullBlock = 
-`// ===== START ${name} =====  
-{
-  name: "${name}",
-  code: \`${textarea.value}\`
-},
-// ===== END ${name} =====`;
+`// ===== START ${name} =====  \n{\n  name: "${name}",\n  code: \`${code}\`\n},\n// ===== END ${name} =====`;
       navigator.clipboard.writeText(fullBlock).then(() => {
         log('📋 Copied as datalayer.js block');
       });
     };
 
     wrapper.appendChild(header);
+    wrapper.appendChild(editorDiv);
     wrapper.appendChild(textarea);
+
+    // Instantiate the Ace editor after a short delay to ensure the element exists in the DOM
+    setTimeout(() => {
+      if (window.ace) {
+        editorInstance = ace.edit(editorDiv.id);
+        editorInstance.session.setMode('ace/mode/javascript');
+        editorInstance.setTheme('ace/theme/chrome');
+        editorInstance.setValue(preset.code || '', -1);
+        editorInstance.setOptions({
+          showPrintMargin: false,
+          tabSize: 2,
+          useSoftTabs: true
+        });
+        // Sync the hidden textarea whenever the editor content changes
+        editorInstance.session.on('change', () => {
+          textarea.value = editorInstance.getValue();
+        });
+      }
+    }, 0);
+
     return wrapper;
   }
 
@@ -536,6 +597,24 @@ dataLayer.push({
     const lastId = localStorage.getItem('gtm_id');
     if (lastId) document.getElementById('gtmId').value = lastId;
     loadPresets();
+    // Initialise the Ace editor for the custom JS playground once the DOM is ready.
+    if (window.ace) {
+      const customEditor = ace.edit('customEditor');
+      customEditor.session.setMode('ace/mode/javascript');
+      // Use a light theme to match the application's design
+      customEditor.setTheme('ace/theme/chrome');
+      customEditor.setValue(document.getElementById('customJson').value || '', -1);
+      customEditor.session.on('change', () => {
+        document.getElementById('customJson').value = customEditor.getValue();
+      });
+      // Hide the print margin and adjust some editor options
+      customEditor.setOptions({
+        showPrintMargin: false,
+        tabSize: 2,
+        useSoftTabs: true
+      });
+      window.customEditor = customEditor;
+    }
   });
 </script>
 </body>
