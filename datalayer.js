@@ -62,7 +62,7 @@ const presetEvents = [
   name: "product_listing_view",
   code: `dataLayer.push({
   event: 'product_listing_view',
-  product_listing: { 
+  product_listing: {
     product_listing_id: '123-abc',
     product_listing_name: 'Mobiltelefoner',
     product_sorting: 'Mest populære',
@@ -151,12 +151,12 @@ const presetEvents = [
   name: "search",
   code: `dataLayer.push({
   event: 'search',
-   'search': {
-    'product_sorting': 'Relevance',
-    'search_term': 'panik',
-    'search_term_lenght': 5,
+   'search': {
+     'product_sorting': 'Relevance',
+     'search_term': 'panik',
+     'search_term_lenght': 5,
      'search_results': 34
-  }
+  }
 });`
 },
 // ===== END search =====
