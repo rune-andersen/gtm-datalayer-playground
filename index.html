@@ -220,6 +220,33 @@
       border: none;
     }
 
+    /* Allow the Ace editor container to be vertically resizable by the user. */
+    .ace-editor-container {
+      resize: vertical;
+      overflow: auto;
+    }
+
+    /* Button state when syntax errors are present in the editor. */
+    .error-button {
+      background-color: #dc3545 !important;
+      color: #fff !important;
+    }
+    .error-button:hover {
+      background-color: #c82333 !important;
+    }
+
+    /* Lighten the appearance of error highlights in Ace to reduce visual noise. */
+    .ace_editor .ace_error {
+      background-color: #fee2e2;
+    }
+    .ace_editor .ace_gutter-cell.ace_error {
+      background-color: #fee2e2;
+      color: #721c24;
+    }
+    .ace_editor .ace_marker-layer .ace_error {
+      background-color: #fecaca;
+    }
+
   </style>
 
   <!-- Include Ace Editor from CDN for syntax highlighting.  The CDN provides the core, mode and theme scripts. -->
@@ -486,6 +513,21 @@ dataLayer.push({
         editorInstance.session.on('change', () => {
           textarea.value = editorInstance.getValue();
         });
+
+        // Monitor annotations to toggle the run button colour when errors are present
+        const session = editorInstance.getSession();
+        const updateButtonState = () => {
+          const anns = session.getAnnotations() || [];
+          const hasError = anns.some(a => a.type === 'error');
+          runBtn.classList.toggle('error-button', hasError);
+        };
+        updateButtonState();
+        session.on('changeAnnotation', updateButtonState);
+
+        // Resize the editor when the container is resized by the user
+        editorDiv.addEventListener('mouseup', () => {
+          editorInstance.resize();
+        });
       }
     }, 0);
 
@@ -607,6 +649,27 @@ dataLayer.push({
         useSoftTabs: true
       });
       window.customEditor = customEditor;
+
+      // Attach error state styling to the playground push button
+      const customRunBtn = document.querySelector('.custom-js-section .preset-header-left button');
+      if (customRunBtn) {
+        const session = customEditor.getSession();
+        const updatePlaygroundButton = () => {
+          const anns = session.getAnnotations() || [];
+          const hasError = anns.some(a => a.type === 'error');
+          customRunBtn.classList.toggle('error-button', hasError);
+        };
+        updatePlaygroundButton();
+        session.on('changeAnnotation', updatePlaygroundButton);
+      }
+
+      // Allow resizing of the custom editor and refresh layout on mouseup
+      const customContainer = document.getElementById('customEditor');
+      if (customContainer) {
+        customContainer.addEventListener('mouseup', () => {
+          customEditor.resize();
+        });
+      }
     }
   });
 </script>
