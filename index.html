@@ -56,9 +56,19 @@
     button:hover {
       background-color: #0056b3;
     }
+    /*
+       Small buttons represent secondary actions.  They have a more neutral
+       colour palette compared with primary buttons and subtle hover
+       feedback.  Use margin to separate them when stacked.
+    */
     .small-button {
       font-size: 14px;
       padding: 6px 10px;
+      background-color: #e2e6ea;
+      color: #333;
+    }
+    .small-button:hover {
+      background-color: #d4dadd;
     }
     /* Each group of preset controls is laid out as a card with a
        subtle shadow and rounded corners. */
@@ -78,6 +88,11 @@
       flex-direction: column;
       flex-shrink: 0;
       margin-top: 0;
+    }
+
+    /* Add spacing between buttons in each preset */
+    .preset-buttons button + button {
+      margin-top: 8px;
     }
     .preset-textarea {
       flex: 1;
@@ -412,6 +427,10 @@ dataLayer.push({
 </script>
 </body>
 </html>
+
+
+
+
 
 
 
