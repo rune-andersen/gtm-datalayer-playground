@@ -222,17 +222,10 @@
 
   </style>
 
-  <!-- Include Ace Editor locally for lightweight code editing with syntax highlighting.
-       The core library and required mode/theme scripts are stored alongside this file. -->
-  <script src="ace.js"></script>
-  <script>
-    // Configure Ace to load additional scripts from the current directory.
-    if (window.ace) {
-      ace.config.set('basePath', '.');
-    }
-  </script>
-  <script src="mode-javascript.js"></script>
-  <script src="theme-chrome.js"></script>
+  <!-- Include Ace Editor from CDN for syntax highlighting.  The CDN provides the core, mode and theme scripts. -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.14/ace.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.14/mode-javascript.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.14/theme-chrome.js"></script>
 </head>
 <body>
   <h1>GTM Playground</h1>
