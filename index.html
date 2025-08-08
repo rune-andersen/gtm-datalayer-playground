@@ -3,6 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <title>GTM Playground</title>
+  <!-- Application version metadata.  Update these values when you commit new versions.
+       app-version holds a simple version string, e.g. 1.2.3, and app-changelog holds
+       a short description of what changed. -->
+  <meta name="app-version" content="1.1.2">
+  <meta name="app-changelog" content="add version text option">
   <style>
     /*
      * Base layout styling.  A subtle background colour and modern
@@ -296,8 +301,10 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.14/theme-chrome.js"></script>
 </head>
 <body>
-  <!-- Version label displayed in the top right corner.  The actual value is populated via a GitHub API call below. -->
-  <div class="version-label" id="versionLabel">Version: loading…</div>
+  <!-- Version label displayed in the top right corner.  This text will be populated using
+       the meta tag values defined in the document head (see meta[name="app-version"]).
+       When deploying a new version, update the meta tags accordingly. -->
+  <div class="version-label" id="versionLabel">Version: —</div>
   <h1>GTM Playground</h1>
 
   <label for="gtmId">Enter your GTM Container ID:</label><br>
@@ -374,27 +381,17 @@ dataLayer.push({
 <script>
   window.dataLayer = window.dataLayer || [];
 
-  // Fetch the latest commit SHA from GitHub and display it in the version label.
-  (function loadVersionLabel() {
+  // Display the static version defined in the meta tags.  To update, modify the
+  // meta[name="app-version"] and meta[name="app-changelog"] values in the head.
+  (function displayStaticVersion() {
     const versionEl = document.getElementById('versionLabel');
     if (!versionEl) return;
-    // Use GitHub API to retrieve the latest commit on the main branch.  This call is
-    // unauthenticated and therefore public; it will succeed as long as the API
-    // supports CORS for anonymous requests.
-    fetch('https://api.github.com/repos/rune-andersen/gtm-datalayer-playground/commits/main')
-      .then((resp) => resp.ok ? resp.json() : null)
-      .then((data) => {
-        if (!data) return;
-        // The API returns either a commit object or an array of commits depending on the endpoint.
-        const sha = Array.isArray(data) ? (data[0] && data[0].sha) : data.sha;
-        if (sha) {
-          versionEl.textContent = 'Commit: ' + sha.substring(0, 7);
-        }
-      })
-      .catch(() => {
-        // If the fetch fails, quietly fall back to a static version string.
-        versionEl.textContent = '';
-      });
+    const versionMeta = document.querySelector('meta[name="app-version"]');
+    const changeMeta = document.querySelector('meta[name="app-changelog"]');
+    const version = versionMeta ? versionMeta.getAttribute('content') : '';
+    const desc = changeMeta ? changeMeta.getAttribute('content') : '';
+    if (version) versionEl.textContent = 'Version: ' + version;
+    if (desc) versionEl.title = desc;
   })();
 
   function loadGTM() {
