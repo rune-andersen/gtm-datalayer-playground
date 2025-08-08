@@ -61,33 +61,31 @@ const presetEvents = [
 {
   name: "product_listing_view",
   code: `dataLayer.push({
-  event: 'product_listing_view',
-  product_listing: {  
-    product_listing_id: '123-abc',
-    product_listing_name: 'Mobiltelefoner',
-    product_sorting: 'Mest populære',
+  event: 'product_listing_view',
+  product_listing: { 
+    product_listing_id: '123-abc',
+    product_listing_name: 'Mobiltelefoner',
+    product_sorting: 'Mest populære',
     product_count: 43,
     pagination_current: 1,
     pagination_total: 10,
     	filters: [{
-      filter_name: 'brand',
-      filter_value: 'nokia'
-    },
-    {
-      filter_name: 'color',
-      filter_value: 'black'
-    },
-    {
-      filter_name: 'offer',
-      filter_value: false
-    },
-    {
-      filter_name: 'InStock',
-      filter_value: true
-    }
-  ],
-},
-});`
+      filter_name: 'brand',
+      filter_value: 'nokia'
+    },
+    {
+      filter_name: 'color',
+      filter_value: 'black'
+    },
+    {
+      filter_name: 'offer',
+      filter_value: false
+    },
+    {
+      filter_name: 'InStock',
+      filter_value: true
+    }
+  ]}});`
 },
 // ===== END product_listing_view =====
 
