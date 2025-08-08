@@ -6,8 +6,8 @@
   <!-- Application version metadata.  Update these values when you commit new versions.
        app-version holds a simple version string, e.g. 1.2.3, and app-changelog holds
        a short description of what changed. -->
-  <meta name="app-version" content="2.2.0">
-  <meta name="app-changelog" content="When using loacal file change header">
+  <meta name="app-version" content="2.3.0">
+  <meta name="app-changelog" content="Improve GTM load">
   <style>
     /*
      * Base layout styling.  A subtle background colour and modern
@@ -60,6 +60,15 @@
     }
     button:hover {
       background-color: #0056b3;
+    }
+
+    /* Styling for a neutral button used to clear GTM injection. */
+    .clear-button {
+      background-color: #e2e6ea;
+      color: #333;
+    }
+    .clear-button:hover {
+      background-color: #d4dadd;
     }
     /*
        Small buttons represent secondary actions.  They have a more neutral
@@ -336,7 +345,7 @@
     <div class="gtm-id-group">
       <!-- Input for GTM Container ID.  The explanatory text is provided via a tooltip instead of an always‑visible label. -->
       <input type="text" id="gtmId" placeholder="GTM-XXXXXXX" title="Enter your GTM Container ID" />
-      <button onclick="loadGTM()">Inject GTM</button>
+      <button id="gtmButton" onclick="loadGTM()">Inject GTM</button>
     </div>
     <div class="local-file-group">
       <input type="file" id="localFileInput" accept=".js" />
@@ -423,6 +432,13 @@ dataLayer.push({
 <script>
   window.dataLayer = window.dataLayer || [];
 
+    // Track whether the GTM container has been injected.  These variables
+    // store references to the script and iframe elements so they can be
+    // removed when clearing the GTM setup.
+    let gtmInjected = false;
+    let gtmScriptTag = null;
+    let gtmIframeTag = null;
+
     // Holds a reference to the currently selected local file so it can be reloaded
     // without prompting the user to pick a file again.  This variable is set
     // when a file is successfully loaded via loadLocalFile().
@@ -447,20 +463,9 @@ dataLayer.push({
       alert('Invalid GTM ID');
       return;
     }
+    // Persist the ID so it is reused on subsequent page loads
     localStorage.setItem('gtm_id', id);
-    const script = document.createElement('script');
-    script.src = 'https://www.googletagmanager.com/gtm.js?id=' + id;
-    script.async = true;
-    document.head.appendChild(script);
-    dataLayer.push({ 'gtm.start': new Date().getTime(), event: 'gtm.js' });
-
-    const iframe = document.createElement('iframe');
-    iframe.src = `https://www.googletagmanager.com/ns.html?id=${id}`;
-    iframe.height = 0;
-    iframe.width = 0;
-    iframe.style.display = 'none';
-    iframe.style.visibility = 'hidden';
-    document.body.appendChild(iframe);
+    injectGTM(id);
   }
 
   function runCustom() {
@@ -510,6 +515,67 @@ dataLayer.push({
     }
     document.getElementById('customJson').value = trimmed;
     log('🧹 Trailing spaces and extra punctuation removed');
+  }
+
+  // Inject the GTM container into the page by appending the script and
+  // noscript iframe.  This function uses gtmInjected to prevent multiple
+  // injections and updates the GTM button state accordingly.
+  function injectGTM(id) {
+    if (gtmInjected) return;
+    // Create and append the GTM script
+    gtmScriptTag = document.createElement('script');
+    gtmScriptTag.src = 'https://www.googletagmanager.com/gtm.js?id=' + id;
+    gtmScriptTag.async = true;
+    gtmScriptTag.id = 'gtm-script';
+    document.head.appendChild(gtmScriptTag);
+    // Push gtm.start event to the dataLayer
+    dataLayer.push({ 'gtm.start': new Date().getTime(), event: 'gtm.js' });
+    // Create and append the noscript iframe
+    gtmIframeTag = document.createElement('iframe');
+    gtmIframeTag.src = 'https://www.googletagmanager.com/ns.html?id=' + id;
+    gtmIframeTag.height = 0;
+    gtmIframeTag.width = 0;
+    gtmIframeTag.style.display = 'none';
+    gtmIframeTag.style.visibility = 'hidden';
+    document.body.appendChild(gtmIframeTag);
+    gtmInjected = true;
+    updateGtmButtonState(true, id);
+  }
+
+  // Clear the previously injected GTM script and iframe.  Also remove the
+  // stored GTM ID and reset the button state.
+  function clearGTM() {
+    localStorage.removeItem('gtm_id');
+    if (gtmScriptTag) {
+      gtmScriptTag.remove();
+      gtmScriptTag = null;
+    }
+    if (gtmIframeTag) {
+      gtmIframeTag.remove();
+      gtmIframeTag = null;
+    }
+    gtmInjected = false;
+    // Clear the input field
+    const input = document.getElementById('gtmId');
+    if (input) input.value = '';
+    updateGtmButtonState(false);
+  }
+
+  // Update the GTM button to reflect whether a container is loaded.  When
+  // loaded is true, the button becomes a neutral "Clear GTM" button; when
+  // false, it reverts to the primary "Inject GTM" button.
+  function updateGtmButtonState(loaded, id) {
+    const btn = document.getElementById('gtmButton');
+    if (!btn) return;
+    if (loaded) {
+      btn.textContent = 'Clear GTM';
+      btn.onclick = clearGTM;
+      btn.classList.add('clear-button');
+    } else {
+      btn.textContent = 'Inject GTM';
+      btn.onclick = loadGTM;
+      btn.classList.remove('clear-button');
+    }
   }
 
   // Update the header for the loaded events section based on the source
@@ -908,7 +974,11 @@ dataLayer.push({
 
   window.addEventListener('load', () => {
     const lastId = localStorage.getItem('gtm_id');
-    if (lastId) document.getElementById('gtmId').value = lastId;
+    if (lastId) {
+      document.getElementById('gtmId').value = lastId;
+      // Automatically inject the stored GTM container on page load
+      injectGTM(lastId);
+    }
     loadPresets();
     // Initialise the Ace editor for the custom JS playground once the DOM is ready.
     if (window.ace) {
