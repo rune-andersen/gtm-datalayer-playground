@@ -4,37 +4,74 @@
   <meta charset="UTF-8" />
   <title>GTM Playground</title>
   <style>
+    /*
+     * Base layout styling.  A subtle background colour and modern
+     * typography give the app a more contemporary feel.  The
+     * content is centred with a maximum width to improve readability.
+     */
     body {
-      font-family: sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
+        Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+      background: #f7f9fb;
+      color: #333;
       padding: 20px;
       max-width: 1000px;
       margin: auto;
     }
-    input, button, textarea {
+
+    /* Form controls adopt a consistent height, border radius and
+       light border. */
+    input,
+    textarea {
       font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      padding: 8px;
     }
     input {
-      padding: 8px;
       width: 300px;
-    }
-    button {
-      padding: 8px 12px;
-      cursor: pointer;
-      margin-bottom: 5px;
     }
     textarea {
       width: 100%;
       font-family: monospace;
       resize: both;
       overflow: auto;
+      background: #fff;
     }
+
+    /* General button styling with a primary colour palette and
+       transitions for hover effects.  A small border radius softens
+       corners. */
+    button {
+      font-size: 16px;
+      padding: 8px 14px;
+      cursor: pointer;
+      border: none;
+      border-radius: 4px;
+      background-color: #007bff;
+      color: #fff;
+      transition: background-color 0.15s ease;
+      display: inline-block;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    .small-button {
+      font-size: 14px;
+      padding: 6px 10px;
+    }
+    /* Each group of preset controls is laid out as a card with a
+       subtle shadow and rounded corners. */
     .preset-wrapper {
       display: flex;
-      gap: 10px;
+      gap: 20px;
       align-items: flex-start;
       margin-bottom: 20px;
-      border-bottom: 1px solid #ddd;
-      padding-bottom: 20px;
+      border: 1px solid #eceff3;
+      border-radius: 4px;
+      padding: 15px;
+      background: #fff;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
     }
     .preset-buttons {
       display: flex;
@@ -46,26 +83,27 @@
       flex: 1;
       min-height: 100px;
     }
+    /* Headings use a modern size/weight and extra spacing around
+       sections. */
     .label {
-      font-weight: bold;
-      margin: 30px 0 10px;
-      font-size: 36px;
-    }
-    .log {
-      margin-top: 15px;
-      background: #f9f9f9;
-      padding: 10px;
-      border: 1px solid #ddd;
-      font-family: monospace;
-    }
-    .small-button {
-      padding: 4px 8px;
-      font-size: 14px;
+      font-weight: 600;
+      margin: 40px 0 15px;
+      font-size: 28px;
     }
     .preset-header {
       font-size: 18px;
-      font-weight: bold;
-      margin-bottom: 5px;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+    /* Log output adopts a card-like style similar to presets. */
+    .log {
+      margin-top: 15px;
+      background: #fff;
+      padding: 10px;
+      border: 1px solid #eceff3;
+      border-radius: 4px;
+      font-family: monospace;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
     }
 
     /*
@@ -87,6 +125,41 @@
       display: flex;
       flex-direction: column;
       align-items: flex-start;
+    }
+
+    /*
+     * Custom JS section styling inspired by Google Tag Manager.  The
+     * section uses a card with a light header bar containing the title
+     * and action buttons.  The textarea occupies the remainder of
+     * the card without its own border, giving a cohesive look.
+     */
+    .custom-js-section {
+      border: 1px solid #eceff3;
+      border-radius: 4px;
+      background: #fff;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+      margin-bottom: 40px;
+    }
+    .custom-js-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #f5f7fa;
+      border-bottom: 1px solid #eceff3;
+      padding: 12px 16px;
+      font-weight: 600;
+      font-size: 20px;
+    }
+    .custom-js-actions button {
+      margin-left: 10px;
+    }
+    .custom-js-section textarea {
+      border: none;
+      border-radius: 0 0 4px 4px;
+      padding: 12px 16px;
+      min-height: 120px;
+      resize: vertical;
+      width: 100%;
     }
   </style>
 </head>
@@ -118,11 +191,14 @@
 
   <hr>
 
-  <div class="label">Free custom JS</div>
-  <div class="preset-wrapper">
-    <div class="preset-buttons">
-      <button onclick="runCustom()">Run JS</button>
-      <button class="small-button" onclick="copyCustom()">Copy</button>
+  <!-- Modernised custom JS section inspired by GTM UI -->
+  <div class="custom-js-section">
+    <div class="custom-js-header">
+      <span>Free custom JS</span>
+      <div class="custom-js-actions">
+        <button onclick="runCustom()">Run JS</button>
+        <button class="small-button" onclick="copyCustom()">Copy</button>
+      </div>
     </div>
     <textarea id="customJson" rows="6">// Example:
 dataLayer.push({
