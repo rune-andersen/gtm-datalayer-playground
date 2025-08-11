@@ -6,8 +6,8 @@
   <!-- Application version metadata.  Update these values when you commit new versions.
        app-version holds a simple version string, e.g. 1.2.3, and app-changelog holds
        a short description of what changed. -->
-  <meta name="app-version" content="2.3.0">
-  <meta name="app-changelog" content="Improve GTM load">
+  <meta name="app-version" content="3.1.0">
+  <meta name="app-changelog" content="Add comment function and auto-scale for textbox hights">
   <style>
     /*
      * Base layout styling.  A subtle background colour and modern
@@ -20,7 +20,8 @@
       background: #f7f9fb;
       color: #333;
       padding: 20px;
-      max-width: 1000px;
+      /* Increase the maximum width to accommodate side‑by‑side code and comment panes */
+      max-width: 1300px;
       margin: auto;
     }
 
@@ -130,6 +131,39 @@
       width: 100%;
       /* Ensure padding is included in the width to align with header */
       box-sizing: border-box;
+    }
+
+    /* Layout for event content: code area and comment area side by side */
+    .preset-content {
+      display: flex;
+      /* Use explicit widths rather than gaps. */
+    }
+    /* Code area takes up 800px of the available width */
+    .preset-content .code-area {
+      flex: 0 0 800px;
+    }
+    /* A vertical divider between code and comment areas.  The colour matches
+       the grey header used for event cards. */
+    .preset-content .divider {
+      flex: 0 0 50px;
+      background-color: #f5f7fa;
+    }
+    /* Comment area takes up 450px of the available width */
+    .preset-content .comment-area {
+      flex: 0 0 450px;
+      display: flex;
+      flex-direction: column;
+    }
+    .comment-area textarea {
+      width: 100%;
+      border: 1px solid #eceff3;
+      border-radius: 0 0 4px 4px;
+      padding: 12px 16px;
+      resize: vertical;
+      /* Height will be adjusted dynamically to match the code area */
+      font-size: 14px;
+      font-family: sans-serif;
+      background: #fff;
     }
 
     /* Ace editor container inherits similar styling to the textarea it replaces. */
@@ -734,7 +768,30 @@ dataLayer.push({
     };
 
     wrapper.appendChild(header);
-    wrapper.appendChild(editorDiv);
+    // Create a container for the code and comment areas
+    const contentDiv = document.createElement('div');
+    contentDiv.className = 'preset-content';
+    // Wrap the Ace editor in a code area div to control width
+    const codeWrapper = document.createElement('div');
+    codeWrapper.className = 'code-area';
+    codeWrapper.appendChild(editorDiv);
+    // Create the comment area on the right
+    const commentWrapper = document.createElement('div');
+    commentWrapper.className = 'comment-area';
+    const commentTextarea = document.createElement('textarea');
+    commentTextarea.placeholder = 'Add comment…';
+    // Populate the comment textarea with preset.comment if provided
+    commentTextarea.value = preset.comment || '';
+    // Associate this comment textarea with the hidden code textarea via dataset
+    commentTextarea.dataset.index = index;
+    commentWrapper.appendChild(commentTextarea);
+    // Assemble content with a divider between the code and comment areas
+    contentDiv.appendChild(codeWrapper);
+    const dividerEl = document.createElement('div');
+    dividerEl.className = 'divider';
+    contentDiv.appendChild(dividerEl);
+    contentDiv.appendChild(commentWrapper);
+    wrapper.appendChild(contentDiv);
     wrapper.appendChild(textarea);
 
     // Instantiate the Ace editor after a short delay to ensure the element exists in the DOM
@@ -758,6 +815,31 @@ dataLayer.push({
         if (editorInstance.session.$worker) {
           editorInstance.session.$worker.call('setOptions', [{ esversion: 10 }]);
         }
+
+        // Adjust the height of the code and comment areas based on the number of lines
+        const adjustHeight = () => {
+          // Determine how many lines are in the editor
+          const lineCount = editorInstance.session.getLength();
+          // Always display at least 10 lines.  Add one extra line beyond
+          // the actual code to provide breathing room, but cap at 20 lines.
+          // Add two extra blank lines for visual breathing room.  Ensure at
+          // least 10 lines are shown, but cap to avoid excessive height.
+          let lines = lineCount + 2;
+          if (lines < 10) lines = 10;
+          // Use a slightly higher cap so that visually 20 lines are shown in the Ace editor
+          if (lines > 21) lines = 21;
+          const lineHeight = editorInstance.renderer.lineHeight || 16;
+          const newHeight = lines * lineHeight;
+          // Apply height to the Ace editor container and comment textarea
+          editorDiv.style.height = newHeight + 'px';
+          if (commentTextarea) {
+            commentTextarea.style.height = newHeight + 'px';
+          }
+          editorInstance.resize();
+        };
+        adjustHeight();
+        // Recalculate height whenever the content changes
+        editorInstance.session.on('change', adjustHeight);
 
         // Monitor annotations and content to toggle the run button colour
         // and display a trim‑spaces button when trailing whitespace is present.
@@ -809,12 +891,19 @@ dataLayer.push({
   function savePresets() {
     const all = document.querySelectorAll('.preset-textarea');
     const updated = Array.from(all).map((el) => {
-      // Use the dataset attribute on the textarea to determine the
-      // event name rather than parsing from a header.
       const name = el.dataset.name || '';
+      const code = el.value;
+      // Find the comment textarea within the same preset wrapper
+      let comment = '';
+      const wrapper = el.closest('.preset-wrapper');
+      if (wrapper) {
+        const commentEl = wrapper.querySelector('.comment-area textarea');
+        if (commentEl) comment = commentEl.value || '';
+      }
       return {
         name: name,
-        code: el.value
+        code: code,
+        comment: comment
       };
     });
     localStorage.setItem('presets_full_js', JSON.stringify(updated));
@@ -879,7 +968,7 @@ dataLayer.push({
         const wrapper = new Function('window', content + '\n; return window.gtmPresets || window.presetEvents || []');
         const events = wrapper(sandbox);
         if (Array.isArray(events) && events.length > 0) {
-          const processed = events.map(ev => ({ name: ev.name, code: ev.code }));
+          const processed = events.map(ev => ({ name: ev.name, code: ev.code, comment: ev.comment || '' }));
           localStorage.setItem('presets_full_js', JSON.stringify(processed));
           log('📁 Loaded events from local file');
           // Remember this file so we can reload it later without asking the user
@@ -914,10 +1003,19 @@ dataLayer.push({
   const eventBlocks = Array.from(all).map((el, i) => {
     const name = el.dataset.name || `custom_${i + 1}`;
     const code = el.value;
-
+    // Retrieve comment from the preset wrapper if available
+    let comment = '';
+    const wrapper = el.closest('.preset-wrapper');
+    if (wrapper) {
+      const commentEl = wrapper.querySelector('.comment-area textarea');
+      if (commentEl) comment = commentEl.value || '';
+    }
+    // Construct the block with an optional comment property.  Use backticks
+    // for both code and comment to preserve formatting and support special characters.
     return `// ===== START ${name} =====  
 {
   name: "${name}",
+  comment: \`${comment}\`,
   code: \`${code}\`
 },
 // ===== END ${name} =====`;
