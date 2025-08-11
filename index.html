@@ -459,11 +459,11 @@
     </div>
     <div class="button-group">
       <!-- Copy all events button with tooltip in English. -->
-      <button onclick="copyAllAsDataLayer()" title="Copy all events in the format used by datalayer.js">📋 Copy ALL as datalayer.js file</button>
+      <button onclick="copyAllAsDataLayer()" title="Copy all events in the format used by datalayer.js">📋 Copy ALL in datalayer.js fileformat</button>
     </div>
     <div class="button-group">
       <!-- Reset button with tooltip for English help. -->
-      <button onclick="resetPresets()" title="Remove saved events and reload from datalayer.js">♻️ Reset and use datalayer.js</button>
+      <button onclick="resetPresets()" title="Remove saved events and changes and reload from datalayer.js on github">♻️ Reset and use datalayer.js from github</button>
     </div>
   </div>
 
@@ -1361,14 +1361,14 @@ dataLayer.push({
           // Update the local loader button to indicate a local file is in use
           const localBtn = document.querySelector('.local-file-group button');
           if (localBtn) {
-            localBtn.textContent = `Reload local ${file.name}`;
+            localBtn.textContent = `Reset to local ${file.name}`;
             // Remove previous small-button class and apply a primary style.  We
             // deliberately keep the small-button sizing so the control remains
             // consistent with the other auxiliary buttons, but apply a
             // primary-button class to colour it blue.
             localBtn.classList.remove('small-button');
             localBtn.classList.add('small-button', 'primary-button');
-            localBtn.title = `Reload the locally loaded file (${file.name})`;
+            localBtn.title = `Reload the locally loaded file (${file.name}) - If chnages are made it need to be selected again`;
           }
           loadPresets();
           // Persist that a local file is in use and store its name for display
