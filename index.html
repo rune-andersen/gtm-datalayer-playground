@@ -6,8 +6,8 @@
   <!-- Application version metadata.  Update these values when you commit new versions.
        app-version holds a simple version string, e.g. 1.2.3, and app-changelog holds
        a short description of what changed. -->
-  <meta name="app-version" content="3.2.0">
-  <meta name="app-changelog" content="Links functionality">
+  <meta name="app-version" content="3.3.0">
+  <meta name="app-changelog" content="Add warning when local changes">
   <style>
     /*
      * Base layout styling.  A subtle background colour and modern
@@ -197,6 +197,16 @@
     }
     .link-item button:hover {
       color: #007bff;
+    }
+
+    /* Warning label for presets that are only stored in localStorage or
+       have been edited locally.  This label appears next to the event
+       name and uses a muted orange colour to draw attention without
+       overwhelming the interface. */
+    .change-warning {
+      font-size: 12px;
+      color: #d97706;
+      margin-left: 8px;
     }
 
     /* Simple inline form for adding a link (URL and description) */
@@ -476,6 +486,8 @@
       <div class="preset-header-actions">
         <!-- Trim spaces button is hidden via visibility to preserve layout.  It is placed first so copy buttons stay in place. -->
         <button class="small-button" id="customTrimBtn" onclick="trimCustom()" style="visibility:hidden;">Trim spaces</button>
+        <!-- Button to add/save the current custom playground code as a new event in localStorage. -->
+        <button class="small-button" onclick="addCustomEvent()">Save Event to localStorage</button>
         <button class="small-button" onclick="copyCustom()">Copy as dataLayer.push</button>
         <button class="small-button" onclick="copyCustomDL()">Copy as datalayer.js block</button>
       </div>
@@ -602,6 +614,56 @@ dataLayer.push({
     log('🧹 Trailing spaces and extra punctuation removed');
   }
 
+  /**
+   * Add the current code from the custom playground as a new event in
+   * the presets list.  Attempts to extract the event name from the
+   * `event` property within the code; if none is found, prompts the
+   * user to enter a name.  The new event is appended to the end of
+   * the existing presets stored in localStorage under
+   * `presets_full_js`.  After saving, the presets are reloaded and
+   * the navigation bar is refreshed.
+   */
+  function addCustomEvent() {
+    const editor = window.customEditor;
+    const code = editor ? editor.getValue() : document.getElementById('customJson').value;
+    // Try to extract an event name from the code
+    let match = code.match(/event\s*:\s*["'`]([^"'`]+)["'`]/);
+    let name = match ? match[1] : '';
+    if (!name) {
+      name = prompt('Enter event name for the new event:', '') || '';
+      name = name.trim();
+      if (!name) {
+        alert('No event name provided. Aborting.');
+        return;
+      }
+    }
+    // Retrieve existing presets from localStorage or default presets
+    let presets;
+    const saved = localStorage.getItem('presets_full_js');
+    if (saved) {
+      try {
+        presets = JSON.parse(saved);
+        if (!Array.isArray(presets)) presets = [];
+      } catch (e) {
+        presets = [];
+      }
+    } else {
+      presets = (window.gtmPresets || []).map(ev => {
+        return {
+          name: ev.name,
+          code: ev.code,
+          comment: ev.comment || '',
+          links: []
+        };
+      });
+    }
+    // Append the new event
+    presets.push({ name: name, code: code, comment: '', links: [] });
+    localStorage.setItem('presets_full_js', JSON.stringify(presets));
+    log('➕ Added event \'' + name + '\' to list');
+    loadPresets();
+  }
+
   // Inject the GTM container into the page by appending the script and
   // noscript iframe.  This function uses gtmInjected to prevent multiple
   // injections and updates the GTM button state accordingly.
@@ -684,6 +746,15 @@ dataLayer.push({
   }
 
   const defaultPresets = window.gtmPresets || [];
+  // Track the base presets loaded from the source file (GitHub or
+  // local file).  This array is used to determine whether an event
+  // in localStorage has diverged from the original source (changed
+  // code or comment) or is entirely new.  Initially it points at
+  // the default presets from window.gtmPresets, but when a local
+  // datalayer.js file is loaded the basePresets will be updated to
+  // that processed list.  When the presets are reset, basePresets
+  // reverts to the default presets.
+  let basePresets = window.gtmPresets || [];
 
   function loadPresets() {
     const saved = localStorage.getItem('presets_full_js');
@@ -718,7 +789,65 @@ dataLayer.push({
     const title = document.createElement('span');
     title.className = 'preset-header-title';
     const eventName = preset.name || `custom_${index + 1}`;
-    title.textContent = eventName;
+    // Determine whether the event is new or modified relative to the base
+    let baseEventForName = basePresets.find(ev => ev && ev.name === eventName);
+    let displayName = eventName;
+    if (!baseEventForName) {
+      // New event created in this session/localStorage
+      displayName = `${eventName} (In localStorage)`;
+    } else {
+      // Check if code/comment differ; reuse the changed calculation logic
+      const normName = (str) => {
+        if (!str) return '';
+        return str
+          .trim()
+          .replace(/\r\n/g, '\n')
+          .replace(/[ \t]+$/gm, '');
+      };
+      const baseCodeForName = normName(baseEventForName.code);
+      const thisCodeForName = normName(preset.code);
+      const baseCommentForName = normName(baseEventForName.comment || '');
+      const thisCommentForName = normName(preset.comment || '');
+      if (baseCodeForName !== thisCodeForName || baseCommentForName !== thisCommentForName) {
+        displayName = `${eventName} (Modified)`;
+      }
+    }
+    title.textContent = displayName;
+
+    // Determine whether this preset has been modified relative to the
+    // original source (basePresets).  A preset is considered modified
+    // if it does not exist in basePresets or if the code or comment
+    // differs from its counterpart.  Whitespace at the ends of lines
+    // is ignored for comparison.
+    let changed = false;
+    do {
+      const base = basePresets.find(ev => ev && ev.name === eventName);
+      if (!base) {
+        // New event not present in the source file
+        changed = true;
+        break;
+      }
+      // Normalise whitespace for comparison
+      const norm = (str) => {
+        if (!str) return '';
+        return str
+          .trim()
+          .replace(/\r\n/g, '\n')
+          .replace(/[ \t]+$/gm, '');
+      };
+      const baseCode = norm(base.code);
+      const thisCode = norm(preset.code);
+      if (baseCode !== thisCode) {
+        changed = true;
+        break;
+      }
+      const baseComment = norm(base.comment || '');
+      const thisComment = norm(preset.comment || '');
+      if (baseComment !== thisComment) {
+        changed = true;
+        break;
+      }
+    } while (false);
 
     // Primary action: push/run the event code
     const runBtn = document.createElement('button');
@@ -727,6 +856,14 @@ dataLayer.push({
     // Build left part: run button followed by event name
     headerLeft.appendChild(runBtn);
     headerLeft.appendChild(title);
+
+    // A span used to display a warning when the event differs from the
+    // original source.  Create it once and toggle its visibility later.
+    const warnSpan = document.createElement('span');
+    warnSpan.className = 'change-warning';
+    warnSpan.textContent = '(local changes)';
+    warnSpan.style.display = changed ? 'inline' : 'none';
+    headerLeft.appendChild(warnSpan);
 
     // Right part: copy as dataLayer.push and as datalayer.js block
     const actions = document.createElement('div');
@@ -739,6 +876,14 @@ dataLayer.push({
     const copyDLBtn = document.createElement('button');
     copyDLBtn.textContent = 'Copy as datalayer.js block';
     copyDLBtn.className = 'small-button';
+
+    // If this preset has local-only changes, visually mark the copy button
+    // and add a subtle warning label to the header.  The warning
+    // indicates that the current event differs from the loaded source
+    // (either a new event or modified code/comment).
+    if (changed) {
+      copyDLBtn.classList.add('warn-button');
+    }
 
     // Utility to trim trailing whitespace from the editor content.  This button
     // begins hidden (via visibility) to preserve layout and will be shown
@@ -1048,6 +1193,44 @@ dataLayer.push({
         session.on('changeAnnotation', updateButtonState);
         session.on('change', updateButtonState);
 
+        // Function to evaluate whether the current event differs from the
+        // base presets.  If the code or comment has been modified or if
+        // the event did not exist in the original file, this will show
+        // a warning label and highlight the datalayer.js copy button.
+        const updateChange = () => {
+          // Find the matching base event by name
+          const baseEvent = basePresets.find(ev => ev && ev.name === eventName);
+          let isChanged = false;
+          const normalise = (str) => {
+            if (!str) return '';
+            return str
+              .trim()
+              .replace(/\r\n/g, '\n')
+              .replace(/[ \t]+$/gm, '');
+          };
+          const currentCode = normalise(editorInstance ? editorInstance.getValue() : textarea.value);
+          const currentComment = normalise(commentTextarea.value || '');
+          if (!baseEvent) {
+            isChanged = true;
+          } else {
+            const baseCode = normalise(baseEvent.code);
+            const baseComment = normalise(baseEvent.comment || '');
+            if (baseCode !== currentCode || baseComment !== currentComment) {
+              isChanged = true;
+            }
+          }
+          // Toggle UI elements accordingly
+          if (warnSpan) {
+            warnSpan.style.display = isChanged ? 'inline' : 'none';
+          }
+          copyDLBtn.classList.toggle('warn-button', isChanged);
+        };
+        // Initial evaluation
+        updateChange();
+        // Monitor changes to code and comment
+        editorInstance.session.on('change', updateChange);
+        commentTextarea.addEventListener('input', updateChange);
+
         // Resize the Ace editor when the container is resized by the user
         editorDiv.addEventListener('mouseup', () => {
           editorInstance.resize();
@@ -1102,6 +1285,8 @@ dataLayer.push({
     }
     // Fetch presets again from the original datalayer.js
     const fallbackPresets = window.gtmPresets || [];
+    // Reset base presets to the original source
+    basePresets = fallbackPresets.slice();
     const container = document.getElementById('presetsArea');
     container.innerHTML = '';
     fallbackPresets.forEach((preset, i) => {
@@ -1168,6 +1353,8 @@ dataLayer.push({
             };
           });
           localStorage.setItem('presets_full_js', JSON.stringify(processed));
+          // Update base presets to reflect the contents of the loaded local file
+          basePresets = processed.slice();
           log('📁 Loaded events from local file');
           // Remember this file so we can reload it later without asking the user
           currentLocalFile = file;
@@ -1184,6 +1371,9 @@ dataLayer.push({
             localBtn.title = `Reload the locally loaded file (${file.name})`;
           }
           loadPresets();
+          // Persist that a local file is in use and store its name for display
+          localStorage.setItem('presets_source', 'local');
+          localStorage.setItem('presets_filename', file.name);
           // Update the header to reflect that presets are from a local file
           updateLoadedEventsHeader();
         } else {
@@ -1345,6 +1535,3 @@ dataLayer.push({
 </script>
 </body>
 </html>
-
-
-
