@@ -6,8 +6,8 @@
   <!-- Application version metadata.  Update these values when you commit new versions.
        app-version holds a simple version string, e.g. 1.2.3, and app-changelog holds
        a short description of what changed. -->
-  <meta name="app-version" content="3.1.0">
-  <meta name="app-changelog" content="Add comment function and auto-scale for textbox hights">
+  <meta name="app-version" content="3.2.0">
+  <meta name="app-changelog" content="Links functionality">
   <style>
     /*
      * Base layout styling.  A subtle background colour and modern
@@ -164,6 +164,57 @@
       font-size: 14px;
       font-family: sans-serif;
       background: #fff;
+    }
+    /* List of manually added links for each event. */
+    .links-list {
+      font-size: 13px;
+      margin-bottom: 6px;
+    }
+    .links-list a {
+      color: #007bff;
+      text-decoration: underline;
+      display: block;
+    }
+    /* Button to add a new link. Placed inside the comment area. */
+    .add-link-btn {
+      margin-bottom: 6px;
+    }
+
+    /* Individual link item with edit and delete controls */
+    .link-item {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      margin-bottom: 2px;
+    }
+    .link-item button {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 14px;
+      padding: 0 4px;
+      color: #6c757d;
+    }
+    .link-item button:hover {
+      color: #007bff;
+    }
+
+    /* Simple inline form for adding a link (URL and description) */
+    .link-form {
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 6px;
+      gap: 4px;
+    }
+    .link-form input {
+      padding: 6px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+    .link-form .link-form-actions {
+      display: flex;
+      gap: 6px;
     }
 
     /* Ace editor container inherits similar styling to the textarea it replaces. */
@@ -745,8 +796,18 @@ dataLayer.push({
     copyDLBtn.onclick = () => {
       const name = textarea.dataset.name || `custom_${index + 1}`;
       const code = editorInstance ? editorInstance.getValue() : textarea.value;
+      // Retrieve comment from this preset's comment textarea
+      const comment = commentTextarea ? commentTextarea.value : '';
+      // Gather any links associated with this preset
+      let links = [];
+      const wrapperDiv = textarea.closest('.preset-wrapper');
+      if (wrapperDiv) {
+        const linkEls = wrapperDiv.querySelectorAll('.links-list a');
+        links = Array.from(linkEls).map((a) => ({ url: a.getAttribute('href'), text: a.textContent }));
+      }
+      const linkLines = links.map((l, idx) => `  link${idx + 1}: "${l.url} (${l.text})",\n`).join('');
       const fullBlock = 
-`// ===== START ${name} =====  \n{\n  name: "${name}",\n  code: \`${code}\`\n},\n// ===== END ${name} =====`;
+`// ===== START ${name} =====  \n{\n  name: "${name}",\n  comment: \`${comment}\`,\n${linkLines}  code: \`${code}\`\n},\n// ===== END ${name} =====`;
       navigator.clipboard.writeText(fullBlock).then(() => {
         log('📋 Copied as datalayer.js block');
       });
@@ -778,13 +839,123 @@ dataLayer.push({
     // Create the comment area on the right
     const commentWrapper = document.createElement('div');
     commentWrapper.className = 'comment-area';
+    // Container to list added links
+    const linksDiv = document.createElement('div');
+    linksDiv.className = 'links-list';
+    commentWrapper.appendChild(linksDiv);
+    // Button to add new links
+    const addLinkBtn = document.createElement('button');
+    addLinkBtn.textContent = 'Add link';
+    addLinkBtn.className = 'small-button add-link-btn';
+    commentWrapper.appendChild(addLinkBtn);
+    // Comment textarea for freeform notes
     const commentTextarea = document.createElement('textarea');
     commentTextarea.placeholder = 'Add comment…';
-    // Populate the comment textarea with preset.comment if provided
     commentTextarea.value = preset.comment || '';
-    // Associate this comment textarea with the hidden code textarea via dataset
     commentTextarea.dataset.index = index;
     commentWrapper.appendChild(commentTextarea);
+    // Internal array to store links as objects { url, text }
+    const links = [];
+    // If preset has existing links (e.g., loaded from localStorage), initialise them
+    if (preset.links && Array.isArray(preset.links)) {
+      preset.links.forEach(l => {
+        if (l && l.url) links.push({ url: l.url, text: l.text || l.url });
+      });
+    }
+    // Helper to create a link form for adding/editing a link
+    const createLinkForm = (initialUrl = '', initialText = '', onSave) => {
+      addLinkBtn.style.display = 'none';
+      const form = document.createElement('div');
+      form.className = 'link-form';
+      const urlInput = document.createElement('input');
+      urlInput.type = 'text';
+      urlInput.placeholder = 'URL';
+      urlInput.value = initialUrl;
+      const textInput = document.createElement('input');
+      textInput.type = 'text';
+      textInput.placeholder = 'Description (optional)';
+      textInput.value = initialText;
+      const actions = document.createElement('div');
+      actions.className = 'link-form-actions';
+      const saveBtn = document.createElement('button');
+      saveBtn.textContent = 'Save';
+      saveBtn.className = 'small-button';
+      const cancelBtn = document.createElement('button');
+      cancelBtn.textContent = 'Cancel';
+      cancelBtn.className = 'small-button';
+      actions.appendChild(saveBtn);
+      actions.appendChild(cancelBtn);
+      form.appendChild(urlInput);
+      form.appendChild(textInput);
+      form.appendChild(actions);
+      commentWrapper.insertBefore(form, commentTextarea);
+      // Save handler
+      saveBtn.onclick = () => {
+        const url = urlInput.value.trim();
+        if (!url) {
+          alert('Please enter a URL.');
+          return;
+        }
+        const txt = textInput.value.trim() || url;
+        onSave(url, txt);
+        form.remove();
+        addLinkBtn.style.display = '';
+      };
+      // Cancel handler
+      cancelBtn.onclick = () => {
+        form.remove();
+        addLinkBtn.style.display = '';
+      };
+    };
+    // Function to render links list in the UI with edit/delete controls
+    const renderLinks = () => {
+      linksDiv.innerHTML = '';
+      if (links.length > 0) {
+        linksDiv.style.display = 'block';
+        links.forEach((l, idx) => {
+          const item = document.createElement('div');
+          item.className = 'link-item';
+          const linkEl = document.createElement('a');
+          linkEl.href = l.url;
+          linkEl.target = '_blank';
+          linkEl.rel = 'noopener noreferrer';
+          linkEl.textContent = l.text || l.url;
+          linkEl.title = l.url;
+          item.appendChild(linkEl);
+          // Edit button
+          const editBtn = document.createElement('button');
+          editBtn.innerHTML = '✏️';
+          editBtn.title = 'Edit link';
+          editBtn.onclick = () => {
+            createLinkForm(l.url, l.text || '', (newUrl, newText) => {
+              links[idx] = { url: newUrl, text: newText || newUrl };
+              renderLinks();
+            });
+          };
+          item.appendChild(editBtn);
+          // Delete button
+          const delBtn = document.createElement('button');
+          delBtn.innerHTML = '🗑️';
+          delBtn.title = 'Delete link';
+          delBtn.onclick = () => {
+            links.splice(idx, 1);
+            renderLinks();
+          };
+          item.appendChild(delBtn);
+          linksDiv.appendChild(item);
+        });
+      } else {
+        linksDiv.style.display = 'none';
+      }
+    };
+    renderLinks();
+    // Show the link form when the add button is clicked
+    addLinkBtn.onclick = () => {
+      createLinkForm('', '', (url, txt) => {
+        links.push({ url: url, text: txt });
+        renderLinks();
+      });
+    };
     // Assemble content with a divider between the code and comment areas
     contentDiv.appendChild(codeWrapper);
     const dividerEl = document.createElement('div');
@@ -893,17 +1064,21 @@ dataLayer.push({
     const updated = Array.from(all).map((el) => {
       const name = el.dataset.name || '';
       const code = el.value;
-      // Find the comment textarea within the same preset wrapper
       let comment = '';
       const wrapper = el.closest('.preset-wrapper');
+      let links = [];
       if (wrapper) {
         const commentEl = wrapper.querySelector('.comment-area textarea');
         if (commentEl) comment = commentEl.value || '';
+        // Collect any links stored in the links-list
+        const linkEls = wrapper.querySelectorAll('.links-list a');
+        links = Array.from(linkEls).map((a) => ({ url: a.getAttribute('href'), text: a.textContent }));
       }
       return {
         name: name,
         code: code,
-        comment: comment
+        comment: comment,
+        links: links
       };
     });
     localStorage.setItem('presets_full_js', JSON.stringify(updated));
@@ -968,7 +1143,30 @@ dataLayer.push({
         const wrapper = new Function('window', content + '\n; return window.gtmPresets || window.presetEvents || []');
         const events = wrapper(sandbox);
         if (Array.isArray(events) && events.length > 0) {
-          const processed = events.map(ev => ({ name: ev.name, code: ev.code, comment: ev.comment || '' }));
+          const processed = events.map(ev => {
+            // Extract links from properties named link1, link2, etc.
+            const links = [];
+            Object.keys(ev).forEach((k) => {
+              if (/^link\d+$/.test(k)) {
+                const val = ev[k];
+                if (typeof val === 'string') {
+                  // Expect pattern "url (text)"
+                  const m = val.match(/^(.+)\s+\((.*)\)$/);
+                  if (m) {
+                    links.push({ url: m[1].trim(), text: m[2].trim() });
+                  } else {
+                    links.push({ url: val.trim(), text: val.trim() });
+                  }
+                }
+              }
+            });
+            return {
+              name: ev.name,
+              code: ev.code,
+              comment: ev.comment || '',
+              links: links
+            };
+          });
           localStorage.setItem('presets_full_js', JSON.stringify(processed));
           log('📁 Loaded events from local file');
           // Remember this file so we can reload it later without asking the user
@@ -1003,22 +1201,21 @@ dataLayer.push({
   const eventBlocks = Array.from(all).map((el, i) => {
     const name = el.dataset.name || `custom_${i + 1}`;
     const code = el.value;
-    // Retrieve comment from the preset wrapper if available
+    // Retrieve comment and links from the preset wrapper if available
     let comment = '';
+    let links = [];
     const wrapper = el.closest('.preset-wrapper');
     if (wrapper) {
       const commentEl = wrapper.querySelector('.comment-area textarea');
       if (commentEl) comment = commentEl.value || '';
+      const linkEls = wrapper.querySelectorAll('.links-list a');
+      links = Array.from(linkEls).map((a) => ({ url: a.getAttribute('href'), text: a.textContent }));
     }
-    // Construct the block with an optional comment property.  Use backticks
+    // Build link properties as link1, link2, etc.
+    const linkLines = links.map((l, idx) => `  link${idx + 1}: "${l.url} (${l.text})",\n`).join('');
+    // Construct the block with comment and link properties.  Use backticks
     // for both code and comment to preserve formatting and support special characters.
-    return `// ===== START ${name} =====  
-{
-  name: "${name}",
-  comment: \`${comment}\`,
-  code: \`${code}\`
-},
-// ===== END ${name} =====`;
+    return `// ===== START ${name} =====  \n{\n  name: "${name}",\n  comment: \`${comment}\`,\n${linkLines}  code: \`${code}\`\n},\n// ===== END ${name} =====`;
   });
 
   const finalCode = `const presetEvents = [\n${eventBlocks.join('\n\n')}\n];\n\nwindow.gtmPresets = presetEvents;`;
