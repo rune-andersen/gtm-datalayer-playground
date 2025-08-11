@@ -1,0 +1,11 @@
+Copyright (c) 2025 Rune Andersen
+
+Permission is granted to use this software for personal or internal purposes, including running it as-is and learning from the source code.
+
+You may not:
+- Redistribute this software in whole or in part.
+- Modify and publish a modified version.
+- Claim ownership or authorship of this software.
+- Use this software for commercial purposes without written permission from the author.
+
+This software is provided “as is”, without warranty of any kind, express or implied, including but not limited to the warranties of merchantability, fitness for a particular purpose, and noninfringement. In no event shall the author be liable for any claim, damages, or other liability arising from the use of the software.
