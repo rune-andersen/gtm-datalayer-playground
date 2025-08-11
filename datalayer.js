@@ -2,8 +2,7 @@ const presetEvents = [
 // ===== START data =====  
 {
   name: "data",
-  comment: `This a test of the comment function.
-
+  comment: `This a test 2 of the comment function.
 And i will also add a link
 https://noa-ignite-dk-data.monday.com/docs/2080212657?blockId=1b8b4ed2-7bbf-45e1-a1a3-324b1808e9d7`,
   code: `dataLayer.push({
