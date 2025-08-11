@@ -3,7 +3,6 @@ const presetEvents = [
 {
   name: "data",
   comment: ``,
-  link1: "https://noa-ignite-dk-data.monday.com/docs/2080212657?blockId=1b8b4ed2-7bbf-45e1-a1a3-324b1808e9d7 (Monday - Data)",
   code: `dataLayer.push({
   event: 'data',
   user: {
