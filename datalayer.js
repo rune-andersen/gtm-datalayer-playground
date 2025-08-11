@@ -2,6 +2,10 @@ const presetEvents = [
 // ===== START data =====  
 {
   name: "data",
+  comment: `This a test of the comment function.
+
+And i will also add a link
+https://noa-ignite-dk-data.monday.com/docs/2080212657?blockId=1b8b4ed2-7bbf-45e1-a1a3-324b1808e9d7`,
   code: `dataLayer.push({
   event: 'data',
   user: {
@@ -48,18 +52,20 @@ const presetEvents = [
 },
 // ===== END data =====
 
-// ===== START page_view =====  
+// ===== START page_view_test =====  
 {
-  name: "page_view",
+  name: "page_view_test",
+  comment: ``,
   code: `dataLayer.push({
-  event: 'page_view'
+  event: 'page_view_test'
 });`
 },
-// ===== END page_view =====
+// ===== END page_view_test =====
 
 // ===== START product_listing_view =====  
 {
   name: "product_listing_view",
+  comment: ``,
   code: `dataLayer.push({
   event: 'product_listing_view',
   product_listing: {
@@ -92,6 +98,7 @@ const presetEvents = [
 // ===== START login =====  
 {
   name: "login",
+  comment: ``,
   code: `dataLayer.push({
   event: 'login',
   auth: {
@@ -104,6 +111,7 @@ const presetEvents = [
 // ===== START logout =====  
 {
   name: "logout",
+  comment: ``,
   code: `dataLayer.push({
   event: 'logout',
   auth: {
@@ -112,10 +120,11 @@ const presetEvents = [
 });`
 },
 // ===== END logout =====
-	
+
 // ===== START login_fail =====  
 {
   name: "login_fail",
+  comment: ``,
   code: `dataLayer.push({
   event: 'login_fail',
   auth: {
@@ -133,6 +142,7 @@ const presetEvents = [
 // ===== START product_view =====  
 {
   name: "product_view",
+  comment: ``,
   code: `dataLayer.push({
   event: 'product_view',
   product_view: {
@@ -145,32 +155,6 @@ const presetEvents = [
 });`
 },
 // ===== END product_view =====
-
-// ===== START search =====  
-{
-  name: "search",
-  code: `dataLayer.push({
-  event: 'search',
-   'search': {
-     'product_sorting': 'Relevance',
-     'search_term': 'panik',
-     'search_term_lenght': 5,
-     'search_results': 34
-  }
-});`
-},
-// ===== END search =====
-
-// ===== START cart_view =====  
-{
-  name: "cart_view",
-  code: `dataLayer.push({
-  event: 'cart_view'
-});`
-},
-// ===== END cart_view =====
-	
 ];
 
 window.gtmPresets = presetEvents;
-
