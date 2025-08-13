@@ -2,18 +2,54 @@
 
 A lightweight, browser-based tool to test Google Tag Manager (GTM) containers and dataLayer events in real-time.
 
+## Version 5.0.0 Features
+
+- **Journey Builder**: Create and run sequences of events with configurable delays—perfect for testing user journeys and conversion flows.
+- **Multi-Playground System**: Add multiple playground instances with three complexity levels: Flat, Object, and Object & Array structures.
+- **Smart Event Naming**: Playgrounds automatically detect and display event names from your dataLayer.push code for better organization.
+- **Enhanced Event Management**: Collapsible event sections with expand/collapse all options for better workspace organization.
+- **Advanced Local Storage**: Split storage system that preserves original events while tracking local modifications separately.
+- **Instant Reset Functionality**: Reset buttons appear immediately when changes are made, allowing quick reversion to original event states.
+- **Improved UI Layout**: Reorganized sections with better visual hierarchy—Settings, Journey Builder, Playgrounds, and Loaded Events.
+- **Enhanced Copy Functions**: Multiple export formats including dataLayer.push blocks, local file format, and journey presets.
+- **Smart Trim Detection**: Automatic detection of trailing whitespace with visual warnings and one-click trimming.
+- **Event Navigation**: "Go to event" functionality integrated into the Loaded Events section for quick event jumping.
+
 ## Version 4.0.0 Features
 
-- **Inject GTM container**: Enter your GTM container ID to inject it directly into the page—even persists across reloads.
-- **Load event presets**: Choose predefined dataLayer events from GitHub or upload a local `datalayer.js` file (your custom format).
-- **Validate & push events**: Syntax-highlighted code editor; click “Push” to send the event to the actual GTM container.
-- **Playground for custom events**: Write and run your own dataLayer event code in a separate editor.
-- **Save custom events**: Click “Save Event to localStorage” to add a playground event to your presets, instantly updated in the event list.
-- **Editable comments**: Each event has a comment box—ideal for descriptions or links (supports manual link entries).
-- **Dynamic layout**: Code and comment panes side-by-side; height adjusts to show up to 20 code lines with breathing room for comments.
-- **Local file persistence**: Use a local file and reload it later with “Reload local [filename]” in the same session.
-- **Local modifications warning**: Events modified or added locally are clearly marked and the “Copy as datalayer.js block” button turns yellow to alert you before export.
-- **Copy & Export**: Copy individual event blocks or all presets into a downloadable `datalayer.js` file.
+- **Comment System**: Add descriptive comments to each event for better documentation.
+- **Link Management**: Attach URLs and descriptions to events for reference and documentation.
+- **Side-by-Side Layout**: Code and comment panes displayed side-by-side for better workflow.
+- **Local Changes Warning**: Visual indicators when events have been modified locally.
+- **Event Export from Playground**: Save playground events directly to the loaded events list.
+- **Enhanced Copy Functions**: Multiple export formats including dataLayer.push blocks and local file format.
+- **Dynamic Height Adjustment**: Comment areas automatically adjust to match code editor height.
+
+## Version 3.0.0 Features
+
+- **Local File Support**: Upload and use custom datalayer.js files instead of built-in examples.
+- **File Persistence**: Remember and reload previously used local files in the same session.
+- **Improved Error Handling**: Better error detection and display in the code editor.
+- **Enhanced Styling**: Refined UI with better spacing and visual hierarchy.
+- **File Format Flexibility**: Support for custom event formats beyond the default examples.
+
+## Version 2.0.0 Features
+
+- **Enhanced UI Design**: Modern card-based layout with improved typography and styling.
+- **Ace Code Editor**: Syntax-highlighted JavaScript editor for better code writing experience.
+- **Trim Spaces Function**: Automatic detection and removal of trailing whitespace with visual warnings.
+- **Improved Navigation**: "Go to event" navigation bar for quick jumping between events.
+- **Better Button Layout**: Reorganized action buttons for improved user experience.
+- **Enhanced Copy Functions**: Improved copy functionality for both individual events and all events.
+
+## Version 1.0.0 Features
+
+- **Basic GTM Injection**: Enter your GTM container ID to inject it directly into the page.
+- **Simple Event Testing**: Basic textarea-based interface for testing dataLayer events.
+- **Event Presets**: Load predefined dataLayer events from a datalayer.js file.
+- **Basic Copy Functions**: Copy individual events as dataLayer.push or datalayer.js blocks.
+- **Local Storage**: Save changes to localStorage for persistence across reloads.
+- **Console Output**: Simple log display for operation feedback.
 
 ## Disclaimer / License
 
@@ -23,10 +59,12 @@ This tool is **free to use**, but redistribution, modification, or claiming auth
 
 1. **Inject your GTM container** or leave it out if testing without GTM.
 2. Load events from GitHub or your local file.
-3. Use “Go to event” navigation to jump between events.
-4. Modify or create events via the Playground, then **Save Event to localStorage**.
-5. Export all or select events using the copy buttons.
-6. When using a local file, choose it once—“Reload” works until you reload the page. Reset to default with “Reset and use datalayer.js”.
+3. Use "Go to event" navigation to jump between events.
+4. **Create custom events** in the Playgrounds section with three complexity levels.
+5. **Build event journeys** by dragging events into the Journey Builder and running them sequentially.
+6. Modify or create events via the Playground, then **Save Event to localStorage**.
+7. Export all or select events using the copy buttons.
+8. When using a local file, choose it once—"Reload" works until you reload the page. Reset to default with "Reset and use examples from GitHub".
 
 ---
 By Rune Andersen
