@@ -5,7 +5,7 @@ const presetEvents = [
   code: `dataLayer.push({
   event: 'data',
   user: {
-    user_id_subscriberkey: '70f60375-3c6e-4856-8e72-6d9943485249',
+    user_id_id: '70f60375-3c6e-4856-8e72-6d9943485249',
     user_id_sfmc: '0034I00002ffwLeQAI',
     logged_in: true
   },
@@ -64,8 +64,8 @@ const presetEvents = [
   event: 'product_listing_view',
   product_listing: {
     product_listing_id: '123-abc',
-    product_listing_name: 'Mobiltelefoner',
-    product_sorting: 'Mest populære',
+    product_listing_name: 'phones',
+    product_sorting: 'best seller',
     product_count: 43,
     pagination_current: 1,
     pagination_total: 10,
@@ -95,7 +95,7 @@ const presetEvents = [
   code: `dataLayer.push({
   event: 'login',
   auth: {
-    login_method: 'MitID'
+    login_method: 'password'
   }
 });`
 },
@@ -119,7 +119,7 @@ const presetEvents = [
   code: `dataLayer.push({
   event: 'login_fail',
   auth: {
-    login_method: 'MitID',
+    login_method: 'password',
 	  login_error_message: 'Unknows user',
 	  login_error_reason: 'abc-123'
   },
@@ -153,7 +153,7 @@ const presetEvents = [
   event: 'search',
    'search': {
      'product_sorting': 'Relevance',
-     'search_term': 'panik',
+     'search_term': 'samsung',
      'search_term_lenght': 5,
      'search_results': 34
   }
