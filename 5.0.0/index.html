@@ -1024,7 +1024,7 @@
     </div>
     
     <div class="settings-content" id="settingsContent">
-      <!-- Combined row for GTM ID entry and optional local datalayer.js loader -->
+      <!-- Combined row for GTM ID entry and optional local file loader -->
       <div class="gtm-row">
         <div class="gtm-id-group">
           <input type="text" id="gtmId" placeholder="GTM-XXXXXXX" title="Enter your GTM Container ID" />
@@ -1032,8 +1032,8 @@
         </div>
         <div class="local-file-group">
           <input type="file" id="localFileInput" accept=".js" />
-          <button class="small-button" onclick="loadLocalFile()" title="Use a local file instead of the built‑in datalayer.js">Use local file</button>
-          <button class="small-button" onclick="resetPresets()" title="Remove saved events and changes and reload from datalayer.js on github">♻️ Reset and use datalayer.js from github</button>
+          <button class="small-button" onclick="loadLocalFile()" title="Use a local file instead of the built‑in examples from GitHub">Use local file</button>
+          <button class="small-button" onclick="resetPresets()" title="Remove saved events and changes and reload from the built‑in examples on GitHub">♻️ Reset and use examples from GitHub</button>
         </div>
       </div>
 
@@ -1149,7 +1149,7 @@
       <div class="event-nav-title" style="margin-top:0;">Go to event:</div>
       <div id="eventNav" class="event-nav"></div>
       <hr>
-      <p id="loadedEventsSubLabel" class="sub-label">(editable in <code>datalayer.js</code>)</p>
+      <p id="loadedEventsSubLabel" class="sub-label">(editable in loaded file)</p>
       <div id="presetsArea"></div>
     </div>
   </div>
@@ -1907,7 +1907,7 @@
   // in localStorage has diverged from the original source (changed
   // code or comment) or is entirely new.  Initially it points at
   // the default presets from window.gtmPresets, but when a local
-  // datalayer.js file is loaded the basePresets will be updated to
+      // local file is loaded the basePresets will be updated to
   // that processed list.  When the presets are reset, basePresets
   // reverts to the default presets.
   let basePresets = window.gtmPresets || [];
@@ -2332,7 +2332,7 @@
       const fullBlock = 
 `// ===== START ${name} =====  \n{\n  name: "${name}",\n  comment: \`${comment}\`,\n${linkLines}  code: \`${processedCode}\`\n},\n// ===== END ${name} =====`;
       navigator.clipboard.writeText(fullBlock).then(() => {
-        log('📋 Copied in local file format'');
+        log('📋 Copied in local file format');
       });
     };
 
@@ -2640,19 +2640,19 @@
     // Clear both split storage areas
     localStorage.removeItem('events_loaded_js');
     localStorage.removeItem('events_changes_js');
-    log('♻️ LocalStorage cleared. Reloading datalayer.js presets…');
+    log('♻️ LocalStorage cleared. Reloading examples from GitHub…');
     // Clear any reference to a previously loaded local file
     currentLocalFile = null;
     // Reset the local loader button back to its original state
     const localBtn = document.querySelector('.local-file-group button');
     if (localBtn) {
-      localBtn.textContent = 'Use local datalayer.js';
+      localBtn.textContent = 'Use local file';
       // Restore small-button styling so it appears neutral
       localBtn.classList.remove('primary-button');
       localBtn.classList.add('small-button');
-      localBtn.title = 'Use a local file instead of the built‑in datalayer.js';
+      localBtn.title = 'Use a local file instead of the built‑in examples from GitHub';
     }
-    // Fetch presets again from the original datalayer.js on github
+          // Fetch presets again from the original examples on GitHub
     const fallbackPresets = window.gtmPresets || [];
     // Reset base presets to the original source
     basePresets = fallbackPresets.slice();
@@ -3062,7 +3062,7 @@
 
     const copyDLBtn = document.createElement('button');
     copyDLBtn.className = 'small-button';
-    copyDLBtn.textContent = 'Copy in local file format'';
+    copyDLBtn.textContent = 'Copy in local file format';
 
     const trimBtn = document.createElement('button');
     trimBtn.className = 'small-button';
@@ -3296,6 +3296,13 @@ object_name: {
       }
     }
   })();
+
+  // Initialize the application when the page loads
+  window.addEventListener('load', () => {
+    const lastId = localStorage.getItem('gtm_id');
+    if (lastId) document.getElementById('gtmId').value = lastId;
+    loadPresets();
+  });
 
   function expandAllPlaygrounds() {
     document.querySelectorAll('#playgroundsSection .preset-wrapper.collapsed').forEach(el => {
