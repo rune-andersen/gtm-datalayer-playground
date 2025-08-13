@@ -6,7 +6,7 @@ const presetEvents = [
   code: `dataLayer.push({
   event: 'data',
   user: {
-    user_id_id: '70f60375-3c6e-4856-8e72-6d9943485249',
+    user_id: '70f60375-3c6e-4856-8e72-6d9943485249',
     user_id_sfmc: '0034I00002ffwLeQAI',
     logged_in: true
   },
