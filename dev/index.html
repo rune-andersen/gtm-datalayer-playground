@@ -2,12 +2,12 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>GTM & dataLayer Playground - DEV VERSION</title>
+              <title>GTM & dataLayer Playground - Version 6.0.0 (Fixed Collapse/Expand Functionality & Temporarily Disabled Drag & Drop & Unified Button Styling with Consistent Grey Color & Enhanced Console Logging)</title>
   <!-- Application version metadata.  Update these values when you commit new versions.
        app-version holds a simple version string, e.g. 1.2.3, and app-changelog holds
        a short description of what changed. -->
-  <meta name="app-version" content="5.0.0">
-  <meta name="app-changelog" content="Added Journey Builder, multible playground event, reorganized layout and reset option">
+      <meta name="app-version" content="6.0.0">
+          <meta name="app-changelog" content="Fixed Collapse/Expand Functionality & Temporarily Disabled Drag & Drop & Unified Button Styling with Consistent Grey Color & Enhanced Console Logging">
   <style>
     /*
      * Base layout styling.  A subtle background colour and modern
@@ -45,85 +45,206 @@
       background: #fff;
     }
 
-    /* General button styling with a primary colour palette and
-       transitions for hover effects.  A small border radius softens
-       corners. */
-    button {
-      font-size: 16px;
-      padding: 8px 14px;
-      cursor: pointer;
-      border: none;
-      border-radius: 4px;
-      background-color: #007bff;
-      color: #fff;
-      transition: background-color 0.15s ease;
-      display: inline-block;
+    /* Unified button styling system */
+          button {
+        font-size: 16px;
+        padding: 8px 16px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        background-color: #e2e6ea; /* Default grey for all buttons - same as "Add to Journey" button */
+        color: #333;
+      }
+
+          button:hover {
+        background-color: #d4dadd;
+        transform: translateY(-1px);
+      }
+
+    button:active {
+      transform: translateY(0);
     }
-    button:hover {
+
+    /* Button variants */
+    .btn-primary {
+      background-color: #007bff;
+      color: white;
+    }
+
+    .btn-primary:hover {
       background-color: #0056b3;
     }
 
-    /* Styling for a neutral button used to clear GTM injection. */
-    .clear-button {
-      background-color: #e2e6ea;
+    .btn-secondary {
+      background-color: #e2e6ea; /* Same grey as "Add to Journey" button */
       color: #333;
     }
-    .clear-button:hover {
+
+    .btn-secondary:hover {
       background-color: #d4dadd;
     }
-    
-    /* Styling for reset button used to revert changes. */
-    .reset-button {
-      background-color: #ffc107;
-      color: #000;
+
+    .btn-success {
+      background-color: #28a745;
+      color: white;
     }
-    .reset-button:hover {
-      background-color: #e0a800;
+
+    .btn-success:hover {
+      background-color: #1e7e34;
     }
-    /*
-       Small buttons represent secondary actions.  They have a more neutral
-       colour palette compared with primary buttons and subtle hover
-       feedback.  Use margin to separate them when stacked.
-    */
-    .small-button {
-      font-size: 12px;
-      padding: 4px 8px;
-      background-color: #e2e6ea;
-      color: #333;
-    }
-    .small-button:hover {
-      background-color: #d4dadd;
-    }
-    
-    /* Push button styling */
-    .push-button {
-      background-color: #007bff;
-      color: #fff;
-    }
-    .push-button:hover {
-      background-color: #0056b3;
-    }
-    .push-button.error {
-      background-color: #dc3545;
-      cursor: not-allowed;
-    }
-    .push-button.error:hover {
-      background-color: #c82333;
-    }
-    .push-button.warning {
+
+    .btn-warning {
       background-color: #ffc107;
       color: #212529;
     }
-    .push-button.warning:hover {
+
+    .btn-warning:hover {
       background-color: #e0a800;
     }
-    .trim-button {
-      background-color: #007bff;
-      color: #fff;
+
+    .btn-danger {
+      background-color: #dc3545;
+      color: white;
     }
-    .trim-button:hover {
-      background-color: #0056b3;
+
+    .btn-danger:hover {
+      background-color: #c82333;
     }
+
+    .btn-sm {
+      font-size: 12px;
+      padding: 4px 8px;
+    }
+
+    .btn-error {
+      background-color: #dc3545;
+      color: white;
+    }
+
+    .btn-error:hover {
+      background-color: #c82333;
+    }
+
+    .btn-warn {
+      background-color: #ffc107;
+      color: #212529;
+    }
+
+    .btn-warn:hover {
+      background-color: #e0a800;
+    }
+
+    /* Settings section specific button styling */
+    .settings-section .btn-primary {
+      background-color: #e2e6ea; /* Grey by default - same as "Add to Journey" button */
+      color: #333;
+    }
+
+    .settings-section .btn-primary:hover {
+      background-color: #d4dadd;
+    }
+
+    /* Journey Builder section specific button styling */
+    .journey-section .btn-primary {
+      background-color: #e2e6ea; /* Grey by default - same as "Add to Journey" button */
+      color: #333;
+    }
+
+    .journey-section .btn-primary:hover {
+      background-color: #d4dadd;
+    }
+
+    /* Playground section specific button styling */
+    .playground-section .btn-primary {
+      background-color: #e2e6ea; /* Grey by default - same as "Add to Journey" button */
+      color: #333;
+    }
+
+    .playground-section .btn-primary:hover {
+      background-color: #d4dadd;
+    }
+
+    .playground-section .btn-success {
+      background-color: #28a745; /* Keep Push button green */
+      color: white;
+    }
+
+    .playground-section .btn-success:hover {
+      background-color: #1e7e34;
+    }
+
+    /* Loaded Events section specific button styling */
+    .events-section .btn-primary {
+      background-color: #e2e6ea; /* Grey by default - same as "Add to Journey" button */
+      color: #333;
+    }
+
+    .events-section .btn-primary:hover {
+      background-color: #d4dadd;
+    }
+
+    .events-section .btn-success {
+      background-color: #28a745; /* Keep Push button green */
+      color: white;
+    }
+
+    .events-section .btn-success:hover {
+      background-color: #1e7e34;
+    }
+
+    /* Go to event buttons - blue foreground to indicate they are links */
+    .go-to-event-btn {
+      background-color: #e2e6ea; /* Same grey as "Add to Journey" button */
+      color: #007bff !important; /* Blue text to show they are links */
+    }
+
+    .go-to-event-btn:hover {
+      background-color: #d4dadd;
+    }
+
+    /* Add link button - grey */
+    .add-link-btn {
+      background-color: #e2e6ea; /* Same grey as "Add to Journey" button */
+      color: #333;
+    }
+
+    .add-link-btn:hover {
+      background-color: #d4dadd;
+    }
+
+    /* Small button variant */
+    .btn-sm {
+      font-size: 13px;
+      padding: 6px 10px;
+    }
+    
+    /* Button states */
+    .btn-error {
+      background-color: #dc3545 !important;
+      color: #fff !important;
+      cursor: not-allowed;
+    }
+    .btn-error:hover {
+      background-color: #c82333 !important;
+    }
+    
+    .btn-warn {
+      background-color: #ffc107 !important;
+      color: #212529 !important;
+    }
+    .btn-warn:hover {
+      background-color: #e0a800 !important;
+    }
+    
+    .btn-primary {
+      background-color: #007bff !important;
+      color: #fff !important;
+    }
+    .btn-primary:hover {
+      background-color: #0056b3 !important;
+    }
+
     /*
        Preset event card styling.  Each event is a card with a grey
        header bar containing the event name and action buttons.  The
@@ -169,8 +290,6 @@
       margin-left: 10px;
     }
     
-    /* Secondary actions styling */
-
     .preset-wrapper textarea {
       border: none;
       border-radius: 0 0 4px 4px;
@@ -197,9 +316,9 @@
       flex: 0 0 50px;
       background-color: #f5f7fa;
     }
-    /* Comment area takes up 600px of the available width */
+    /* Comment area takes up 450px of the available width */
     .preset-content .comment-area {
-      flex: 0 0 600px;
+      flex: 0 0 450px;
       display: flex;
       flex-direction: column;
     }
@@ -214,6 +333,7 @@
       font-family: sans-serif;
       background: #fff;
     }
+    
     /* List of manually added links for each event. */
     .links-list {
       font-size: 13px;
@@ -281,6 +401,7 @@
       width: 100%;
       min-height: 120px;
     }
+    
     /* Headings use a modern size/weight and extra spacing around
        sections. */
     .label {
@@ -288,6 +409,7 @@
       margin: 40px 0 15px;
       font-size: 28px;
     }
+    
     /* Log output adopts a card-like style similar to presets. */
     .log {
       margin-top: 15px;
@@ -319,16 +441,6 @@
       flex-direction: column;
       align-items: flex-start;
     }
-
-    /*
-     * Custom JS section styling inspired by Google Tag Manager.  The
-     * section uses a card with a light header bar containing the title
-     * and action buttons.  The textarea occupies the remainder of
-     * the card without its own border, giving a cohesive look.
-     */
-    /* The playground section inherits card styles from .preset-wrapper.
-       Only a larger bottom margin is applied here to separate it
-       visually from the navigation and test events. */
 
     /*
      * Event navigation bar styling.  Displays a row of buttons to
@@ -391,6 +503,7 @@
       align-items: center;
       gap: 10px;
     }
+    
     /* Ace editor uses its own themes; ensure fonts align with the rest of the app. */
     .ace_editor {
       font-family: monospace;
@@ -403,34 +516,6 @@
     .ace-editor-container {
       resize: vertical;
       overflow: auto;
-    }
-
-    /* Button state when syntax errors are present in the editor. */
-    .error-button {
-      background-color: #dc3545 !important;
-      color: #fff !important;
-    }
-    .error-button:hover {
-      background-color: #c82333 !important;
-    }
-
-    /* Button state when only warnings (e.g., extra spaces) are present. */
-    .warn-button {
-      background-color: #ffc107 !important;
-      color: #212529 !important;
-    }
-    .warn-button:hover {
-      background-color: #e0a800 !important;
-    }
-
-    /* Primary style for trim buttons when they are active.  Uses the main button
-       colour to draw attention while retaining small-button sizing. */
-    .primary-button {
-      background-color: #007bff !important;
-      color: #fff !important;
-    }
-    .primary-button:hover {
-      background-color: #0056b3 !important;
     }
 
     /* Lighten the appearance of error highlights in Ace to reduce visual noise. */
@@ -467,12 +552,18 @@
       z-index: 1000;
     }
 
-    /* Console logging toggle styling */
+    /* Console logging toggles styling */
+    .console-toggles {
+      margin: 15px 0;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
     .console-toggle {
       display: flex;
       align-items: center;
       gap: 8px;
-      margin: 10px 0;
+      margin: 0;
       padding: 8px 12px;
       background: #f8f9fa;
       border: 1px solid #dee2e6;
@@ -491,14 +582,22 @@
     /* Random User ID section styling */
     .user-id-section {
       display: flex;
-      align-items: center;
-      gap: 15px;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 10px;
       margin: 10px 0;
       padding: 12px 16px;
       background: #fff;
       border: 1px solid #dee2e6;
       border-radius: 4px;
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+    
+    .user-id-section .user-id-row {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      width: 100%;
     }
     .user-id-display {
       font-family: monospace;
@@ -514,9 +613,30 @@
       font-size: 14px;
       padding: 6px 12px;
     }
+    
+    .user-id-help {
+      margin-top: 8px;
+      padding: 8px 12px;
+      background: #f8f9fa;
+      border-radius: 4px;
+      border-left: 3px solid #007bff;
+    }
+    
+    .user-id-help small {
+      color: #6c757d;
+      line-height: 1.4;
+    }
+    
+    .user-id-help code {
+      background: #e9ecef;
+      padding: 2px 4px;
+      border-radius: 3px;
+      font-family: monospace;
+      font-size: 12px;
+    }
 
-    /* Settings section styling */
-    .settings-section {
+    /* Unified section styling */
+    .section {
       margin: 20px 0;
       padding: 16px;
       background: #fff;
@@ -524,7 +644,8 @@
       border-radius: 4px;
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
-    .settings-header {
+    
+    .section-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -532,7 +653,8 @@
       padding-bottom: 12px;
       border-bottom: 1px solid #dee2e6;
     }
-    .settings-title {
+    
+    .section-title {
       font-size: 18px;
       font-weight: 600;
       color: #495057;
@@ -540,7 +662,8 @@
       align-items: center;
       gap: 8px;
     }
-    .settings-toggle-btn {
+    
+    .section-toggle-btn {
       background: none;
       border: none;
       font-size: 16px;
@@ -550,24 +673,23 @@
       color: #6c757d;
       transition: transform 0.2s ease;
     }
-    .settings-toggle-btn:hover {
+    .section-toggle-btn:hover {
       color: #495057;
     }
-    .settings-toggle-btn.collapsed {
+    .section-toggle-btn.collapsed {
       transform: rotate(-90deg);
     }
-    .settings-content {
+    
+    .section-content {
       transition: all 0.3s ease;
       overflow: hidden;
     }
-    .settings-content.collapsed {
+    .section-content.collapsed {
       max-height: 0;
       opacity: 0;
       margin: 0;
       padding: 0;
     }
-
-
 
     /* No playgrounds message styling */
     .no-playgrounds-message {
@@ -581,73 +703,6 @@
     }
 
     /* Journey Queue styling */
-    .journey-section {
-      margin: 20px 0;
-      padding: 16px;
-      background: #fff;
-      border: 1px solid #dee2e6;
-      border-radius: 4px;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    }
-    .journey-toggle-btn {
-      background: none;
-      border: none;
-      font-size: 16px;
-      cursor: pointer;
-      padding: 0;
-      margin-right: 8px;
-      color: #6c757d;
-      transition: transform 0.2s ease;
-    }
-    .journey-toggle-btn:hover {
-      color: #495057;
-    }
-    .journey-toggle-btn.collapsed {
-      transform: rotate(-90deg);
-    }
-    .journey-content {
-      transition: all 0.3s ease;
-      overflow: hidden;
-    }
-    .journey-content.collapsed {
-      max-height: 0;
-      opacity: 0;
-      margin: 0;
-      padding: 0;
-    }
-    .journey-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 16px;
-      padding-bottom: 12px;
-      border-bottom: 1px solid #dee2e6;
-    }
-    .journey-title {
-      font-size: 18px;
-      font-weight: 600;
-      color: #495057;
-    }
-    .journey-controls {
-      display: flex;
-      gap: 10px;
-      align-items: center;
-      flex-wrap: wrap;
-    }
-    .journey-delay {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-right: 15px;
-    }
-    .journey-delay input {
-      width: 80px;
-      text-align: center;
-    }
-    .journey-delay label {
-      font-size: 14px;
-      color: #6c757d;
-    }
     .journey-queue {
       min-height: 60px;
       padding: 12px;
@@ -663,6 +718,7 @@
       color: #6c757d;
       font-style: italic;
     }
+    
     .journey-item {
       display: flex;
       align-items: center;
@@ -682,11 +738,11 @@
       opacity: 0.5;
       transform: rotate(2deg);
     }
-    .journey-item .drag-handle {
+    /* .journey-item .drag-handle {
       color: #6c757d;
       cursor: move;
       font-size: 16px;
-    }
+    } */
     .journey-item .event-name {
       flex: 1;
       font-weight: 500;
@@ -703,32 +759,63 @@
     .journey-item .remove-btn:hover {
       background-color: #fee2e2;
     }
+    
     .journey-status {
-      display: flex;
-      align-items: center;
-      gap: 15px;
-      padding: 12px;
-      background: #e9ecef;
-      border-radius: 4px;
-      font-size: 14px;
-      color: #495057;
+      margin: 15px 0;
+      padding: 15px;
+      background-color: #f8f9fa;
+      border-radius: 8px;
+      border: 1px solid #e9ecef;
     }
+    
     .journey-progress {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 15px;
     }
-    .journey-progress-bar {
+    
+    .progress-bar {
       flex: 1;
-      height: 8px;
-      background: #dee2e6;
-      border-radius: 4px;
+      height: 20px;
+      background-color: #e9ecef;
+      border-radius: 10px;
       overflow: hidden;
     }
-    .journey-progress-fill {
+    
+    .progress-fill {
       height: 100%;
-      background: #007bff;
+      background-color: #28a745;
+      width: 0%;
       transition: width 0.3s ease;
+    }
+    
+    .progress-text {
+      font-weight: 600;
+      color: #495057;
+      min-width: 60px;
+      text-align: center;
+    }
+
+    .journey-delay {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-right: 15px;
+    }
+    .journey-delay input {
+      width: 80px;
+      text-align: center;
+    }
+    .journey-delay label {
+      font-size: 14px;
+      color: #6c757d;
+    }
+
+    .journey-controls {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
     }
 
     .small-journey-btn {
@@ -736,25 +823,6 @@
       padding: 6px 12px;
       min-width: auto;
       flex: none;
-    }
-    .run-btn {
-      background-color: #28a745;
-    }
-    .run-btn:hover {
-      background-color: #218838;
-    }
-    .pause-btn {
-      background-color: #ffc107;
-      color: #212529;
-    }
-    .pause-btn:hover {
-      background-color: #e0a800;
-    }
-    .clear-btn {
-      background-color: #dc3545;
-    }
-    .clear-btn:hover {
-      background-color: #c82333;
     }
 
     /* Queue button styling for individual events */
@@ -769,9 +837,11 @@
       background-color: #28a745 !important;
       color: #fff !important;
     }
+    
     .queue-btn.queued:hover {
       background-color: #218838 !important;
     }
+    
     .queue-clear-btn {
       background-color: #dc3545 !important;
       color: #fff !important;
@@ -780,8 +850,6 @@
     .queue-clear-btn:hover {
       background-color: #c82333 !important;
     }
-
-
 
     /* Journey presets styling */
     .journey-presets {
@@ -837,18 +905,18 @@
       flex: 1;
     }
     
-             .preset-name {
-           font-weight: 600;
-           color: #007bff;
-           margin-bottom: 4px;
-           cursor: pointer;
-           text-decoration: underline;
-           transition: color 0.2s ease;
-         }
-         
-         .preset-name:hover {
-           color: #0056b3;
-         }
+    .preset-name {
+      font-weight: 600;
+      color: #007bff;
+      margin-bottom: 4px;
+      cursor: pointer;
+      text-decoration: underline;
+      transition: color 0.2s ease;
+    }
+    
+    .preset-name:hover {
+      color: #0056b3;
+    }
     
     .preset-details {
       font-size: 12px;
@@ -887,104 +955,56 @@
     .preset-delete-btn:hover {
       background-color: #c82333 !important;
     }
-    
-    /* Updated journey controls for inline buttons */
-    
-    /* Journey Status and Progress */
-    .journey-status {
-      margin: 15px 0;
-      padding: 15px;
-      background-color: #f8f9fa;
-      border-radius: 8px;
-      border: 1px solid #e9ecef;
-    }
-    
-    .journey-progress {
-      display: flex;
-      align-items: center;
-      gap: 15px;
-    }
-    
-    .progress-bar {
-      flex: 1;
-      height: 20px;
-      background-color: #e9ecef;
-      border-radius: 10px;
-      overflow: hidden;
-    }
-    
-    .progress-fill {
-      height: 100%;
-      background-color: #28a745;
-      width: 0%;
-      transition: width 0.3s ease;
-    }
-    
-    .progress-text {
-      font-weight: 600;
-      color: #495057;
-      min-width: 60px;
-      text-align: center;
-    }
 
-    /* Loaded Events section styling */
-    .events-section {
-      margin: 20px 0;
-      padding: 16px;
-      background: #fff;
-      border: 1px solid #dee2e6;
-      border-radius: 4px;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    }
-    .events-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 16px;
-      padding-bottom: 12px;
-      border-bottom: 1px solid #dee2e6;
-    }
-    .events-title {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .events-title-text {
+    /* Drag and Drop styling - TEMPORARILY DISABLED */
+    /*
+    .drag-handle {
+      cursor: grab;
+      color: #666;
       font-size: 18px;
-      font-weight: 600;
-      color: #495057;
-    }
-    .events-toggle-btn {
-      background: none;
-      border: none;
-      font-size: 16px;
-      cursor: pointer;
-      padding: 0;
+      padding: 4px 6px;
+      border-radius: 4px;
+      transition: all 0.2s ease;
+      user-select: none;
+      display: inline-block;
+      background: rgba(0, 0, 0, 0.08);
+      border: 1px solid #ccc;
       margin-right: 8px;
-      color: #6c757d;
-      transition: transform 0.2s ease;
+      position: relative;
+      z-index: 10;
+      pointer-events: auto;
     }
-    .events-toggle-btn:hover {
-      color: #495057;
+    .drag-handle:hover {
+      color: #333;
+      background: rgba(0, 0, 0, 0.12);
+      border-color: #999;
+      transform: scale(1.05);
     }
-    .events-toggle-btn.collapsed {
-      transform: rotate(-90deg);
+    .drag-handle:active {
+      cursor: grabbing;
+      transform: scale(0.95);
     }
-    .events-content {
-      transition: all 0.3s ease;
-      overflow: hidden;
+    
+    /* Ensure drag handle on left side has proper spacing */
+    .preset-header-left .drag-handle {
+      margin-right: 8px;
+      margin-left: 0;
     }
-    .events-content.collapsed {
-      max-height: 0;
-      opacity: 0;
-      margin: 0;
-      padding: 0;
+    
+    /* Drag and drop visual feedback - TEMPORARILY DISABLED */
+    /*
+    .preset-wrapper.dragging {
+      opacity: 0.6;
+      transform: rotate(1deg) scale(0.98);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      z-index: 1000;
     }
-    .events-actions {
-      display: flex;
-      gap: 10px;
-      align-items: center;
+    .preset-wrapper.drag-over {
+      border: 2px dashed #007bff;
+      background: rgba(0, 123, 255, 0.08);
+      box-shadow: inset 0 0 0 2px rgba(0, 123, 255, 0.2);
     }
+    */
 
     /* Per-event collapse */
     .preset-wrapper.collapsed .preset-content { display: none; }
@@ -997,6 +1017,13 @@
       color: #6c757d;
     }
     .preset-wrapper .collapse-toggle:hover { color: #495057; }
+    
+    /* Section actions styling */
+    .section-actions {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
   </style>
 
   <!-- Include Ace Editor from CDN for syntax highlighting.  The CDN provides the core, mode and theme scripts. -->
@@ -1015,15 +1042,15 @@
   <div class="log" id="logOutput">Console output will appear here…</div>
 
   <!-- 1. SETTINGS SECTION (Collapsible) -->
-  <div class="settings-section">
-    <div class="settings-header">
-      <div class="settings-title">
-        <button class="settings-toggle-btn" onclick="toggleSettingsSection()">▼</button>
+  <div class="section settings-section">
+    <div class="section-header">
+      <div class="section-title">
+        <button class="section-toggle-btn" onclick="toggleSettingsSection()">▼</button>
         ⚙️ Settings
       </div>
     </div>
     
-    <div class="settings-content" id="settingsContent">
+    <div class="section-content" id="settingsContent">
       <!-- Combined row for GTM ID entry and optional local file loader -->
       <div class="gtm-row">
         <div class="gtm-id-group">
@@ -1032,47 +1059,62 @@
         </div>
         <div class="local-file-group">
           <input type="file" id="localFileInput" accept=".js" />
-          <button class="small-button" onclick="loadLocalFile()" title="Use a local file instead of the built‑in examples from GitHub">Use local file</button>
-          <button class="small-button" onclick="resetPresets()" title="Remove saved events and changes and reload from the built‑in examples on GitHub">♻️ Reset and use examples from GitHub</button>
+          <button class="btn-sm" onclick="loadLocalFile()" title="Use a local file instead of the built‑in examples from GitHub">Use local file</button>
+          <button class="btn-sm" onclick="resetPresets()" title="Remove saved events and changes and reload from the built‑in examples on GitHub">♻️ Reset and use examples from GitHub</button>
         </div>
       </div>
 
-      <!-- Console logging toggle -->
-      <div class="console-toggle">
-        <input type="checkbox" id="consoleLogToggle" />
-        <label for="consoleLogToggle">Log dataLayer.push to console</label>
+      <!-- Console logging toggles -->
+      <div class="console-toggles">
+        <div class="console-toggle">
+          <input type="checkbox" id="actionsLogToggle" />
+          <label for="actionsLogToggle">Log actions to console</label>
+        </div>
+        <div class="console-toggle">
+          <input type="checkbox" id="consoleLogToggle" />
+          <label for="consoleLogToggle">Log dataLayer.push to console</label>
+        </div>
+        <div class="console-toggle">
+          <input type="checkbox" id="debugLogToggle" />
+          <label for="debugLogToggle">Log debug information to console</label>
+        </div>
       </div>
 
       <!-- Random User ID Generator -->
       <div class="user-id-section">
-        <span>Current user_id:</span>
-        <span class="user-id-display" id="currentUserId">Generating...</span>
-        <button onclick="generateNewUserId()">🔁 New GUID</button>
+        <div class="user-id-row">
+          <span>Current user_id:</span>
+          <span class="user-id-display" id="currentUserId">Generating...</span>
+          <button onclick="generateNewUserId()">🔁 New GUID</button>
+        </div>
+        <div class="user-id-help">
+          <small>💡 Use <code>{{user_id}}</code> in your events to automatically include this ID. Example: <code>dataLayer.push({event: 'purchase', user_id: '{{user_id}}'})</code></small>
+        </div>
       </div>
     </div>
   </div>
 
   <!-- 2. JOURNEY BUILDER SECTION (Renamed from Journey Queue) -->
-  <div class="journey-section">
-    <div class="journey-header">
-      <div class="journey-title">
-        <button class="journey-toggle-btn" onclick="toggleJourneySection()">▼</button>
+  <div class="section journey-section">
+    <div class="section-header">
+      <div class="section-title">
+        <button class="section-toggle-btn" onclick="toggleJourneySection()">▼</button>
         🚀 Journey Builder
       </div>
       <div class="journey-controls">
-        <button class="run-btn small-journey-btn" onclick="runJourney()" id="runJourneyBtn">▶️ Run Journey</button>
-        <button class="pause-btn small-journey-btn" onclick="pauseJourney()" id="pauseJourneyBtn" style="display: none;">⏸️ Pause</button>
-        <button class="clear-btn small-journey-btn" onclick="clearJourney()">🗑️ Clear Queue</button>
+        <button class="btn-success btn-sm" onclick="runJourney()" id="runJourneyBtn">▶️ Run Journey</button>
+        <button class="btn-warning btn-sm" onclick="pauseJourney()" id="pauseJourneyBtn" style="display: none;">⏸️ Pause</button>
+        <button class="btn-danger btn-sm" onclick="clearJourney()">🗑️ Clear Queue</button>
         <div class="journey-delay">
           <label for="journeyDelay">Delay (ms):</label>
           <input type="number" id="journeyDelay" value="1000" min="0" max="10000" step="100" />
         </div>
-        <button class="small-button" onclick="saveJourneyPreset()">💾 Save Preset</button>
-        <button class="small-button" onclick="loadJourneyPreset()">📁 Load Preset</button>
+        <button class="btn-sm" onclick="saveJourneyPreset()">💾 Save Preset</button>
+        <button class="btn-sm" onclick="loadJourneyPreset()">📁 Load Preset</button>
       </div>
     </div>
     
-    <div class="journey-content" id="journeyContent">
+    <div class="section-content" id="journeyContent">
       <div class="journey-queue" id="journeyQueue">
         <div class="journey-queue empty">Drop events here to build your journey...</div>
       </div>
@@ -1102,28 +1144,28 @@
 
 
   <!-- 3b. MULTI PLAYGROUNDS SECTION (New) -->
-  <div class="events-section" id="playgroundsSection">
-    <div class="events-header">
-      <div class="events-title">
-        <button class="events-toggle-btn" onclick="togglePlaygroundsSection()">▼</button>
-        <span class="events-title-text">Playgrounds</span>
+  <div class="section playground-section" id="playgroundsSection">
+    <div class="section-header">
+      <div class="section-title">
+        <button class="section-toggle-btn" onclick="togglePlaygroundsSection()">▼</button>
+        <span class="section-title-text">Playgrounds</span>
       </div>
-      <div class="events-actions">
-        <button class="small-button" onclick="addPlaygroundCard('flat')" title="Simple flat structure">Add new Flat</button>
-        <button class="small-button" onclick="addPlaygroundCard('object')" title="With nested objects">Add new Object</button>
-        <button class="small-button" onclick="addPlaygroundCard('array')" title="With objects and arrays">Add new Object & Array</button>
-        <button class="small-button" onclick="expandAllPlaygrounds()">Expand All</button>
-        <button class="small-button" onclick="collapseAllPlaygrounds()">Collapse All</button>
+      <div class="section-actions">
+        <button class="btn-sm" onclick="addPlaygroundCard('flat')" title="Simple flat structure">Add new Flat</button>
+        <button class="btn-sm" onclick="addPlaygroundCard('object')" title="With nested objects">Add new Object</button>
+        <button class="btn-sm" onclick="addPlaygroundCard('array')" title="With objects and arrays">Add new Object & Array</button>
+        <button class="btn-sm" onclick="expandAllPlaygrounds()">Expand All</button>
+        <button class="btn-sm" onclick="collapseAllPlaygrounds()">Collapse All</button>
       </div>
     </div>
-    <div class="events-content" id="playgroundsContent">
+    <div class="section-content" id="playgroundsContent">
       <div id="playgroundsArea">
         <div class="no-playgrounds-message">
           <p style="text-align: center; margin-bottom: 15px; color: #666;">Choose a playground type to get started:</p>
           <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
-            <button class="small-button" onclick="addPlaygroundCard('flat')" title="Simple flat structure">Add new Flat</button>
-            <button class="small-button" onclick="addPlaygroundCard('object')" title="With nested objects">Add new Object</button>
-            <button class="small-button" onclick="addPlaygroundCard('array')" title="With objects and arrays">Add new Object & Array</button>
+            <button class="btn-sm" onclick="addPlaygroundCard('flat')" title="Simple flat structure">Add new Flat</button>
+            <button class="btn-sm" onclick="addPlaygroundCard('object')" title="With nested objects">Add new Object</button>
+            <button class="btn-sm" onclick="addPlaygroundCard('array')" title="With objects and arrays">Add new Object & Array</button>
           </div>
         </div>
       </div>
@@ -1131,20 +1173,20 @@
   </div>
 
   <!-- 4. LOADED EVENTS SECTION -->
-  <div class="events-section">
-    <div class="events-header">
-      <div class="events-title">
-        <button class="events-toggle-btn" onclick="toggleEventsSection()">▼</button>
-        <span id="loadedEventsLabel" class="events-title-text">Loaded Events</span>
+  <div class="section events-section">
+    <div class="section-header">
+      <div class="section-title">
+        <button class="section-toggle-btn" onclick="toggleEventsSection()">▼</button>
+        <span id="loadedEventsLabel" class="section-title-text">Loaded Events</span>
       </div>
-      <div class="events-actions">
-        <button class="small-button" onclick="expandAllEvents()">Expand All</button>
-        <button class="small-button" onclick="collapseAllEvents()">Collapse All</button>
-        <button class="small-button" onclick="savePresets()" title="Save changes so they persist on reload">💾 Save Changes (localStorage)</button>
-        <button class="small-button" onclick="copyAllAsDataLayer()" title="Copy all events in the format used by local files. Remember to update the file manuel">📋 Copy All (local file format)</button>
+      <div class="section-actions">
+        <button class="btn-sm" onclick="expandAllEvents()">Expand All</button>
+        <button class="btn-sm" onclick="collapseAllEvents()">Collapse All</button>
+        <button class="btn-sm" onclick="savePresets()" title="Save changes so they persist on reload">💾 Save Changes (localStorage)</button>
+        <button class="btn-sm" onclick="copyAllAsDataLayer()" title="Copy all events in the format used by local files. Remember to update the file manuel">📋 Copy All (local file format)</button>
       </div>
     </div>
-    <div class="events-content" id="eventsContent">
+    <div class="section-content" id="eventsContent">
       <!-- Go to Event inside Loaded Events -->
       <div class="event-nav-title" style="margin-top:0;">Go to event:</div>
       <div id="eventNav" class="event-nav"></div>
@@ -1182,6 +1224,8 @@
 
     // Console Logging
     let consoleLoggingEnabled = false;
+    let actionsLoggingEnabled = false;
+    let debugLoggingEnabled = false;
 
   // Display the static version defined in the meta tags.  To update, modify the
   // meta[name="app-version"] and meta[name="app-changelog"] values in the head.
@@ -1213,42 +1257,58 @@
     log('🆔 New User ID generated: ' + currentUserId);
   }
 
+  // Utility functions to reduce code duplication
+  const utils = {
+    // Unified toggle function for all sections
+    toggleSection(sectionId, storageKey, toggleBtn) {
+      const content = document.getElementById(sectionId);
+      if (!content || !toggleBtn) return;
+      
+      const isCollapsed = content.classList.contains('collapsed');
+      
+      if (isCollapsed) {
+        content.classList.remove('collapsed');
+        toggleBtn.classList.remove('collapsed');
+        toggleBtn.textContent = '▼';
+        localStorage.setItem(storageKey, 'false');
+      } else {
+        content.classList.add('collapsed');
+        toggleBtn.classList.add('collapsed');
+        toggleBtn.textContent = '▶';
+        localStorage.setItem(storageKey, 'true');
+      }
+    },
+    
+    // Create button with consistent styling
+    createButton(text, className, onClick, title = '') {
+      const btn = document.createElement('button');
+      btn.textContent = text;
+      btn.className = className;
+      if (onClick) btn.onclick = onClick;
+      if (title) btn.title = title;
+      return btn;
+    },
+    
+    // Normalize whitespace for comparison
+    normalizeWhitespace(str) {
+      if (!str) return '';
+      return str
+        .trim()
+        .replace(/\r\n/g, '\n')
+        .replace(/[ \t]+$/gm, '');
+    }
+  };
+
   // Toggle journey section visibility
   function toggleJourneySection() {
-    const content = document.getElementById('journeyContent');
-    const toggleBtn = document.querySelector('.journey-toggle-btn');
-    const isCollapsed = content.classList.contains('collapsed');
-    
-    if (isCollapsed) {
-      content.classList.remove('collapsed');
-      toggleBtn.classList.remove('collapsed');
-      toggleBtn.textContent = '▼';
-      localStorage.setItem('gtm_journey_collapsed', 'false');
-    } else {
-      content.classList.add('collapsed');
-      toggleBtn.classList.add('collapsed');
-      toggleBtn.textContent = '▶';
-      localStorage.setItem('gtm_journey_collapsed', 'true');
-    }
+    const toggleBtn = document.querySelector('#journeyContent').closest('.section').querySelector('.section-toggle-btn');
+    utils.toggleSection('journeyContent', 'gtm_journey_collapsed', toggleBtn);
   }
 
   // Toggle settings section visibility
   function toggleSettingsSection() {
-    const content = document.getElementById('settingsContent');
-    const toggleBtn = document.querySelector('.settings-toggle-btn');
-    const isCollapsed = content.classList.contains('collapsed');
-    
-    if (isCollapsed) {
-      content.classList.remove('collapsed');
-      toggleBtn.classList.remove('collapsed');
-      toggleBtn.textContent = '▼';
-      localStorage.setItem('gtm_settings_collapsed', 'false');
-    } else {
-      content.classList.add('collapsed');
-      toggleBtn.classList.add('collapsed');
-      toggleBtn.textContent = '▶';
-      localStorage.setItem('gtm_settings_collapsed', 'true');
-    }
+    const toggleBtn = document.querySelector('#settingsContent').closest('.section').querySelector('.section-toggle-btn');
+    utils.toggleSection('settingsContent', 'gtm_settings_collapsed', toggleBtn);
   }
 
 
@@ -1338,20 +1398,22 @@
     journeyQueue.forEach((item, index) => {
       const queueItem = document.createElement('div');
       queueItem.className = 'journey-item';
-      queueItem.draggable = true;
+      // queueItem.draggable = true; // TEMPORARILY DISABLED
       queueItem.dataset.index = index;
       
       queueItem.innerHTML = `
-        <span class="drag-handle">⋮⋮</span>
+        <!-- <span class="drag-handle">⋮⋮</span> -->
         <span class="event-name">${item.name}</span>
         <button class="remove-btn" onclick="removeFromJourney(${index})">✕</button>
       `;
       
-      // Drag and drop functionality
+      // Drag and drop functionality - TEMPORARILY DISABLED
+      /*
       queueItem.addEventListener('dragstart', handleDragStart);
       queueItem.addEventListener('dragover', handleDragOver);
       queueItem.addEventListener('drop', handleDrop);
       queueItem.addEventListener('dragend', handleDragEnd);
+      */
       
       queueContainer.appendChild(queueItem);
     });
@@ -1467,6 +1529,256 @@
     }
   }
 
+  function moveEventUp(eventName, wrapper) {
+    const currentPresets = mergeEventsWithChanges(loadedEvents, localChanges);
+    const currentIndex = currentPresets.findIndex(p => p.name === eventName);
+    
+    if (currentIndex > 0) {
+      // Store collapsed states before reordering
+      const collapsedStates = saveEventCollapsedStates();
+      
+      // Swap with the event above
+      const temp = currentPresets[currentIndex];
+      currentPresets[currentIndex] = currentPresets[currentIndex - 1];
+      currentPresets[currentIndex - 1] = temp;
+      
+      // Update the arrays
+      updateEventOrder(currentPresets);
+      
+      // Re-render to show the new order
+      loadPresets();
+      
+      // Restore collapsed states after reordering
+      restoreEventCollapsedStates(collapsedStates);
+      
+      // Restore journey button states after reordering
+      updateQueueButtonStates();
+      
+      log(`⬆️ Moved event "${eventName}" up`);
+    }
+  }
+
+  function moveEventDown(eventName, wrapper) {
+    const currentPresets = mergeEventsWithChanges(loadedEvents, localChanges);
+    const currentIndex = currentPresets.findIndex(p => p.name === eventName);
+    
+    if (currentIndex < currentPresets.length - 1) {
+      // Store collapsed states before reordering
+      const collapsedStates = saveEventCollapsedStates();
+      
+      // Swap with the event below
+      const temp = currentPresets[currentIndex];
+      currentPresets[currentIndex] = currentPresets[currentIndex + 1];
+      currentPresets[currentIndex + 1] = temp;
+      
+      // Update the arrays
+      updateEventOrder(currentPresets);
+      
+      // Re-render to show the new order
+      loadPresets();
+      
+      // Restore collapsed states after reordering
+      restoreEventCollapsedStates(collapsedStates);
+      
+      // Restore journey button states after reordering
+      updateQueueButtonStates();
+      
+      log(`⬇️ Moved event "${eventName}" down`);
+    }
+  }
+
+  function saveEventCollapsedStates() {
+    const states = {};
+    const eventWrappers = document.querySelectorAll('.preset-wrapper');
+    eventWrappers.forEach(wrapper => {
+      const eventName = wrapper.dataset.name;
+      if (eventName) {
+        states[eventName] = wrapper.classList.contains('collapsed');
+      }
+    });
+    return states;
+  }
+
+  function restoreEventCollapsedStates(states) {
+    Object.keys(states).forEach(eventName => {
+      const wrapper = document.querySelector(`[data-name="${eventName}"]`);
+      if (wrapper) {
+        if (states[eventName]) {
+          wrapper.classList.add('collapsed');
+          const collapseBtn = wrapper.querySelector('.collapse-toggle');
+          if (collapseBtn) {
+            collapseBtn.textContent = '▶';
+          }
+        } else {
+          wrapper.classList.remove('collapsed');
+          const collapseBtn = wrapper.querySelector('.collapse-toggle');
+          if (collapseBtn) {
+            collapseBtn.textContent = '▼';
+          }
+        }
+      }
+    });
+  }
+
+  // Drag and Drop functionality for event reordering - TEMPORARILY DISABLED
+  /*
+  function handleEventDragStart(e) {
+    e.stopPropagation();
+    const wrapper = e.target.closest('.preset-wrapper');
+    if (!wrapper) return;
+    
+    console.log('Drag start:', wrapper.dataset.name);
+    e.dataTransfer.setData('text/plain', wrapper.dataset.name);
+    e.dataTransfer.effectAllowed = 'move';
+    wrapper.classList.add('dragging');
+    
+    // Add a small delay to ensure the dragging class is applied
+    setTimeout(() => {
+      wrapper.style.opacity = '0.5';
+    }, 0);
+  }
+
+  function handleEventDragEnd(e) {
+    e.stopPropagation();
+    const wrapper = e.target.closest('.preset-wrapper);
+    if (!wrapper) return;
+    
+    wrapper.classList.remove('dragging');
+    wrapper.style.opacity = '';
+    
+    // Remove all drag-over styling
+    document.querySelectorAll('.preset-wrapper').forEach(w => {
+      w.classList.remove('drag-over');
+    });
+  }
+
+  function handleEventDragOver(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    e.dataTransfer.dropEffect = 'move';
+    
+    const wrapper = e.target.closest('.preset-wrapper');
+    if (wrapper && !wrapper.classList.contains('dragging')) {
+      wrapper.classList.add('drag-over');
+    }
+  }
+
+  function handleEventDragLeave(e) {
+    e.stopPropagation();
+    const wrapper = e.target.closest('.preset-wrapper');
+    if (wrapper) {
+      wrapper.classList.remove('drag-over');
+    }
+  }
+
+  function handleEventDrop(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    const draggedEventName = e.dataTransfer.getData('text/plain');
+    const targetWrapper = e.target.closest('.preset-wrapper');
+    
+    console.log('Drop event:', draggedEventName, 'onto:', targetWrapper?.dataset.name);
+    
+    if (targetWrapper && draggedEventName) {
+      const targetEventName = targetWrapper.dataset.name;
+      
+      if (draggedEventName !== targetEventName) {
+        if (debugLoggingEnabled) {
+      console.log('Moving event from', draggedEventName, 'to', targetEventName);
+    }
+        
+        // Store collapsed states before reordering
+        const collapsedStates = saveEventCollapsedStates();
+        
+        // Move the dragged event to the target position
+        moveEventToPosition(draggedEventName, targetEventName);
+        
+        // Restore collapsed states after reordering
+        restoreEventCollapsedStates(collapsedStates);
+      }
+    }
+    
+    // Remove drag-over styling
+    document.querySelectorAll('.preset-wrapper').forEach(wrapper => {
+      wrapper.classList.remove('drag-over');
+    });
+  }
+
+  /*
+  function moveEventToPosition(draggedEventName, targetEventName) {
+    const currentPresets = mergeEventsWithChanges(loadedEvents, localChanges);
+    const draggedIndex = currentPresets.findIndex(p => p.name === draggedEventName);
+    const targetIndex = currentPresets.findIndex(p => p.name === targetEventName);
+    
+    if (draggedIndex !== -1 && targetIndex !== -1) {
+      // Remove the dragged event from its current position
+      const [draggedEvent] = currentPresets.splice(draggedIndex, 1);
+      
+      // Insert it at the target position
+      currentPresets.splice(targetIndex, 0, draggedEvent);
+      
+      // Update the arrays
+      updateEventOrder(currentPresets);
+      
+      // Instead of recreating all elements, just reorder the existing ones in the DOM
+      // This preserves all event listeners and drag-and-drop functionality
+      const container = document.getElementById('presetContainer');
+      if (container) {
+        // Get all existing preset wrappers
+        const existingPresets = Array.from(container.querySelectorAll('.preset-wrapper'));
+        
+        // Reorder them according to the new order
+        currentPresets.forEach((preset, i) => {
+          const existingPreset = existingPresets.find(p => p.dataset.name === preset.name);
+          if (existingPreset) {
+            container.appendChild(existingPreset);
+          }
+        });
+      }
+      
+      // Restore journey button states after reordering
+      updateQueueButtonStates();
+      
+      log(`🔄 Moved event "${draggedEventName}" to position of "${targetEventName}"`);
+    }
+  }
+
+  function updateEventOrder(newOrder) {
+    // Separate the events back into loadedEvents and localChanges
+    const newLoadedEvents = [];
+    const newLocalChanges = [];
+    
+    newOrder.forEach(event => {
+      const baseEvent = loadedEvents.find(b => b.name === event.name);
+      
+      if (baseEvent) {
+        // Check if this event has been modified from base
+        const isModified = isEventModified(event, baseEvent);
+        if (isModified) {
+          newLocalChanges.push(event);
+        }
+        // Always include in loaded events (original + any unmodified)
+        newLoadedEvents.push(isModified ? baseEvent : event);
+      } else {
+        // New event not in base - goes to local changes
+        newLocalChanges.push(event);
+        }
+      }
+    });
+    
+    // Update the global arrays
+    loadedEvents = newLoadedEvents;
+    localChanges = newLocalChanges;
+    
+    // Save to localStorage
+    localStorage.setItem('events_loaded_js', JSON.stringify(loadedEvents));
+    localStorage.setItem('events_changes_js', JSON.stringify(localChanges));
+  }
+  */
+  
+
+
   function updateQueueButtonStates() {
     // Update all queue buttons to show queued state with counts
     const allQueueBtns = document.querySelectorAll('.queue-btn');
@@ -1485,7 +1797,7 @@
           let clearBtn = presetWrapper.querySelector('.queue-clear-btn');
           if (!clearBtn) {
             clearBtn = document.createElement('button');
-            clearBtn.className = 'small-button queue-clear-btn';
+            clearBtn.className = 'btn-sm queue-clear-btn';
             clearBtn.textContent = 'Clear';
             clearBtn.onclick = () => clearEventFromJourney(eventName);
             
@@ -1521,7 +1833,8 @@
     log(`🗑️ Removed ${removedCount} instance(s) of '${eventName}' from journey queue (${journeyQueue.length} remaining)`);
   }
 
-  // Drag and Drop functionality
+  // Drag and Drop functionality - TEMPORARILY DISABLED
+  /*
   function handleDragStart(e) {
     e.target.classList.add('dragging');
     e.dataTransfer.setData('text/plain', e.target.dataset.index);
@@ -1547,6 +1860,7 @@
   function handleDragEnd(e) {
     e.target.classList.remove('dragging');
   }
+  */
 
   function runJourney() {
     if (journeyQueue.length === 0) {
@@ -1873,11 +2187,11 @@
     if (loaded) {
       btn.textContent = 'Clear GTM';
       btn.onclick = clearGTM;
-      btn.classList.add('clear-button');
+      btn.classList.add('btn-secondary');
     } else {
       btn.textContent = 'Inject GTM';
       btn.onclick = loadGTM;
-      btn.classList.remove('clear-button');
+      btn.classList.remove('btn-secondary');
     }
   }
 
@@ -1898,7 +2212,9 @@
 
   function log(msg) {
     document.getElementById('logOutput').textContent = msg;
-    console.log(msg);
+    if (actionsLoggingEnabled) {
+      console.log(msg);
+    }
   }
 
   const defaultPresets = window.gtmPresets || [];
@@ -2073,19 +2389,24 @@
         warnSpan.style.display = hasChanges ? 'inline' : 'none';
       }
       
-      // Update the reset button visibility
+      // Update the reset button visibility and styling
       const resetBtn = wrapper.querySelector('.reset-button');
       if (resetBtn) {
         resetBtn.style.display = hasChanges ? 'inline-block' : 'none';
+        if (hasChanges) {
+          resetBtn.classList.add('btn-warning');
+        } else {
+          resetBtn.classList.remove('btn-warning');
+        }
       }
       
       // Update the copy button styling
       const copyDLBtn = wrapper.querySelector('.preset-header-actions button:nth-child(5)'); // Copy in local file format'
       if (copyDLBtn) {
         if (hasChanges) {
-          copyDLBtn.classList.add('warn-button');
+          copyDLBtn.classList.add('btn-warning');
         } else {
-          copyDLBtn.classList.remove('warn-button');
+          copyDLBtn.classList.remove('btn-warning');
         }
       }
     }
@@ -2157,7 +2478,9 @@
       if (!base) {
         // New event not present in the source file
         changed = true;
-        console.log(`Event ${eventName}: No base found, marking as changed`);
+        if (debugLoggingEnabled) {
+          console.log(`Event ${eventName}: No base found, marking as changed`);
+        }
         break;
       }
       // Normalise whitespace for comparison
@@ -2172,27 +2495,60 @@
       const thisCode = norm(preset.code);
       if (baseCode !== thisCode) {
         changed = true;
-        console.log(`Event ${eventName}: Code differs, marking as changed`);
-        console.log('Base code:', baseCode.substring(0, 100) + '...');
-        console.log('This code:', thisCode.substring(0, 100) + '...');
+        if (debugLoggingEnabled) {
+          console.log(`Event ${eventName}: Code differs, marking as changed`);
+          console.log('Base code:', baseCode.substring(0, 100) + '...');
+          console.log('This code:', thisCode.substring(0, 100) + '...');
+        }
         break;
       }
       const baseComment = norm(base.comment || '');
       const thisComment = norm(preset.comment || '');
       if (baseComment !== thisComment) {
         changed = true;
-        console.log(`Event ${eventName}: Comment differs, marking as changed`);
+        if (debugLoggingEnabled) {
+          console.log(`Event ${eventName}: Comment differs, marking as changed`);
+        }
         break;
       }
-      console.log(`Event ${eventName}: No changes detected`);
+      if (debugLoggingEnabled) {
+        console.log(`Event ${eventName}: No changes detected`);
+      }
     } while (false);
 
     // Primary action: push/run the event code
     const runBtn = document.createElement('button');
     runBtn.textContent = 'Push';
+    runBtn.className = 'btn-success';
 
-    // Build left part: run button followed by event name
+    // Build left part: collapse button, drag handle, run button, event name
+    
     headerLeft.appendChild(collapseBtn);
+    
+    // Drag handle for reordering (placed on the left side) - TEMPORARILY DISABLED
+    /*
+    const dragHandle = document.createElement('span');
+    dragHandle.className = 'drag-handle';
+    dragHandle.textContent = '⋮⋮';
+    dragHandle.title = 'Drag to reorder';
+    dragHandle.draggable = true;
+    dragHandle.setAttribute('data-event-name', eventName);
+    
+    if (debugLoggingEnabled) {
+      console.log('Created drag handle for event:', eventName, 'Element:', dragHandle);
+    }
+    
+    // Add drag and drop event listeners to the drag handle
+    dragHandle.addEventListener('dragstart', handleEventDragStart);
+    dragHandle.addEventListener('dragend', handleEventDragEnd);
+    
+    // Make the entire wrapper droppable
+    wrapper.addEventListener('dragover', handleEventDragOver);
+    wrapper.addEventListener('dragleave', handleEventDragLeave);
+    wrapper.addEventListener('drop', handleEventDrop);
+    
+    headerLeft.appendChild(dragHandle);
+    */
     headerLeft.appendChild(runBtn);
     headerLeft.appendChild(title);
 
@@ -2210,18 +2566,18 @@
 
     const copyBtn = document.createElement('button');
     copyBtn.textContent = 'Copy as dataLayer.push';
-    copyBtn.className = 'small-button';
+    copyBtn.className = 'btn-sm';
 
     const copyDLBtn = document.createElement('button');
     copyDLBtn.textContent = 'Copy in local file format';
-    copyDLBtn.className = 'small-button';
+    copyDLBtn.className = 'btn-sm';
 
     // If this preset has local-only changes, visually mark the copy button
     // and add a subtle warning label to the header.  The warning
     // indicates that the current event differs from the loaded source
     // (either a new event or modified code/comment).
     if (changed) {
-      copyDLBtn.classList.add('warn-button');
+      copyDLBtn.classList.add('btn-warning');
     }
 
     // Utility to trim trailing whitespace from the editor content.  This button
@@ -2229,23 +2585,25 @@
     // when trailing whitespace is detected.  A primary-button class is
     // toggled on demand to emphasise its importance when active.
     const trimBtn = document.createElement('button');
-    trimBtn.className = 'small-button';
+    trimBtn.className = 'btn-sm';
     trimBtn.textContent = 'Trim spaces';
     trimBtn.style.visibility = 'hidden';
 
     // Queue button for adding events to journey
     const queueBtn = document.createElement('button');
     queueBtn.textContent = 'Add to Journey';
-    queueBtn.className = 'small-button queue-btn';
+    queueBtn.className = 'btn-sm queue-btn';
     queueBtn.onclick = () => addToJourney(eventName, preset.code);
 
     // Reset button for reverting changes (always create, show/hide based on changes)
     const resetBtn = document.createElement('button');
     resetBtn.textContent = '🔄';
-    resetBtn.className = 'small-button reset-button';
+    resetBtn.className = 'btn-sm reset-button';
     resetBtn.title = 'Revert to original state';
     resetBtn.onclick = () => resetLoadedEvent(eventName, wrapper);
     resetBtn.style.display = changed ? 'inline-block' : 'none';
+    
+
     
     // Primary actions row: essential buttons
     actions.appendChild(trimBtn);
@@ -2257,7 +2615,7 @@
     // Remove button for deleting events
     const removeBtn = document.createElement('button');
     removeBtn.textContent = '🗑️';
-    removeBtn.className = 'small-button clear-button';
+    removeBtn.className = 'btn-sm';
     removeBtn.title = 'Remove event';
     removeBtn.onclick = () => removeLoadedEvent(eventName, wrapper);
     actions.appendChild(removeBtn);
@@ -2348,7 +2706,7 @@
         trimmed = trimmed.replace(/,\s*([}\]])/g, '$1');
         editorInstance.setValue(trimmed, -1);
         trimBtn.style.visibility = 'hidden';
-        runBtn.className = 'push-button';
+        runBtn.className = 'btn-success';
         log('✂️ Trimmed spaces');
       }
     };
@@ -2371,7 +2729,7 @@
     // Button to add new links
     const addLinkBtn = document.createElement('button');
     addLinkBtn.textContent = 'Add link';
-    addLinkBtn.className = 'small-button add-link-btn';
+    addLinkBtn.className = 'btn-sm add-link-btn';
     commentWrapper.appendChild(addLinkBtn);
     // Comment textarea for freeform notes
     const commentTextarea = document.createElement('textarea');
@@ -2409,10 +2767,10 @@
       actions.className = 'link-form-actions';
       const saveBtn = document.createElement('button');
       saveBtn.textContent = 'Save';
-      saveBtn.className = 'small-button';
+      saveBtn.className = 'btn-sm';
       const cancelBtn = document.createElement('button');
       cancelBtn.textContent = 'Cancel';
-      cancelBtn.className = 'small-button';
+      cancelBtn.className = 'btn-sm';
       actions.appendChild(saveBtn);
       actions.appendChild(cancelBtn);
       form.appendChild(urlInput);
@@ -2567,20 +2925,20 @@
           const lines = code.split('\n');
           const hasTrailing = lines.some(l => /[ \t]+$/.test(l));
           // Apply visual states: red for errors, yellow for only trailing whitespace.
-          runBtn.classList.toggle('error-button', hasError);
-          runBtn.classList.toggle('warn-button', !hasError && hasTrailing);
+          runBtn.classList.toggle('btn-error', hasError);
+          runBtn.classList.toggle('btn-warn', !hasError && hasTrailing);
           // Show the trim button whenever there is trailing whitespace or any annotation.
           if (hasTrailing || hasAnyIssue) {
             trimBtn.style.visibility = 'visible';
             // Highlight as primary only when the issue is just trailing whitespace (no syntax error).
             if (hasTrailing && anns.length === 0) {
-              trimBtn.classList.add('primary-button');
+              trimBtn.classList.add('btn-primary');
             } else {
-              trimBtn.classList.remove('primary-button');
+              trimBtn.classList.remove('btn-primary');
             }
           } else {
             trimBtn.style.visibility = 'hidden';
-            trimBtn.classList.remove('primary-button');
+            trimBtn.classList.remove('btn-primary');
           }
         };
         updateButtonState();
@@ -2618,7 +2976,7 @@
           if (warnSpan) {
             warnSpan.style.display = isChanged ? 'inline' : 'none';
           }
-          copyDLBtn.classList.toggle('warn-button', isChanged);
+          copyDLBtn.classList.toggle('btn-warning', isChanged);
         };
         // Initial evaluation
         updateChange();
@@ -2648,8 +3006,8 @@
     if (localBtn) {
       localBtn.textContent = 'Use local file';
       // Restore small-button styling so it appears neutral
-      localBtn.classList.remove('primary-button');
-      localBtn.classList.add('small-button');
+      localBtn.classList.remove('btn-primary');
+      localBtn.classList.add('btn-sm');
       localBtn.title = 'Use a local file instead of the built‑in examples from GitHub';
     }
           // Fetch presets again from the original examples on GitHub
@@ -2744,8 +3102,8 @@
             // deliberately keep the small-button sizing so the control remains
             // consistent with the other auxiliary buttons, but apply a
             // primary-button class to colour it blue.
-            localBtn.classList.remove('small-button');
-            localBtn.classList.add('small-button', 'primary-button');
+            localBtn.classList.remove('btn-sm');
+            localBtn.classList.add('btn-sm', 'btn-primary');
             localBtn.title = `Reload the locally loaded file (${file.name}) - If chnages are made it need to be selected again`;
           }
           loadPresets();
@@ -2819,7 +3177,7 @@
       wrapper.id = id;
 
       const btn = document.createElement('button');
-      btn.className = 'nav-btn';
+      btn.className = 'nav-btn go-to-event-btn';
       btn.textContent = name;
       btn.onclick = () => {
         const target = document.getElementById(id);
@@ -2838,8 +3196,21 @@
       injectGTM(lastId);
     }
     
-    // Initialize console logging toggle
+    // Initialize console logging toggles
+    const actionsToggle = document.getElementById('actionsLogToggle');
     const consoleToggle = document.getElementById('consoleLogToggle');
+    const debugToggle = document.getElementById('debugLogToggle');
+    
+    if (actionsToggle) {
+      actionsLoggingEnabled = localStorage.getItem('gtm_actions_logging') === 'true';
+      actionsToggle.checked = actionsLoggingEnabled;
+      actionsToggle.addEventListener('change', (e) => {
+        actionsLoggingEnabled = e.target.checked;
+        localStorage.setItem('gtm_actions_logging', actionsLoggingEnabled);
+        log(actionsLoggingEnabled ? '📝 Actions logging enabled' : '🔇 Actions logging disabled');
+      });
+    }
+    
     if (consoleToggle) {
       consoleLoggingEnabled = localStorage.getItem('gtm_console_logging') === 'true';
       consoleToggle.checked = consoleLoggingEnabled;
@@ -2847,6 +3218,16 @@
         consoleLoggingEnabled = e.target.checked;
         localStorage.setItem('gtm_console_logging', consoleLoggingEnabled);
         log(consoleLoggingEnabled ? '📝 Console logging enabled' : '🔇 Console logging disabled');
+      });
+    }
+    
+    if (debugToggle) {
+      debugLoggingEnabled = localStorage.getItem('gtm_debug_logging') === 'true';
+      debugToggle.checked = debugLoggingEnabled;
+      debugToggle.addEventListener('change', (e) => {
+        debugLoggingEnabled = e.target.checked;
+        localStorage.setItem('gtm_debug_logging', debugLoggingEnabled);
+        log(debugLoggingEnabled ? '📝 Debug logging enabled' : '🔇 Debug logging disabled');
       });
     }
     
@@ -2869,7 +3250,7 @@
     const journeyCollapsed = localStorage.getItem('gtm_journey_collapsed') === 'true';
     if (journeyCollapsed) {
       const content = document.getElementById('journeyContent');
-      const toggleBtn = document.querySelector('.journey-toggle-btn');
+      const toggleBtn = document.querySelector('.section-toggle-btn');
       if (content && toggleBtn) {
         content.classList.add('collapsed');
         toggleBtn.classList.add('collapsed');
@@ -2881,7 +3262,7 @@
     const settingsCollapsed = localStorage.getItem('gtm_settings_collapsed') === 'true';
     if (settingsCollapsed) {
       const content = document.getElementById('settingsContent');
-      const toggleBtn = document.querySelector('.settings-toggle-btn');
+      const toggleBtn = document.querySelector('.section-toggle-btn');
       if (content && toggleBtn) {
         content.classList.add('collapsed');
         toggleBtn.classList.add('collapsed');
@@ -2891,6 +3272,18 @@
 
 
     
+    // Add event listener to file input to change button color when file is selected
+    const localFileInput = document.getElementById('localFileInput');
+    if (localFileInput) {
+      localFileInput.addEventListener('change', (e) => {
+        const localBtn = document.querySelector('.local-file-group button');
+        if (localBtn && e.target.files && e.target.files.length > 0) {
+          localBtn.classList.remove('btn-sm');
+          localBtn.classList.add('btn-sm', 'btn-primary');
+        }
+      });
+    }
+
     // Save journey delay changes
     const journeyDelayInput = document.getElementById('journeyDelay');
     if (journeyDelayInput) {
@@ -2927,28 +3320,15 @@
 
   // Toggle loaded events section visibility
   function toggleEventsSection() {
-    const content = document.getElementById('eventsContent');
-    const toggleBtn = document.querySelector('.events-toggle-btn');
-    if (!content || !toggleBtn) return;
-    const isCollapsed = content.classList.contains('collapsed');
-    if (isCollapsed) {
-      content.classList.remove('collapsed');
-      toggleBtn.classList.remove('collapsed');
-      toggleBtn.textContent = '▼';
-      localStorage.setItem('gtm_events_collapsed', 'false');
-    } else {
-      content.classList.add('collapsed');
-      toggleBtn.classList.add('collapsed');
-      toggleBtn.textContent = '▶';
-      localStorage.setItem('gtm_events_collapsed', 'true');
-    }
+    const toggleBtn = document.querySelector('#eventsContent').closest('.section').querySelector('.section-toggle-btn');
+    utils.toggleSection('eventsContent', 'gtm_events_collapsed', toggleBtn);
   }
 
   // Initialize events section collapsed state
   const eventsCollapsed = localStorage.getItem('gtm_events_collapsed') === 'true';
   if (eventsCollapsed) {
     const content = document.getElementById('eventsContent');
-    const toggleBtn = document.querySelector('.events-toggle-btn');
+    const toggleBtn = document.querySelector('.section-toggle-btn');
     if (content && toggleBtn) {
       content.classList.add('collapsed');
       toggleBtn.classList.add('collapsed');
@@ -2973,21 +3353,8 @@
   }
 
   function togglePlaygroundsSection() {
-    const content = document.getElementById('playgroundsContent');
-    const toggleBtn = document.querySelector('#playgroundsSection .events-toggle-btn');
-    if (!content || !toggleBtn) return;
-    const isCollapsed = content.classList.contains('collapsed');
-    if (isCollapsed) {
-      content.classList.remove('collapsed');
-      toggleBtn.classList.remove('collapsed');
-      toggleBtn.textContent = '▼';
-      localStorage.setItem('gtm_playgrounds_collapsed', 'false');
-    } else {
-      content.classList.add('collapsed');
-      toggleBtn.classList.add('collapsed');
-      toggleBtn.textContent = '▶';
-      localStorage.setItem('gtm_playgrounds_collapsed', 'true');
-    }
+    const toggleBtn = document.querySelector('#playgroundsSection .section-toggle-btn');
+    utils.toggleSection('playgroundsContent', 'gtm_playgrounds_collapsed', toggleBtn);
   }
 
   function addPlaygroundCard(exampleType = '', initialCode = '', initialComment = '') {
@@ -3043,7 +3410,7 @@
 
     const runBtn = document.createElement('button');
     runBtn.textContent = 'Push';
-    runBtn.className = 'push-button';
+    runBtn.className = 'btn-success';
 
     headerLeft.appendChild(collapseBtn);
     headerLeft.appendChild(runBtn);
@@ -3053,24 +3420,24 @@
     actions.className = 'preset-header-actions';
 
     const saveBtn = document.createElement('button');
-    saveBtn.className = 'small-button';
+    saveBtn.className = 'btn-sm';
     saveBtn.textContent = 'Save as Loaded Event';
 
     const copyBtn = document.createElement('button');
-    copyBtn.className = 'small-button';
+    copyBtn.className = 'btn-sm';
     copyBtn.textContent = 'Copy as dataLayer.push';
 
     const copyDLBtn = document.createElement('button');
-    copyDLBtn.className = 'small-button';
+    copyDLBtn.className = 'btn-sm';
     copyDLBtn.textContent = 'Copy in local file format';
 
     const trimBtn = document.createElement('button');
-    trimBtn.className = 'small-button';
+    trimBtn.className = 'btn-sm';
     trimBtn.textContent = 'Trim spaces';
     trimBtn.style.visibility = 'hidden';
 
     const removeBtn = document.createElement('button');
-    removeBtn.className = 'small-button clear-button';
+    removeBtn.className = 'btn-sm';
     removeBtn.textContent = '🗑️ Remove';
 
     actions.appendChild(trimBtn);
@@ -3235,7 +3602,7 @@ object_name: {
         trimmed = trimmed.replace(/,\s*([}\]])/g, '$1');
         editorInstance.setValue(trimmed, -1);
         trimBtn.style.visibility = 'hidden';
-        runBtn.className = 'push-button';
+        runBtn.className = 'btn-success';
         log('✂️ Trimmed spaces');
       }
     };
@@ -3264,11 +3631,11 @@ object_name: {
     // Show/hide trim button and update styling (use visibility like Loaded Events)
     if (hasTrailing) {
       trimBtn.style.visibility = 'visible';
-      trimBtn.className = 'small-button trim-button';
-      runBtn.className = 'push-button warning';
+      trimBtn.className = 'btn-sm trim-button';
+      runBtn.className = 'btn-warning';
     } else {
       trimBtn.style.visibility = 'hidden';
-      runBtn.className = 'push-button';
+      runBtn.className = 'btn-success';
     }
     
     // Check for syntax errors
@@ -3278,7 +3645,7 @@ object_name: {
       runBtn.disabled = false;
     } catch (e) {
       runBtn.textContent = '❌ Syntax Error';
-      runBtn.className = 'push-button error';
+      runBtn.className = 'btn-error';
       runBtn.disabled = true;
     }
   }
@@ -3288,7 +3655,7 @@ object_name: {
     const collapsed = localStorage.getItem('gtm_playgrounds_collapsed') === 'true';
     if (collapsed) {
       const content = document.getElementById('playgroundsContent');
-      const toggleBtn = document.querySelector('#playgroundsSection .events-toggle-btn');
+      const toggleBtn = document.querySelector('#playgroundsSection .section-toggle-btn');
       if (content && toggleBtn) {
         content.classList.add('collapsed');
         toggleBtn.classList.add('collapsed');
