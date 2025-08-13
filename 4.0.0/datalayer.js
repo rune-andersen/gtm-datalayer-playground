@@ -6,7 +6,7 @@ const presetEvents = [
   code: `dataLayer.push({
   event: 'data',
   user: {
-    user_id_subscriberkey: '70f60375-3c6e-4856-8e72-6d9943485249',
+    user_id_id: '70f60375-3c6e-4856-8e72-6d9943485249',
     user_id_sfmc: '0034I00002ffwLeQAI',
     logged_in: true
   },
@@ -26,7 +26,7 @@ const presetEvents = [
     cart_value: 130.70,
     items: [
       {
-        product_ean: '4741532901552',
+        product_ean: '3474153296776',
         product_id: '3243322',
         category_id: '987123',
         product_price: 50.10,
@@ -49,12 +49,12 @@ const presetEvents = [
 },
 // ===== END data =====
 
-// ===== START page_view_test =====  
+// ===== START page_view =====  
 {
-  name: "page_view_test",
+  name: "page_view",
   comment: ``,
   code: `dataLayer.push({
-  event: 'page_view_test'
+  event: 'page_view'
 });`
 },
 // ===== END page_view_test =====
@@ -67,8 +67,8 @@ const presetEvents = [
   event: 'product_listing_view',
   product_listing: {
     product_listing_id: '123-abc',
-    product_listing_name: 'Mobiltelefoner',
-    product_sorting: 'Mest populære',
+    product_listing_name: 'phones',
+    product_sorting: 'best sellers',
     product_count: 43,
     pagination_current: 1,
     pagination_total: 10,
@@ -99,7 +99,7 @@ const presetEvents = [
   code: `dataLayer.push({
   event: 'login',
   auth: {
-    login_method: 'MitID'
+    login_method: 'password'
   }
 });`
 },
@@ -125,8 +125,8 @@ const presetEvents = [
   code: `dataLayer.push({
   event: 'login_fail',
   auth: {
-    login_method: 'MitID',
-	  login_error_message: 'Unknows user',
+    login_method: 'password',
+	  login_error_message: 'Unknow user',
 	  login_error_reason: 'abc-123'
   },
   user: {
