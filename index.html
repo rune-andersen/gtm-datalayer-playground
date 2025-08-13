@@ -1,0 +1,3694 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+              <title>GTM & dataLayer Playground - Version 6.0.0 (Fixed Collapse/Expand Functionality & Temporarily Disabled Drag & Drop & Unified Button Styling with Consistent Grey Color & Enhanced Console Logging)</title>
+  <!-- Application version metadata.  Update these values when you commit new versions.
+       app-version holds a simple version string, e.g. 1.2.3, and app-changelog holds
+       a short description of what changed. -->
+      <meta name="app-version" content="6.0.0">
+          <meta name="app-changelog" content="Fixed Collapse/Expand Functionality & Temporarily Disabled Drag & Drop & Unified Button Styling with Consistent Grey Color & Enhanced Console Logging">
+  <style>
+    /*
+     * Base layout styling.  A subtle background colour and modern
+     * typography give the app a more contemporary feel.  The
+     * content is centred with a maximum width to improve readability.
+     */
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
+        Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+      background: #f7f9fb;
+      color: #333;
+      padding: 20px;
+      /* Increase the maximum width to accommodate side‑by‑side code and comment panes */
+      max-width: 1300px;
+      margin: auto;
+    }
+
+    /* Form controls adopt a consistent height, border radius and
+       light border. */
+    input,
+    textarea {
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      padding: 8px;
+    }
+    input {
+      width: 300px;
+    }
+    textarea {
+      width: 100%;
+      font-family: monospace;
+      resize: both;
+      overflow: auto;
+      background: #fff;
+    }
+
+    /* Unified button styling system */
+          button {
+        font-size: 16px;
+        padding: 8px 16px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        background-color: #e2e6ea; /* Default grey for all buttons - same as "Add to Journey" button */
+        color: #333;
+      }
+
+          button:hover {
+        background-color: #d4dadd;
+        transform: translateY(-1px);
+      }
+
+    button:active {
+      transform: translateY(0);
+    }
+
+    /* Button variants */
+    .btn-primary {
+      background-color: #007bff;
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background-color: #0056b3;
+    }
+
+    .btn-secondary {
+      background-color: #e2e6ea; /* Same grey as "Add to Journey" button */
+      color: #333;
+    }
+
+    .btn-secondary:hover {
+      background-color: #d4dadd;
+    }
+
+    .btn-success {
+      background-color: #28a745;
+      color: white;
+    }
+
+    .btn-success:hover {
+      background-color: #1e7e34;
+    }
+
+    .btn-warning {
+      background-color: #ffc107;
+      color: #212529;
+    }
+
+    .btn-warning:hover {
+      background-color: #e0a800;
+    }
+
+    .btn-danger {
+      background-color: #dc3545;
+      color: white;
+    }
+
+    .btn-danger:hover {
+      background-color: #c82333;
+    }
+
+    .btn-sm {
+      font-size: 12px;
+      padding: 4px 8px;
+    }
+
+    .btn-error {
+      background-color: #dc3545;
+      color: white;
+    }
+
+    .btn-error:hover {
+      background-color: #c82333;
+    }
+
+    .btn-warn {
+      background-color: #ffc107;
+      color: #212529;
+    }
+
+    .btn-warn:hover {
+      background-color: #e0a800;
+    }
+
+    /* Settings section specific button styling */
+    .settings-section .btn-primary {
+      background-color: #e2e6ea; /* Grey by default - same as "Add to Journey" button */
+      color: #333;
+    }
+
+    .settings-section .btn-primary:hover {
+      background-color: #d4dadd;
+    }
+
+    /* Journey Builder section specific button styling */
+    .journey-section .btn-primary {
+      background-color: #e2e6ea; /* Grey by default - same as "Add to Journey" button */
+      color: #333;
+    }
+
+    .journey-section .btn-primary:hover {
+      background-color: #d4dadd;
+    }
+
+    /* Playground section specific button styling */
+    .playground-section .btn-primary {
+      background-color: #e2e6ea; /* Grey by default - same as "Add to Journey" button */
+      color: #333;
+    }
+
+    .playground-section .btn-primary:hover {
+      background-color: #d4dadd;
+    }
+
+    .playground-section .btn-success {
+      background-color: #28a745; /* Keep Push button green */
+      color: white;
+    }
+
+    .playground-section .btn-success:hover {
+      background-color: #1e7e34;
+    }
+
+    /* Loaded Events section specific button styling */
+    .events-section .btn-primary {
+      background-color: #e2e6ea; /* Grey by default - same as "Add to Journey" button */
+      color: #333;
+    }
+
+    .events-section .btn-primary:hover {
+      background-color: #d4dadd;
+    }
+
+    .events-section .btn-success {
+      background-color: #28a745; /* Keep Push button green */
+      color: white;
+    }
+
+    .events-section .btn-success:hover {
+      background-color: #1e7e34;
+    }
+
+    /* Go to event buttons - blue foreground to indicate they are links */
+    .go-to-event-btn {
+      background-color: #e2e6ea; /* Same grey as "Add to Journey" button */
+      color: #007bff !important; /* Blue text to show they are links */
+    }
+
+    .go-to-event-btn:hover {
+      background-color: #d4dadd;
+    }
+
+    /* Add link button - grey */
+    .add-link-btn {
+      background-color: #e2e6ea; /* Same grey as "Add to Journey" button */
+      color: #333;
+    }
+
+    .add-link-btn:hover {
+      background-color: #d4dadd;
+    }
+
+    /* Small button variant */
+    .btn-sm {
+      font-size: 13px;
+      padding: 6px 10px;
+    }
+    
+    /* Button states */
+    .btn-error {
+      background-color: #dc3545 !important;
+      color: #fff !important;
+      cursor: not-allowed;
+    }
+    .btn-error:hover {
+      background-color: #c82333 !important;
+    }
+    
+    .btn-warn {
+      background-color: #ffc107 !important;
+      color: #212529 !important;
+    }
+    .btn-warn:hover {
+      background-color: #e0a800 !important;
+    }
+    
+    .btn-primary {
+      background-color: #007bff !important;
+      color: #fff !important;
+    }
+    .btn-primary:hover {
+      background-color: #0056b3 !important;
+    }
+
+    /*
+       Preset event card styling.  Each event is a card with a grey
+       header bar containing the event name and action buttons.  The
+       textarea aligns with the header and occupies the rest of the
+       card. */
+    .preset-wrapper {
+      border: 1px solid #eceff3;
+      border-radius: 4px;
+      background: #fff;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+      margin-bottom: 20px;
+    }
+    .preset-header-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #f5f7fa;
+      border-bottom: 1px solid #eceff3;
+      padding: 12px 16px;
+      font-weight: 600;
+    }
+
+    /* Left side of the preset header holds the primary action and the event name. */
+    .preset-header-left {
+      display: flex;
+      align-items: center;
+    }
+    .preset-header-left button {
+      margin-right: 10px;
+    }
+    .preset-header-title {
+      font-size: 17px;
+      margin-left: 0;
+    }
+    .preset-header-actions {
+      display: flex;
+      gap: 5px;
+      align-items: center;
+      flex-wrap: nowrap;
+      overflow-x: auto;
+    }
+    .preset-header-actions button {
+      margin-left: 10px;
+    }
+    
+    .preset-wrapper textarea {
+      border: none;
+      border-radius: 0 0 4px 4px;
+      padding: 12px 16px;
+      min-height: 120px;
+      resize: vertical;
+      width: 100%;
+      /* Ensure padding is included in the width to align with header */
+      box-sizing: border-box;
+    }
+
+    /* Layout for event content: code area and comment area side by side */
+    .preset-content {
+      display: flex;
+      /* Use explicit widths rather than gaps. */
+    }
+    /* Code area takes up 800px of the available width */
+    .preset-content .code-area {
+      flex: 0 0 800px;
+    }
+    /* A vertical divider between code and comment areas.  The colour matches
+       the grey header used for event cards. */
+    .preset-content .divider {
+      flex: 0 0 50px;
+      background-color: #f5f7fa;
+    }
+    /* Comment area takes up 450px of the available width */
+    .preset-content .comment-area {
+      flex: 0 0 450px;
+      display: flex;
+      flex-direction: column;
+    }
+    .comment-area textarea {
+      width: 100%;
+      border: 1px solid #eceff3;
+      border-radius: 0 0 4px 4px;
+      padding: 12px 16px;
+      resize: vertical;
+      height: 150px;
+      font-size: 14px;
+      font-family: sans-serif;
+      background: #fff;
+    }
+    
+    /* List of manually added links for each event. */
+    .links-list {
+      font-size: 13px;
+      margin-bottom: 6px;
+    }
+    .links-list a {
+      color: #007bff;
+      text-decoration: underline;
+      display: block;
+    }
+    /* Button to add a new link. Placed inside the comment area. */
+    .add-link-btn {
+      margin-bottom: 6px;
+    }
+
+    /* Individual link item with edit and delete controls */
+    .link-item {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      margin-bottom: 2px;
+    }
+    .link-item button {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 14px;
+      padding: 0 4px;
+      color: #6c757d;
+    }
+    .link-item button:hover {
+      color: #007bff;
+    }
+
+    /* Warning label for presets that are only stored in localStorage or
+       have been edited locally.  This label appears next to the event
+       name and uses a muted orange colour to draw attention without
+       overwhelming the interface. */
+    .change-warning {
+      font-size: 12px;
+      color: #d97706;
+      margin-left: 8px;
+    }
+
+    /* Simple inline form for adding a link (URL and description) */
+    .link-form {
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 6px;
+      gap: 4px;
+    }
+    .link-form input {
+      padding: 6px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+    .link-form .link-form-actions {
+      display: flex;
+      gap: 6px;
+    }
+
+    /* Ace editor container inherits similar styling to the textarea it replaces. */
+    .ace-editor-container {
+      width: 100%;
+      min-height: 120px;
+    }
+    
+    /* Headings use a modern size/weight and extra spacing around
+       sections. */
+    .label {
+      font-weight: 600;
+      margin: 40px 0 15px;
+      font-size: 28px;
+    }
+    
+    /* Log output adopts a card-like style similar to presets. */
+    .log {
+      margin-top: 15px;
+      background: #fff;
+      padding: 10px;
+      border: 1px solid #eceff3;
+      border-radius: 4px;
+      font-family: monospace;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+    }
+
+    /*
+     * Layout helpers for the top action buttons.  These classes group the three
+     * preset actions (save, copy all and reset) together near the top of the
+     * page and arrange them horizontally.  Each group contains the primary
+     * button and its descriptive caption stacked vertically.  The flex
+     * container allows the groups to sit side‑by‑side and wrap on narrow
+     * screens.
+     */
+    .top-buttons {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+      align-items: flex-start;
+      margin: 20px 0;
+    }
+    .button-group {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    /*
+     * Event navigation bar styling.  Displays a row of buttons to
+     * quickly scroll to each event section.  Buttons use a neutral
+     * colour palette similar to secondary actions.
+     */
+    .event-nav {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin: 20px 0;
+    }
+    .event-nav .nav-btn {
+      background-color: #e2e6ea;
+      border: none;
+      border-radius: 4px;
+      padding: 6px 12px;
+      color: #333;
+      cursor: pointer;
+      transition: background-color 0.15s ease;
+      font-size: 14px;
+    }
+    .event-nav .nav-btn:hover {
+      background-color: #d4dadd;
+    }
+
+    .event-nav-title {
+      font-weight: 600;
+      margin: 10px 0 5px;
+    }
+
+    /* Sub-label styling used below section headers for explanatory notes. */
+    .sub-label {
+      color: gray;
+      font-size: 14px;
+      margin-top: -10px;
+      margin-bottom: 20px;
+    }
+
+    /* Layout for the GTM ID and local file row.  Places the GTM ID input and
+       local file picker side by side on wider screens.  Allows wrapping on
+       narrow screens. */
+    .gtm-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 20px;
+      margin: 10px 0;
+    }
+    .gtm-id-group input {
+      margin-right: 8px;
+    }
+    .local-file-group input[type="file"] {
+      /* Reset margin so the file input aligns vertically with the adjacent button */
+      margin: 0;
+    }
+    /* Align the file input and the local loader button horizontally. */
+    .local-file-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    /* Ace editor uses its own themes; ensure fonts align with the rest of the app. */
+    .ace_editor {
+      font-family: monospace;
+      font-size: 14px;
+      border-radius: 0 0 4px 4px;
+      border: none;
+    }
+
+    /* Allow the Ace editor container to be vertically resizable by the user. */
+    .ace-editor-container {
+      resize: vertical;
+      overflow: auto;
+    }
+
+    /* Lighten the appearance of error highlights in Ace to reduce visual noise. */
+    .ace_editor .ace_error {
+      background-color: #fee2e2 !important;
+    }
+    .ace_editor .ace_gutter-cell.ace_error {
+      background-color: #fee2e2 !important;
+      color: #721c24 !important;
+    }
+    .ace_editor .ace_marker-layer .ace_error {
+      background-color: #fecaca !important;
+    }
+
+    /* Lighten warning annotations (e.g., trailing whitespace) but keep them visible. */
+    .ace_editor .ace_warning {
+      background-color: #fff3cd !important;
+    }
+    .ace_editor .ace_gutter-cell.ace_warning {
+      background-color: #fff3cd !important;
+      color: #856404 !important;
+    }
+    .ace_editor .ace_marker-layer .ace_warning {
+      background-color: #ffe8a1 !important;
+    }
+
+    /* Version label styling */
+    .version-label {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      font-size: 12px;
+      color: gray;
+      z-index: 1000;
+    }
+
+    /* Console logging toggles styling */
+    .console-toggles {
+      margin: 15px 0;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .console-toggle {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 0;
+      padding: 8px 12px;
+      background: #f8f9fa;
+      border: 1px solid #dee2e6;
+      border-radius: 4px;
+    }
+    .console-toggle input[type="checkbox"] {
+      width: auto;
+      margin: 0;
+    }
+    .console-toggle label {
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+    }
+
+    /* Random User ID section styling */
+    .user-id-section {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 10px;
+      margin: 10px 0;
+      padding: 12px 16px;
+      background: #fff;
+      border: 1px solid #dee2e6;
+      border-radius: 4px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+    
+    .user-id-section .user-id-row {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      width: 100%;
+    }
+    .user-id-display {
+      font-family: monospace;
+      font-size: 14px;
+      color: #495057;
+      background: #f8f9fa;
+      padding: 6px 10px;
+      border-radius: 4px;
+      border: 1px solid #dee2e6;
+      min-width: 200px;
+    }
+    .user-id-section button {
+      font-size: 14px;
+      padding: 6px 12px;
+    }
+    
+    .user-id-help {
+      margin-top: 8px;
+      padding: 8px 12px;
+      background: #f8f9fa;
+      border-radius: 4px;
+      border-left: 3px solid #007bff;
+    }
+    
+    .user-id-help small {
+      color: #6c757d;
+      line-height: 1.4;
+    }
+    
+    .user-id-help code {
+      background: #e9ecef;
+      padding: 2px 4px;
+      border-radius: 3px;
+      font-family: monospace;
+      font-size: 12px;
+    }
+
+    /* Unified section styling */
+    .section {
+      margin: 20px 0;
+      padding: 16px;
+      background: #fff;
+      border: 1px solid #dee2e6;
+      border-radius: 4px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid #dee2e6;
+    }
+    
+    .section-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: #495057;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .section-toggle-btn {
+      background: none;
+      border: none;
+      font-size: 16px;
+      cursor: pointer;
+      padding: 0;
+      margin-right: 8px;
+      color: #6c757d;
+      transition: transform 0.2s ease;
+    }
+    .section-toggle-btn:hover {
+      color: #495057;
+    }
+    .section-toggle-btn.collapsed {
+      transform: rotate(-90deg);
+    }
+    
+    .section-content {
+      transition: all 0.3s ease;
+      overflow: hidden;
+    }
+    .section-content.collapsed {
+      max-height: 0;
+      opacity: 0;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* No playgrounds message styling */
+    .no-playgrounds-message {
+      text-align: center;
+      padding: 40px 20px;
+      color: #6c757d;
+    }
+    .no-playgrounds-message button {
+      font-size: 16px;
+      padding: 12px 24px;
+    }
+
+    /* Journey Queue styling */
+    .journey-queue {
+      min-height: 60px;
+      padding: 12px;
+      background: #f8f9fa;
+      border: 2px dashed #dee2e6;
+      border-radius: 4px;
+      margin-bottom: 16px;
+    }
+    .journey-queue.empty {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #6c757d;
+      font-style: italic;
+    }
+    
+    .journey-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 12px;
+      background: #fff;
+      border: 1px solid #dee2e6;
+      border-radius: 4px;
+      margin-bottom: 8px;
+      cursor: move;
+      transition: all 0.2s ease;
+    }
+    .journey-item:hover {
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    .journey-item.dragging {
+      opacity: 0.5;
+      transform: rotate(2deg);
+    }
+    /* .journey-item .drag-handle {
+      color: #6c757d;
+      cursor: move;
+      font-size: 16px;
+    } */
+    .journey-item .event-name {
+      flex: 1;
+      font-weight: 500;
+    }
+    .journey-item .remove-btn {
+      background: none;
+      border: none;
+      color: #dc3545;
+      cursor: pointer;
+      padding: 4px;
+      border-radius: 3px;
+      transition: background-color 0.2s ease;
+    }
+    .journey-item .remove-btn:hover {
+      background-color: #fee2e2;
+    }
+    
+    .journey-status {
+      margin: 15px 0;
+      padding: 15px;
+      background-color: #f8f9fa;
+      border-radius: 8px;
+      border: 1px solid #e9ecef;
+    }
+    
+    .journey-progress {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+    
+    .progress-bar {
+      flex: 1;
+      height: 20px;
+      background-color: #e9ecef;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    
+    .progress-fill {
+      height: 100%;
+      background-color: #28a745;
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+    
+    .progress-text {
+      font-weight: 600;
+      color: #495057;
+      min-width: 60px;
+      text-align: center;
+    }
+
+    .journey-delay {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-right: 15px;
+    }
+    .journey-delay input {
+      width: 80px;
+      text-align: center;
+    }
+    .journey-delay label {
+      font-size: 14px;
+      color: #6c757d;
+    }
+
+    .journey-controls {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .small-journey-btn {
+      font-size: 14px;
+      padding: 6px 12px;
+      min-width: auto;
+      flex: none;
+    }
+
+    /* Queue button styling for individual events */
+    .queue-btn {
+      background-color: #e2e6ea !important;
+      color: #333 !important;
+    }
+    .queue-btn:hover {
+      background-color: #d4dadd !important;
+    }
+    .queue-btn.queued {
+      background-color: #28a745 !important;
+      color: #fff !important;
+    }
+    
+    .queue-btn.queued:hover {
+      background-color: #218838 !important;
+    }
+    
+    .queue-clear-btn {
+      background-color: #dc3545 !important;
+      color: #fff !important;
+      margin-left: 5px;
+    }
+    .queue-clear-btn:hover {
+      background-color: #c82333 !important;
+    }
+
+    /* Journey presets styling */
+    .journey-presets {
+      margin-top: 20px;
+      padding: 15px;
+      background-color: #f8f9fa;
+      border-radius: 8px;
+      border: 1px solid #e9ecef;
+    }
+    
+    .presets-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+    
+    .presets-header h4 {
+      margin: 0;
+      color: #495057;
+      font-size: 16px;
+    }
+    
+    .presets-count {
+      color: #6c757d;
+      font-size: 14px;
+      font-style: italic;
+    }
+    
+    .presets-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    
+    .preset-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px;
+      background-color: white;
+      border: 1px solid #dee2e6;
+      border-radius: 6px;
+      transition: all 0.2s ease;
+    }
+    
+    .preset-item:hover {
+      border-color: #007bff;
+      box-shadow: 0 2px 4px rgba(0, 123, 255, 0.1);
+    }
+    
+    .preset-info {
+      flex: 1;
+    }
+    
+    .preset-name {
+      font-weight: 600;
+      color: #007bff;
+      margin-bottom: 4px;
+      cursor: pointer;
+      text-decoration: underline;
+      transition: color 0.2s ease;
+    }
+    
+    .preset-name:hover {
+      color: #0056b3;
+    }
+    
+    .preset-details {
+      font-size: 12px;
+      color: #6c757d;
+    }
+    
+    .preset-actions {
+      display: flex;
+      gap: 8px;
+    }
+    
+    .preset-load-btn {
+      background-color: #007bff !important;
+      color: white !important;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 4px;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    
+    .preset-load-btn:hover {
+      background-color: #0056b3 !important;
+    }
+    
+    .preset-delete-btn {
+      background-color: #dc3545 !important;
+      color: white !important;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 4px;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    
+    .preset-delete-btn:hover {
+      background-color: #c82333 !important;
+    }
+
+    /* Drag and Drop styling - TEMPORARILY DISABLED */
+    /*
+    .drag-handle {
+      cursor: grab;
+      color: #666;
+      font-size: 18px;
+      padding: 4px 6px;
+      border-radius: 4px;
+      transition: all 0.2s ease;
+      user-select: none;
+      display: inline-block;
+      background: rgba(0, 0, 0, 0.08);
+      border: 1px solid #ccc;
+      margin-right: 8px;
+      position: relative;
+      z-index: 10;
+      pointer-events: auto;
+    }
+    .drag-handle:hover {
+      color: #333;
+      background: rgba(0, 0, 0, 0.12);
+      border-color: #999;
+      transform: scale(1.05);
+    }
+    .drag-handle:active {
+      cursor: grabbing;
+      transform: scale(0.95);
+    }
+    
+    /* Ensure drag handle on left side has proper spacing */
+    .preset-header-left .drag-handle {
+      margin-right: 8px;
+      margin-left: 0;
+    }
+    
+    /* Drag and drop visual feedback - TEMPORARILY DISABLED */
+    /*
+    .preset-wrapper.dragging {
+      opacity: 0.6;
+      transform: rotate(1deg) scale(0.98);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      z-index: 1000;
+    }
+    .preset-wrapper.drag-over {
+      border: 2px dashed #007bff;
+      background: rgba(0, 123, 255, 0.08);
+      box-shadow: inset 0 0 0 2px rgba(0, 123, 255, 0.2);
+    }
+    */
+
+    /* Per-event collapse */
+    .preset-wrapper.collapsed .preset-content { display: none; }
+    .preset-wrapper .collapse-toggle {
+      background: none;
+      border: none;
+      font-size: 16px;
+      cursor: pointer;
+      padding: 0 8px 0 0;
+      color: #6c757d;
+    }
+    .preset-wrapper .collapse-toggle:hover { color: #495057; }
+    
+    /* Section actions styling */
+    .section-actions {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+  </style>
+
+  <!-- Include Ace Editor from CDN for syntax highlighting.  The CDN provides the core, mode and theme scripts. -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.14/ace.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.14/mode-javascript.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.14/theme-chrome.js"></script>
+</head>
+<body>
+  <!-- Version label displayed in the top right corner.  This text will be populated using
+       the meta tag values defined in the document head (see meta[name="app-version"]).
+       When deploying a new version, update the meta tags accordingly. -->
+  <div class="version-label" id="versionLabel">Version: —</div>
+  <h1>GTM Playground</h1>
+
+  <!-- Console output at top -->
+  <div class="log" id="logOutput">Console output will appear here…</div>
+
+  <!-- 1. SETTINGS SECTION (Collapsible) -->
+  <div class="section settings-section">
+    <div class="section-header">
+      <div class="section-title">
+        <button class="section-toggle-btn" onclick="toggleSettingsSection()">▼</button>
+        ⚙️ Settings
+      </div>
+    </div>
+    
+    <div class="section-content" id="settingsContent">
+      <!-- Combined row for GTM ID entry and optional local file loader -->
+      <div class="gtm-row">
+        <div class="gtm-id-group">
+          <input type="text" id="gtmId" placeholder="GTM-XXXXXXX" title="Enter your GTM Container ID" />
+          <button id="gtmButton" onclick="loadGTM()">Inject GTM</button>
+        </div>
+        <div class="local-file-group">
+          <input type="file" id="localFileInput" accept=".js" />
+          <button class="btn-sm" onclick="loadLocalFile()" title="Use a local file instead of the built‑in examples from GitHub">Use local file</button>
+          <button class="btn-sm" onclick="resetPresets()" title="Remove saved events and changes and reload from the built‑in examples on GitHub">♻️ Reset and use examples from GitHub</button>
+        </div>
+      </div>
+
+      <!-- Console logging toggles -->
+      <div class="console-toggles">
+        <div class="console-toggle">
+          <input type="checkbox" id="actionsLogToggle" />
+          <label for="actionsLogToggle">Log actions to console</label>
+        </div>
+        <div class="console-toggle">
+          <input type="checkbox" id="consoleLogToggle" />
+          <label for="consoleLogToggle">Log dataLayer.push to console</label>
+        </div>
+        <div class="console-toggle">
+          <input type="checkbox" id="debugLogToggle" />
+          <label for="debugLogToggle">Log debug information to console</label>
+        </div>
+      </div>
+
+      <!-- Random User ID Generator -->
+      <div class="user-id-section">
+        <div class="user-id-row">
+          <span>Current user_id:</span>
+          <span class="user-id-display" id="currentUserId">Generating...</span>
+          <button onclick="generateNewUserId()">🔁 New GUID</button>
+        </div>
+        <div class="user-id-help">
+          <small>💡 Use <code>{{user_id}}</code> in your events to automatically include this ID. Example: <code>dataLayer.push({event: 'purchase', user_id: '{{user_id}}'})</code></small>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. JOURNEY BUILDER SECTION (Renamed from Journey Queue) -->
+  <div class="section journey-section">
+    <div class="section-header">
+      <div class="section-title">
+        <button class="section-toggle-btn" onclick="toggleJourneySection()">▼</button>
+        🚀 Journey Builder
+      </div>
+      <div class="journey-controls">
+        <button class="btn-success btn-sm" onclick="runJourney()" id="runJourneyBtn">▶️ Run Journey</button>
+        <button class="btn-warning btn-sm" onclick="pauseJourney()" id="pauseJourneyBtn" style="display: none;">⏸️ Pause</button>
+        <button class="btn-danger btn-sm" onclick="clearJourney()">🗑️ Clear Queue</button>
+        <div class="journey-delay">
+          <label for="journeyDelay">Delay (ms):</label>
+          <input type="number" id="journeyDelay" value="1000" min="0" max="10000" step="100" />
+        </div>
+        <button class="btn-sm" onclick="saveJourneyPreset()">💾 Save Preset</button>
+        <button class="btn-sm" onclick="loadJourneyPreset()">📁 Load Preset</button>
+      </div>
+    </div>
+    
+    <div class="section-content" id="journeyContent">
+      <div class="journey-queue" id="journeyQueue">
+        <div class="journey-queue empty">Drop events here to build your journey...</div>
+      </div>
+      
+      <!-- Journey Status and Progress -->
+      <div class="journey-status" id="journeyStatus" style="display: none;">
+        <div class="journey-progress">
+          <div class="progress-bar">
+            <div class="progress-fill" id="journeyProgressFill"></div>
+          </div>
+          <span class="progress-text" id="journeyProgressText">0/0</span>
+        </div>
+      </div>
+      <!-- Preset display area -->
+      <div class="journey-presets" id="journeyPresets">
+        <div class="presets-header">
+          <h4>💾 Saved Journey Presets</h4>
+          <span class="presets-count" id="presetsCount">No presets saved</span>
+        </div>
+        <div class="presets-list" id="presetsList">
+          <!-- Presets will be displayed here -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
+  <!-- 3b. MULTI PLAYGROUNDS SECTION (New) -->
+  <div class="section playground-section" id="playgroundsSection">
+    <div class="section-header">
+      <div class="section-title">
+        <button class="section-toggle-btn" onclick="togglePlaygroundsSection()">▼</button>
+        <span class="section-title-text">Playgrounds</span>
+      </div>
+      <div class="section-actions">
+        <button class="btn-sm" onclick="addPlaygroundCard('flat')" title="Simple flat structure">Add new Flat</button>
+        <button class="btn-sm" onclick="addPlaygroundCard('object')" title="With nested objects">Add new Object</button>
+        <button class="btn-sm" onclick="addPlaygroundCard('array')" title="With objects and arrays">Add new Object & Array</button>
+        <button class="btn-sm" onclick="expandAllPlaygrounds()">Expand All</button>
+        <button class="btn-sm" onclick="collapseAllPlaygrounds()">Collapse All</button>
+      </div>
+    </div>
+    <div class="section-content" id="playgroundsContent">
+      <div id="playgroundsArea">
+        <div class="no-playgrounds-message">
+          <p style="text-align: center; margin-bottom: 15px; color: #666;">Choose a playground type to get started:</p>
+          <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+            <button class="btn-sm" onclick="addPlaygroundCard('flat')" title="Simple flat structure">Add new Flat</button>
+            <button class="btn-sm" onclick="addPlaygroundCard('object')" title="With nested objects">Add new Object</button>
+            <button class="btn-sm" onclick="addPlaygroundCard('array')" title="With objects and arrays">Add new Object & Array</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. LOADED EVENTS SECTION -->
+  <div class="section events-section">
+    <div class="section-header">
+      <div class="section-title">
+        <button class="section-toggle-btn" onclick="toggleEventsSection()">▼</button>
+        <span id="loadedEventsLabel" class="section-title-text">Loaded Events</span>
+      </div>
+      <div class="section-actions">
+        <button class="btn-sm" onclick="expandAllEvents()">Expand All</button>
+        <button class="btn-sm" onclick="collapseAllEvents()">Collapse All</button>
+        <button class="btn-sm" onclick="savePresets()" title="Save changes so they persist on reload">💾 Save Changes (localStorage)</button>
+        <button class="btn-sm" onclick="copyAllAsDataLayer()" title="Copy all events in the format used by local files. Remember to update the file manuel">📋 Copy All (local file format)</button>
+      </div>
+    </div>
+    <div class="section-content" id="eventsContent">
+      <!-- Go to Event inside Loaded Events -->
+      <div class="event-nav-title" style="margin-top:0;">Go to event:</div>
+      <div id="eventNav" class="event-nav"></div>
+      <hr>
+      <p id="loadedEventsSubLabel" class="sub-label">(editable in loaded file)</p>
+      <div id="presetsArea"></div>
+    </div>
+  </div>
+
+  <script src="datalayer.js"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+
+    // Track whether the GTM container has been injected.  These variables
+    // store references to the script and iframe elements so they can be
+    // removed when clearing the GTM setup.
+    let gtmInjected = false;
+    let gtmScriptTag = null;
+    let gtmIframeTag = null;
+
+    // Holds a reference to the currently selected local file so it can be reloaded
+    // without prompting the user to pick a file again.  This variable is set
+    // when a file is successfully loaded via loadLocalFile().
+    let currentLocalFile = null;
+
+    // Journey Queue System Variables
+    let journeyQueue = [];
+    let journeyRunning = false;
+    let journeyPaused = false;
+    let currentJourneyIndex = 0;
+    let journeyInterval = null;
+
+    // Random User ID
+    let currentUserId = '';
+
+    // Console Logging
+    let consoleLoggingEnabled = false;
+    let actionsLoggingEnabled = false;
+    let debugLoggingEnabled = false;
+
+  // Display the static version defined in the meta tags.  To update, modify the
+  // meta[name="app-version"] and meta[name="app-changelog"] values in the head.
+  (function displayStaticVersion() {
+    const versionEl = document.getElementById('versionLabel');
+    if (!versionEl) return;
+    const versionMeta = document.querySelector('meta[name="app-version"]');
+    const changeMeta = document.querySelector('meta[name="app-changelog"]');
+    const version = versionMeta ? versionMeta.getAttribute('content') : '';
+    const desc = changeMeta ? changeMeta.getAttribute('content') : '';
+    if (version) versionEl.textContent = 'Version: ' + version;
+    if (desc) versionEl.title = desc;
+  })();
+
+  // Generate a new random User ID (GUID)
+  function generateNewUserId() {
+    // Generate classic GUID format: xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx
+    const generateGuid = () => {
+      return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        const r = Math.random() * 16 | 0;
+        const v = c === 'x' ? r : (r & 0x3 | 0x8);
+        return v.toString(16);
+      });
+    };
+    
+    currentUserId = generateGuid();
+    document.getElementById('currentUserId').textContent = currentUserId;
+    localStorage.setItem('gtm_user_id', currentUserId);
+    log('🆔 New User ID generated: ' + currentUserId);
+  }
+
+  // Utility functions to reduce code duplication
+  const utils = {
+    // Unified toggle function for all sections
+    toggleSection(sectionId, storageKey, toggleBtn) {
+      const content = document.getElementById(sectionId);
+      if (!content || !toggleBtn) return;
+      
+      const isCollapsed = content.classList.contains('collapsed');
+      
+      if (isCollapsed) {
+        content.classList.remove('collapsed');
+        toggleBtn.classList.remove('collapsed');
+        toggleBtn.textContent = '▼';
+        localStorage.setItem(storageKey, 'false');
+      } else {
+        content.classList.add('collapsed');
+        toggleBtn.classList.add('collapsed');
+        toggleBtn.textContent = '▶';
+        localStorage.setItem(storageKey, 'true');
+      }
+    },
+    
+    // Create button with consistent styling
+    createButton(text, className, onClick, title = '') {
+      const btn = document.createElement('button');
+      btn.textContent = text;
+      btn.className = className;
+      if (onClick) btn.onclick = onClick;
+      if (title) btn.title = title;
+      return btn;
+    },
+    
+    // Normalize whitespace for comparison
+    normalizeWhitespace(str) {
+      if (!str) return '';
+      return str
+        .trim()
+        .replace(/\r\n/g, '\n')
+        .replace(/[ \t]+$/gm, '');
+    }
+  };
+
+  // Toggle journey section visibility
+  function toggleJourneySection() {
+    const toggleBtn = document.querySelector('#journeyContent').closest('.section').querySelector('.section-toggle-btn');
+    utils.toggleSection('journeyContent', 'gtm_journey_collapsed', toggleBtn);
+  }
+
+  // Toggle settings section visibility
+  function toggleSettingsSection() {
+    const toggleBtn = document.querySelector('#settingsContent').closest('.section').querySelector('.section-toggle-btn');
+    utils.toggleSection('settingsContent', 'gtm_settings_collapsed', toggleBtn);
+  }
+
+
+
+  // Replace placeholders in code with actual values
+  function replacePlaceholders(code) {
+    if (!code) return code;
+    let processedCode = code;
+    
+    // Replace user_id placeholders (multiple formats)
+    if (currentUserId) {
+      processedCode = processedCode.replace(/\[user_id\]/g, currentUserId);
+      processedCode = processedCode.replace(/\{\{user_id\}\}/g, currentUserId);
+      processedCode = processedCode.replace(/{{user_id}}/g, currentUserId);
+      processedCode = processedCode.replace(/\[USER_ID\]/g, currentUserId);
+      processedCode = processedCode.replace(/\{\{USER_ID\}\}/g, currentUserId);
+    }
+    
+    return processedCode;
+  }
+
+  // Parse dataLayer.push calls from code and extract payloads
+  function parseDataLayerPayloads(code) {
+    const payloads = [];
+    const regex = /dataLayer\.push\s*\(\s*(\{[\s\S]*?\})\s*\)/g;
+    let match;
+    
+    while ((match = regex.exec(code)) !== null) {
+      try {
+        const payload = JSON.parse(match[1]);
+        payloads.push(payload);
+      } catch (e) {
+        // If JSON parsing fails, try to extract as string
+        payloads.push({ raw: match[1] });
+      }
+    }
+    
+    return payloads;
+  }
+
+  // Log dataLayer payloads to console if enabled
+  function logDataLayerPayloads(code, eventName = 'Custom Event') {
+    if (!consoleLoggingEnabled) return;
+    
+    const payloads = parseDataLayerPayloads(code);
+    if (payloads.length === 0) return;
+    
+    // Log to browser console only
+    console.group(`🚀 dataLayer Payloads for: ${eventName}`);
+    payloads.forEach((payload, index) => {
+      if (payload.raw) {
+        console.log(`Payload ${index + 1} (Raw):`, payload.raw);
+      } else {
+        console.log(`Payload ${index + 1}:`, `dataLayer.push(${JSON.stringify(payload, null, 2)});`);
+      }
+    });
+    console.groupEnd();
+  }
+
+  // Journey Queue Functions
+  function addToJourney(eventName, code) {
+    // Add to queue (allow multiple instances)
+    journeyQueue.push({
+      name: eventName,
+      code: code,
+      timestamp: Date.now(),
+      id: Date.now() + Math.random() // Unique ID for each instance
+    });
+    
+    updateJourneyQueue();
+    updateQueueButtonStates();
+    log(`➕ Added '${eventName}' to journey queue (${journeyQueue.length} total)`);
+  }
+
+  function updateJourneyQueue() {
+    const queueContainer = document.getElementById('journeyQueue');
+    if (!queueContainer) return;
+    
+    if (journeyQueue.length === 0) {
+      queueContainer.innerHTML = '<div class="journey-queue empty">Drop events here to build your journey...</div>';
+      queueContainer.classList.add('empty');
+      return;
+    }
+    
+    queueContainer.classList.remove('empty');
+    queueContainer.innerHTML = '';
+    journeyQueue.forEach((item, index) => {
+      const queueItem = document.createElement('div');
+      queueItem.className = 'journey-item';
+      // queueItem.draggable = true; // TEMPORARILY DISABLED
+      queueItem.dataset.index = index;
+      
+      queueItem.innerHTML = `
+        <!-- <span class="drag-handle">⋮⋮</span> -->
+        <span class="event-name">${item.name}</span>
+        <button class="remove-btn" onclick="removeFromJourney(${index})">✕</button>
+      `;
+      
+      // Drag and drop functionality - TEMPORARILY DISABLED
+      /*
+      queueItem.addEventListener('dragstart', handleDragStart);
+      queueItem.addEventListener('dragover', handleDragOver);
+      queueItem.addEventListener('drop', handleDrop);
+      queueItem.addEventListener('dragend', handleDragEnd);
+      */
+      
+      queueContainer.appendChild(queueItem);
+    });
+    
+    // Update queue button states
+    updateQueueButtonStates();
+  }
+
+  function removeFromJourney(index) {
+    journeyQueue.splice(index, 1);
+    updateJourneyQueue();
+    log(`🗑️ Removed event from journey queue (${journeyQueue.length} remaining)`);
+  }
+
+  function removeLoadedEvent(eventName, wrapper) {
+    wrapper.remove();
+    
+    // Check if this is a playground event (should be preserved for reset)
+    const eventInLoaded = loadedEvents.find(p => p.name === eventName);
+    const isPlaygroundEvent = eventInLoaded && eventInLoaded.isPlaygroundEvent;
+    
+    // For playground events, only remove from localChanges, keep in loadedEvents for reset
+    // For source events (local file/GitHub), remove from both
+    if (!isPlaygroundEvent) {
+      const loadedIndex = loadedEvents.findIndex(p => p.name === eventName);
+      if (loadedIndex !== -1) {
+        loadedEvents.splice(loadedIndex, 1);
+      }
+    }
+    
+    // Always remove from local changes
+    const changeIndex = localChanges.findIndex(p => p.name === eventName);
+    if (changeIndex !== -1) {
+      localChanges.splice(changeIndex, 1);
+    }
+    
+    // Update basePresets to match loadedEvents
+    basePresets = loadedEvents.slice();
+    
+    // Save both storage areas
+    localStorage.setItem('events_loaded_js', JSON.stringify(loadedEvents));
+    localStorage.setItem('events_changes_js', JSON.stringify(localChanges));
+    
+    renderNavigation();
+    updateLoadedEventsHeader();
+    log(`🗑️ Removed event: ${eventName}`);
+  }
+
+  function resetLoadedEvent(eventName, wrapper) {
+    console.log(`Resetting event: ${eventName}`);
+    console.log('Current loadedEvents:', loadedEvents.map(e => e.name));
+    console.log('Current localChanges:', localChanges.map(e => e.name));
+    
+    // Find the original event from loadedEvents (the base source)
+    const originalEvent = loadedEvents.find(p => p.name === eventName);
+    
+    if (originalEvent) {
+      console.log('Found original event:', originalEvent);
+      
+      // Remove this event from local changes if it exists there
+      const changeIndex = localChanges.findIndex(p => p.name === eventName);
+      if (changeIndex !== -1) {
+        console.log(`Removing from localChanges at index ${changeIndex}`);
+        localChanges.splice(changeIndex, 1);
+      }
+      
+      // Save the updated local changes
+      localStorage.setItem('events_changes_js', JSON.stringify(localChanges));
+      
+      // Get the Ace editor instance and update it
+      const editorId = wrapper.querySelector('.ace-editor-container').id;
+      const editor = ace.edit(editorId);
+      if (editor) {
+        editor.setValue(originalEvent.code);
+      }
+      
+      // Update the comment textarea if it exists
+      const commentTextarea = wrapper.querySelector('.comment-area textarea');
+      if (commentTextarea) {
+        commentTextarea.value = originalEvent.comment || '';
+      }
+      
+      // Update the links if they exist
+      const linksDiv = wrapper.querySelector('.links-area');
+      if (linksDiv) {
+        // Clear existing links
+        const existingLinks = linksDiv.querySelectorAll('.link-item');
+        existingLinks.forEach(link => link.remove());
+        
+        // Add original links back
+        if (originalEvent.links && originalEvent.links.length > 0) {
+          originalEvent.links.forEach(link => {
+            const linkItem = document.createElement('div');
+            linkItem.className = 'link-item';
+            const linkEl = document.createElement('a');
+            linkEl.href = link.url;
+            linkEl.target = '_blank';
+            linkEl.rel = 'noopener noreferrer';
+            linkEl.textContent = link.text || link.url;
+            linkEl.title = link.url;
+            linkItem.appendChild(linkEl);
+            linksDiv.appendChild(linkItem);
+          });
+        }
+      }
+      
+      // Instead of re-rendering, just reload the presets to update the UI
+      loadPresets();
+      
+      log(`🔄 Reset event: ${eventName} to original state`);
+    } else {
+      log(`⚠️ Cannot reset ${eventName}: original not found in loaded events`);
+    }
+  }
+
+  function moveEventUp(eventName, wrapper) {
+    const currentPresets = mergeEventsWithChanges(loadedEvents, localChanges);
+    const currentIndex = currentPresets.findIndex(p => p.name === eventName);
+    
+    if (currentIndex > 0) {
+      // Store collapsed states before reordering
+      const collapsedStates = saveEventCollapsedStates();
+      
+      // Swap with the event above
+      const temp = currentPresets[currentIndex];
+      currentPresets[currentIndex] = currentPresets[currentIndex - 1];
+      currentPresets[currentIndex - 1] = temp;
+      
+      // Update the arrays
+      updateEventOrder(currentPresets);
+      
+      // Re-render to show the new order
+      loadPresets();
+      
+      // Restore collapsed states after reordering
+      restoreEventCollapsedStates(collapsedStates);
+      
+      // Restore journey button states after reordering
+      updateQueueButtonStates();
+      
+      log(`⬆️ Moved event "${eventName}" up`);
+    }
+  }
+
+  function moveEventDown(eventName, wrapper) {
+    const currentPresets = mergeEventsWithChanges(loadedEvents, localChanges);
+    const currentIndex = currentPresets.findIndex(p => p.name === eventName);
+    
+    if (currentIndex < currentPresets.length - 1) {
+      // Store collapsed states before reordering
+      const collapsedStates = saveEventCollapsedStates();
+      
+      // Swap with the event below
+      const temp = currentPresets[currentIndex];
+      currentPresets[currentIndex] = currentPresets[currentIndex + 1];
+      currentPresets[currentIndex + 1] = temp;
+      
+      // Update the arrays
+      updateEventOrder(currentPresets);
+      
+      // Re-render to show the new order
+      loadPresets();
+      
+      // Restore collapsed states after reordering
+      restoreEventCollapsedStates(collapsedStates);
+      
+      // Restore journey button states after reordering
+      updateQueueButtonStates();
+      
+      log(`⬇️ Moved event "${eventName}" down`);
+    }
+  }
+
+  function saveEventCollapsedStates() {
+    const states = {};
+    const eventWrappers = document.querySelectorAll('.preset-wrapper');
+    eventWrappers.forEach(wrapper => {
+      const eventName = wrapper.dataset.name;
+      if (eventName) {
+        states[eventName] = wrapper.classList.contains('collapsed');
+      }
+    });
+    return states;
+  }
+
+  function restoreEventCollapsedStates(states) {
+    Object.keys(states).forEach(eventName => {
+      const wrapper = document.querySelector(`[data-name="${eventName}"]`);
+      if (wrapper) {
+        if (states[eventName]) {
+          wrapper.classList.add('collapsed');
+          const collapseBtn = wrapper.querySelector('.collapse-toggle');
+          if (collapseBtn) {
+            collapseBtn.textContent = '▶';
+          }
+        } else {
+          wrapper.classList.remove('collapsed');
+          const collapseBtn = wrapper.querySelector('.collapse-toggle');
+          if (collapseBtn) {
+            collapseBtn.textContent = '▼';
+          }
+        }
+      }
+    });
+  }
+
+  // Drag and Drop functionality for event reordering - TEMPORARILY DISABLED
+  /*
+  function handleEventDragStart(e) {
+    e.stopPropagation();
+    const wrapper = e.target.closest('.preset-wrapper');
+    if (!wrapper) return;
+    
+    console.log('Drag start:', wrapper.dataset.name);
+    e.dataTransfer.setData('text/plain', wrapper.dataset.name);
+    e.dataTransfer.effectAllowed = 'move';
+    wrapper.classList.add('dragging');
+    
+    // Add a small delay to ensure the dragging class is applied
+    setTimeout(() => {
+      wrapper.style.opacity = '0.5';
+    }, 0);
+  }
+
+  function handleEventDragEnd(e) {
+    e.stopPropagation();
+    const wrapper = e.target.closest('.preset-wrapper);
+    if (!wrapper) return;
+    
+    wrapper.classList.remove('dragging');
+    wrapper.style.opacity = '';
+    
+    // Remove all drag-over styling
+    document.querySelectorAll('.preset-wrapper').forEach(w => {
+      w.classList.remove('drag-over');
+    });
+  }
+
+  function handleEventDragOver(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    e.dataTransfer.dropEffect = 'move';
+    
+    const wrapper = e.target.closest('.preset-wrapper');
+    if (wrapper && !wrapper.classList.contains('dragging')) {
+      wrapper.classList.add('drag-over');
+    }
+  }
+
+  function handleEventDragLeave(e) {
+    e.stopPropagation();
+    const wrapper = e.target.closest('.preset-wrapper');
+    if (wrapper) {
+      wrapper.classList.remove('drag-over');
+    }
+  }
+
+  function handleEventDrop(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    const draggedEventName = e.dataTransfer.getData('text/plain');
+    const targetWrapper = e.target.closest('.preset-wrapper');
+    
+    console.log('Drop event:', draggedEventName, 'onto:', targetWrapper?.dataset.name);
+    
+    if (targetWrapper && draggedEventName) {
+      const targetEventName = targetWrapper.dataset.name;
+      
+      if (draggedEventName !== targetEventName) {
+        if (debugLoggingEnabled) {
+      console.log('Moving event from', draggedEventName, 'to', targetEventName);
+    }
+        
+        // Store collapsed states before reordering
+        const collapsedStates = saveEventCollapsedStates();
+        
+        // Move the dragged event to the target position
+        moveEventToPosition(draggedEventName, targetEventName);
+        
+        // Restore collapsed states after reordering
+        restoreEventCollapsedStates(collapsedStates);
+      }
+    }
+    
+    // Remove drag-over styling
+    document.querySelectorAll('.preset-wrapper').forEach(wrapper => {
+      wrapper.classList.remove('drag-over');
+    });
+  }
+
+  /*
+  function moveEventToPosition(draggedEventName, targetEventName) {
+    const currentPresets = mergeEventsWithChanges(loadedEvents, localChanges);
+    const draggedIndex = currentPresets.findIndex(p => p.name === draggedEventName);
+    const targetIndex = currentPresets.findIndex(p => p.name === targetEventName);
+    
+    if (draggedIndex !== -1 && targetIndex !== -1) {
+      // Remove the dragged event from its current position
+      const [draggedEvent] = currentPresets.splice(draggedIndex, 1);
+      
+      // Insert it at the target position
+      currentPresets.splice(targetIndex, 0, draggedEvent);
+      
+      // Update the arrays
+      updateEventOrder(currentPresets);
+      
+      // Instead of recreating all elements, just reorder the existing ones in the DOM
+      // This preserves all event listeners and drag-and-drop functionality
+      const container = document.getElementById('presetContainer');
+      if (container) {
+        // Get all existing preset wrappers
+        const existingPresets = Array.from(container.querySelectorAll('.preset-wrapper'));
+        
+        // Reorder them according to the new order
+        currentPresets.forEach((preset, i) => {
+          const existingPreset = existingPresets.find(p => p.dataset.name === preset.name);
+          if (existingPreset) {
+            container.appendChild(existingPreset);
+          }
+        });
+      }
+      
+      // Restore journey button states after reordering
+      updateQueueButtonStates();
+      
+      log(`🔄 Moved event "${draggedEventName}" to position of "${targetEventName}"`);
+    }
+  }
+
+  function updateEventOrder(newOrder) {
+    // Separate the events back into loadedEvents and localChanges
+    const newLoadedEvents = [];
+    const newLocalChanges = [];
+    
+    newOrder.forEach(event => {
+      const baseEvent = loadedEvents.find(b => b.name === event.name);
+      
+      if (baseEvent) {
+        // Check if this event has been modified from base
+        const isModified = isEventModified(event, baseEvent);
+        if (isModified) {
+          newLocalChanges.push(event);
+        }
+        // Always include in loaded events (original + any unmodified)
+        newLoadedEvents.push(isModified ? baseEvent : event);
+      } else {
+        // New event not in base - goes to local changes
+        newLocalChanges.push(event);
+        }
+      }
+    });
+    
+    // Update the global arrays
+    loadedEvents = newLoadedEvents;
+    localChanges = newLocalChanges;
+    
+    // Save to localStorage
+    localStorage.setItem('events_loaded_js', JSON.stringify(loadedEvents));
+    localStorage.setItem('events_changes_js', JSON.stringify(localChanges));
+  }
+  */
+  
+
+
+  function updateQueueButtonStates() {
+    // Update all queue buttons to show queued state with counts
+    const allQueueBtns = document.querySelectorAll('.queue-btn');
+    allQueueBtns.forEach(btn => {
+      const presetWrapper = btn.closest('.preset-wrapper');
+      const eventName = presetWrapper?.querySelector('.preset-header-title')?.textContent?.trim();
+      if (eventName) {
+        // Count how many times this event is in the queue
+        const queueCount = journeyQueue.filter(item => item.name === eventName).length;
+        
+        if (queueCount > 0) {
+          btn.classList.add('queued');
+          btn.textContent = `Added to journey (${queueCount})`;
+          
+          // Add or update clear button
+          let clearBtn = presetWrapper.querySelector('.queue-clear-btn');
+          if (!clearBtn) {
+            clearBtn = document.createElement('button');
+            clearBtn.className = 'btn-sm queue-clear-btn';
+            clearBtn.textContent = 'Clear';
+            clearBtn.onclick = () => clearEventFromJourney(eventName);
+            
+            // Insert after the queue button
+            const actions = presetWrapper.querySelector('.preset-header-actions');
+            if (actions) {
+              const queueBtnIndex = Array.from(actions.children).indexOf(btn);
+              actions.insertBefore(clearBtn, actions.children[queueBtnIndex + 1]);
+            }
+          }
+        } else {
+          btn.classList.remove('queued');
+          btn.textContent = 'Add to Journey';
+          
+          // Remove clear button if it exists
+          const clearBtn = presetWrapper.querySelector('.queue-clear-btn');
+          if (clearBtn) {
+            clearBtn.remove();
+          }
+        }
+      }
+    });
+  }
+
+  // Clear all instances of a specific event from the journey
+  function clearEventFromJourney(eventName) {
+    const initialLength = journeyQueue.length;
+    journeyQueue = journeyQueue.filter(item => item.name !== eventName);
+    const removedCount = initialLength - journeyQueue.length;
+    
+    updateJourneyQueue();
+    updateQueueButtonStates();
+    log(`🗑️ Removed ${removedCount} instance(s) of '${eventName}' from journey queue (${journeyQueue.length} remaining)`);
+  }
+
+  // Drag and Drop functionality - TEMPORARILY DISABLED
+  /*
+  function handleDragStart(e) {
+    e.target.classList.add('dragging');
+    e.dataTransfer.setData('text/plain', e.target.dataset.index);
+  }
+
+  function handleDragOver(e) {
+    e.preventDefault();
+  }
+
+  function handleDrop(e) {
+    e.preventDefault();
+    const draggedIndex = parseInt(e.dataTransfer.getData('text/plain'));
+    const targetIndex = parseInt(e.target.closest('.journey-item')?.dataset.index);
+    
+    if (!isNaN(draggedIndex) && !isNaN(targetIndex) && draggedIndex !== targetIndex) {
+      const draggedItem = journeyQueue[draggedIndex];
+      journeyQueue.splice(draggedIndex, 1);
+      journeyQueue.splice(targetIndex, 0, draggedItem);
+      updateJourneyQueue();
+    }
+  }
+
+  function handleDragEnd(e) {
+    e.target.classList.remove('dragging');
+  }
+  */
+
+  function runJourney() {
+    if (journeyQueue.length === 0) {
+      log('⚠️ Journey queue is empty');
+      return;
+    }
+    
+    if (journeyRunning) return;
+    
+    journeyRunning = true;
+    currentJourneyIndex = 0;
+    journeyPaused = false;
+    
+    // Update UI
+    document.getElementById('runJourneyBtn').style.display = 'none';
+    document.getElementById('pauseJourneyBtn').style.display = 'inline-block';
+    document.getElementById('journeyStatus').style.display = 'flex';
+    
+    log(`🚀 Starting journey with ${journeyQueue.length} events`);
+    
+    runNextJourneyEvent();
+  }
+
+  function runNextJourneyEvent() {
+    if (currentJourneyIndex >= journeyQueue.length || !journeyRunning || journeyPaused) {
+      if (currentJourneyIndex >= journeyQueue.length) {
+        log('✅ Journey completed!');
+        journeyRunning = false;
+        document.getElementById('runJourneyBtn').style.display = 'inline-block';
+        document.getElementById('pauseJourneyBtn').style.display = 'none';
+        document.getElementById('journeyStatus').style.display = 'none';
+      }
+      return;
+    }
+    
+    const event = journeyQueue[currentJourneyIndex];
+    const delay = parseInt(document.getElementById('journeyDelay').value) || 1000;
+    
+    // Update progress
+    updateJourneyProgress();
+    
+    // Execute the event
+    try {
+      const processedCode = replacePlaceholders(event.code);
+      new Function(processedCode)();
+      
+      if (consoleLoggingEnabled) {
+        logDataLayerPayloads(processedCode, event.name);
+      }
+      
+      log(`✅ Executed: ${event.name} (${currentJourneyIndex + 1}/${journeyQueue.length})`);
+    } catch (e) {
+      log(`❌ Error executing ${event.name}: ${e.message}`);
+      // Continue with next event even if this one fails
+    }
+    
+    currentJourneyIndex++;
+    
+    // Schedule next event
+    if (currentJourneyIndex < journeyQueue.length) {
+      journeyInterval = setTimeout(runNextJourneyEvent, delay);
+    } else {
+      runNextJourneyEvent(); // Final call to complete
+    }
+  }
+
+  function pauseJourney() {
+    if (journeyPaused) {
+      journeyPaused = false;
+      document.getElementById('pauseJourneyBtn').textContent = '⏸️ Pause';
+      log('▶️ Journey resumed');
+      runNextJourneyEvent();
+    } else {
+      journeyPaused = true;
+      document.getElementById('pauseJourneyBtn').textContent = '▶️ Resume';
+      log('⏸️ Journey paused');
+      if (journeyInterval) {
+        clearTimeout(journeyInterval);
+        journeyInterval = null;
+      }
+    }
+  }
+
+  function clearJourney() {
+    journeyQueue = [];
+    journeyRunning = false;
+    journeyPaused = false;
+    currentJourneyIndex = 0;
+    
+    if (journeyInterval) {
+      clearTimeout(journeyInterval);
+      journeyInterval = null;
+    }
+    
+    updateJourneyQueue();
+    updateQueueButtonStates(); // Reset all queue button states
+    document.getElementById('runJourneyBtn').style.display = 'inline-block';
+    document.getElementById('pauseJourneyBtn').style.display = 'none';
+    document.getElementById('journeyStatus').style.display = 'none';
+    
+    log('🗑️ Journey queue cleared');
+  }
+
+  function updateJourneyProgress() {
+    const progressText = document.getElementById('journeyProgressText');
+    const progressFill = document.getElementById('journeyProgressFill');
+    
+    if (progressText && progressFill) {
+      const progress = (currentJourneyIndex / journeyQueue.length) * 100;
+      progressText.textContent = `${currentJourneyIndex}/${journeyQueue.length} sent`;
+      progressFill.style.width = `${progress}%`;
+    }
+  }
+
+  // Save and load journey presets
+  function saveJourneyPreset() {
+    if (journeyQueue.length === 0) {
+      alert('No events in journey queue to save');
+      return;
+    }
+    
+    const presetName = prompt('Enter a name for this journey preset:');
+    if (!presetName || presetName.trim() === '') return;
+    
+    const preset = {
+      name: presetName.trim(),
+      events: journeyQueue,
+      delay: parseInt(document.getElementById('journeyDelay').value) || 1000,
+      timestamp: Date.now()
+    };
+    
+    let presets = JSON.parse(localStorage.getItem('journey_presets') || '[]');
+    presets.push(preset);
+    localStorage.setItem('journey_presets', JSON.stringify(presets));
+    
+    log(`💾 Saved journey preset: ${presetName}`);
+    displayJourneyPresets(); // Refresh the display
+  }
+
+  function loadJourneyPreset() {
+    // This function is now handled by clicking on preset names or load buttons
+    // Keeping it for backward compatibility but it's no longer the primary way to load
+    const presets = JSON.parse(localStorage.getItem('journey_presets') || '[]');
+    
+    if (presets.length === 0) {
+      alert('No saved journey presets found');
+      return;
+    }
+      
+    const presetNames = presets.map(p => p.name);
+    const selectedName = prompt('Select a preset to load:\n\n' + presetNames.join('\n'));
+    
+    if (!selectedName) return;
+    
+    const preset = presets.find(p => p.name === selectedName);
+    if (preset) {
+      journeyQueue = preset.events;
+      document.getElementById('journeyDelay').value = preset.delay;
+      updateJourneyQueue();
+      updateQueueButtonStates();
+      log(`📁 Loaded journey preset: ${preset.name} (${preset.events.length} events)`);
+    } else {
+      alert('Preset not found');
+    }
+  }
+  
+  function displayJourneyPresets() {
+    const presetsList = document.getElementById('presetsList');
+    const presetsCount = document.getElementById('presetsCount');
+    
+    if (!presetsList || !presetsCount) return;
+    
+    const presets = JSON.parse(localStorage.getItem('journey_presets') || '[]');
+    
+    if (presets.length === 0) {
+      presetsCount.textContent = 'No presets saved';
+      presetsList.innerHTML = '<div class="preset-item" style="text-align: center; color: #6c757d; font-style: italic;">No journey presets saved yet. Save your first journey to get started!</div>';
+      return;
+    }
+    
+    presetsCount.textContent = `${presets.length} preset${presets.length === 1 ? '' : 's'} saved`;
+    
+    presetsList.innerHTML = '';
+    presets.forEach((preset, index) => {
+      const presetItem = document.createElement('div');
+      presetItem.className = 'preset-item';
+      
+      const presetInfo = document.createElement('div');
+      presetInfo.className = 'preset-info';
+      
+      const presetName = document.createElement('div');
+      presetName.className = 'preset-name';
+      presetName.textContent = preset.name;
+      presetName.onclick = () => loadPresetByName(preset.name);
+      
+      const presetDetails = document.createElement('div');
+      presetDetails.className = 'preset-details';
+      const date = new Date(preset.timestamp);
+      presetDetails.textContent = `${preset.events.length} events • Saved ${date.toLocaleDateString()} at ${date.toLocaleTimeString()}`;
+      
+      presetInfo.appendChild(presetName);
+      presetInfo.appendChild(presetDetails);
+      
+      const presetActions = document.createElement('div');
+      presetActions.className = 'preset-actions';
+      
+      const loadBtn = document.createElement('button');
+      loadBtn.className = 'preset-load-btn';
+      loadBtn.textContent = 'Load';
+      loadBtn.onclick = () => loadPresetByName(preset.name);
+      
+      const deleteBtn = document.createElement('button');
+      deleteBtn.className = 'preset-delete-btn';
+      deleteBtn.textContent = 'Delete';
+      deleteBtn.onclick = () => deletePresetByName(preset.name);
+      
+      presetActions.appendChild(loadBtn);
+      presetActions.appendChild(deleteBtn);
+      
+      presetItem.appendChild(presetInfo);
+      presetItem.appendChild(presetActions);
+      
+      presetsList.appendChild(presetItem);
+    });
+  }
+  
+  function loadPresetByName(presetName) {
+    const presets = JSON.parse(localStorage.getItem('journey_presets') || '[]');
+    const preset = presets.find(p => p.name === presetName);
+    
+    if (preset) {
+      journeyQueue = preset.events;
+      document.getElementById('journeyDelay').value = preset.delay;
+      updateJourneyQueue();
+      updateQueueButtonStates();
+      log(`📁 Loaded journey preset: ${preset.name} (${preset.events.length} events)`);
+    } else {
+      alert('Preset not found');
+    }
+  }
+  
+  function deletePresetByName(presetName) {
+    if (confirm(`Are you sure you want to delete the preset "${presetName}"?`)) {
+      let presets = JSON.parse(localStorage.getItem('journey_presets') || '[]');
+      presets = presets.filter(p => p.name !== presetName);
+      localStorage.setItem('journey_presets', JSON.stringify(presets));
+      
+      log(`🗑️ Deleted journey preset: ${presetName}`);
+      displayJourneyPresets(); // Refresh the display
+    }
+  }
+
+  function loadGTM() {
+    const id = document.getElementById('gtmId').value.trim();
+    if (!id.match(/^GTM-[A-Z0-9]+$/i)) {
+      alert('Invalid GTM ID');
+      return;
+    }
+    // Persist the ID so it is reused on subsequent page loads
+    localStorage.setItem('gtm_id', id);
+    injectGTM(id);
+  }
+
+
+
+
+
+
+
+
+
+
+
+  // Inject the GTM container into the page by appending the script and
+  // noscript iframe.  This function uses gtmInjected to prevent multiple
+  // injections and updates the GTM button state accordingly.
+  function injectGTM(id) {
+    if (gtmInjected) return;
+    // Create and append the GTM script
+    gtmScriptTag = document.createElement('script');
+    gtmScriptTag.src = 'https://www.googletagmanager.com/gtm.js?id=' + id;
+    gtmScriptTag.async = true;
+    gtmScriptTag.id = 'gtm-script';
+    document.head.appendChild(gtmScriptTag);
+    // Push gtm.start event to the dataLayer
+    dataLayer.push({ 'gtm.start': new Date().getTime(), event: 'gtm.js' });
+    // Create and append the noscript iframe
+    gtmIframeTag = document.createElement('iframe');
+    gtmIframeTag.src = 'https://www.googletagmanager.com/ns.html?id=' + id;
+    gtmIframeTag.height = 0;
+    gtmIframeTag.width = 0;
+    gtmIframeTag.style.display = 'none';
+    gtmIframeTag.style.visibility = 'hidden';
+    document.body.appendChild(gtmIframeTag);
+    gtmInjected = true;
+    updateGtmButtonState(true, id);
+  }
+
+  // Clear the previously injected GTM script and iframe.  Also remove the
+  // stored GTM ID and reset the button state.
+  function clearGTM() {
+    localStorage.removeItem('gtm_id');
+    if (gtmScriptTag) {
+      gtmScriptTag.remove();
+      gtmScriptTag = null;
+    }
+    if (gtmIframeTag) {
+      gtmIframeTag.remove();
+      gtmIframeTag = null;
+    }
+    gtmInjected = false;
+    // Clear the input field
+    const input = document.getElementById('gtmId');
+    if (input) input.value = '';
+    updateGtmButtonState(false);
+  }
+
+  // Update the GTM button to reflect whether a container is loaded.  When
+  // loaded is true, the button becomes a neutral "Clear GTM" button; when
+  // false, it reverts to the primary "Inject GTM" button.
+  function updateGtmButtonState(loaded, id) {
+    const btn = document.getElementById('gtmButton');
+    if (!btn) return;
+    if (loaded) {
+      btn.textContent = 'Clear GTM';
+      btn.onclick = clearGTM;
+      btn.classList.add('btn-secondary');
+    } else {
+      btn.textContent = 'Inject GTM';
+      btn.onclick = loadGTM;
+      btn.classList.remove('btn-secondary');
+    }
+  }
+
+  // Update the header for the loaded events section based on the source
+  // of presets.  When currentLocalFile is set, the header indicates
+  // that events come from a local file and includes the file name.  Otherwise,
+  // it states that events are loaded from GitHub.  The sub-label text
+  // remains unchanged.
+  function updateLoadedEventsHeader() {
+    const labelEl = document.getElementById('loadedEventsLabel');
+    if (!labelEl) return;
+    if (currentLocalFile) {
+      labelEl.textContent = `Loaded Events from local file ${currentLocalFile.name}`;
+    } else {
+      labelEl.textContent = 'Loaded Events from GitHub';
+    }
+  }
+
+  function log(msg) {
+    document.getElementById('logOutput').textContent = msg;
+    if (actionsLoggingEnabled) {
+      console.log(msg);
+    }
+  }
+
+  const defaultPresets = window.gtmPresets || [];
+  // Track the base presets loaded from the source file (GitHub or
+  // local file).  This array is used to determine whether an event
+  // in localStorage has diverged from the original source (changed
+  // code or comment) or is entirely new.  Initially it points at
+  // the default presets from window.gtmPresets, but when a local
+      // local file is loaded the basePresets will be updated to
+  // that processed list.  When the presets are reset, basePresets
+  // reverts to the default presets.
+  let basePresets = window.gtmPresets || [];
+
+  // Split storage solution: separate original loaded events from local changes
+  let loadedEvents = []; // Original events from source (GitHub or local file)
+  let localChanges = []; // Local modifications and new events
+
+  function loadPresets() {
+    // Load original events from source
+    const savedLoaded = localStorage.getItem('events_loaded_js');
+    const savedChanges = localStorage.getItem('events_changes_js');
+    
+    if (savedLoaded) {
+      loadedEvents = JSON.parse(savedLoaded);
+      basePresets = loadedEvents.slice(); // Update basePresets to match loaded events
+    } else {
+      // Fallback to default presets if no loaded events stored
+      loadedEvents = defaultPresets.slice();
+      basePresets = defaultPresets.slice();
+    }
+    
+    // Load local changes
+    if (savedChanges) {
+      localChanges = JSON.parse(savedChanges);
+    } else {
+      localChanges = [];
+    }
+    
+    // Merge loaded events with local changes to create the working presets
+    const presets = mergeEventsWithChanges(loadedEvents, localChanges);
+
+    const container = document.getElementById('presetsArea');
+    container.innerHTML = '';
+
+    presets.forEach((preset, i) => {
+      container.appendChild(renderPreset(preset, i));
+    });
+
+    // After presets have been rendered, rebuild the navigation bar.  This
+    // ensures that each event is represented by a navigation button.
+    renderNavigation();
+
+    // Update the header to indicate the source of the loaded events
+    updateLoadedEventsHeader();
+  }
+
+  function mergeEventsWithChanges(loaded, changes) {
+    const merged = [...loaded];
+    
+    // Apply local changes to loaded events
+    changes.forEach(change => {
+      const existingIndex = merged.findIndex(p => p.name === change.name);
+      if (existingIndex !== -1) {
+        // Update existing event
+        merged[existingIndex] = { ...merged[existingIndex], ...change };
+      } else {
+        // Add new event
+        merged.push(change);
+      }
+    });
+    
+    return merged;
+  }
+
+  function savePresets() {
+    // Get current working presets (loaded events + local changes, excluding removed ones)
+    const currentPresets = mergeEventsWithChanges(loadedEvents, localChanges);
+    
+    // Separate loaded events from local changes
+    const { newLoadedEvents, newLocalChanges } = separateEvents(currentPresets, loadedEvents);
+    
+    // Save both to localStorage
+    localStorage.setItem('events_loaded_js', JSON.stringify(newLoadedEvents));
+    localStorage.setItem('events_changes_js', JSON.stringify(newLocalChanges));
+    
+    // Update global variables
+    loadedEvents = newLoadedEvents;
+    localChanges = newLocalChanges;
+    
+    log('💾 Events saved to localStorage (split storage)');
+    loadPresets();
+  }
+
+  function separateEvents(allEvents, baseEvents) {
+    const newLoadedEvents = [];
+    const newLocalChanges = [];
+    
+    allEvents.forEach(event => {
+      const baseEvent = baseEvents.find(b => b.name === event.name);
+      
+      if (baseEvent) {
+        // Check if this event has been modified from base
+        const isModified = isEventModified(event, baseEvent);
+        if (isModified) {
+          newLocalChanges.push(event);
+        }
+        // Always include in loaded events (original + any unmodified)
+        newLoadedEvents.push(isModified ? baseEvent : event);
+      } else {
+        // New event not in base - goes to local changes
+        newLocalChanges.push(event);
+      }
+    });
+    
+    return { newLoadedEvents, newLocalChanges };
+  }
+
+  function isEventModified(event, baseEvent) {
+    const norm = (str) => {
+      if (!str) return '';
+      return str
+        .trim()
+        .replace(/\r\n/g, '\n')
+        .replace(/[ \t]+$/gm, '');
+    };
+    
+    const baseCode = norm(baseEvent.code);
+    const thisCode = norm(event.code);
+    const baseComment = norm(baseEvent.comment || '');
+    const thisComment = norm(event.comment || '');
+    
+    return baseCode !== thisCode || baseComment !== thisComment;
+  }
+
+  function updateLocalChanges(eventName, code, comment, links) {
+    // Find if this event already exists in local changes
+    let changeIndex = localChanges.findIndex(p => p.name === eventName);
+    
+    if (changeIndex !== -1) {
+      // Update existing change
+      localChanges[changeIndex] = {
+        ...localChanges[changeIndex],
+        code: code,
+        comment: comment,
+        links: links
+      };
+    } else {
+      // Create new change entry
+      localChanges.push({
+        name: eventName,
+        code: code,
+        comment: comment,
+        links: links
+      });
+    }
+    
+    // Save to localStorage
+    localStorage.setItem('events_changes_js', JSON.stringify(localChanges));
+    
+    // Immediately update the UI to show/hide reset button and update warning
+    const wrapper = document.querySelector(`.preset-wrapper[data-name="${eventName}"]`);
+    if (wrapper) {
+      // Check if this event has changes compared to loadedEvents
+      const baseEvent = loadedEvents.find(ev => ev && ev.name === eventName);
+      const hasChanges = !baseEvent || 
+        baseEvent.code !== code || 
+        (baseEvent.comment || '') !== comment;
+      
+      // Update the warning span
+      const warnSpan = wrapper.querySelector('.change-warning');
+      if (warnSpan) {
+        warnSpan.style.display = hasChanges ? 'inline' : 'none';
+      }
+      
+      // Update the reset button visibility and styling
+      const resetBtn = wrapper.querySelector('.reset-button');
+      if (resetBtn) {
+        resetBtn.style.display = hasChanges ? 'inline-block' : 'none';
+        if (hasChanges) {
+          resetBtn.classList.add('btn-warning');
+        } else {
+          resetBtn.classList.remove('btn-warning');
+        }
+      }
+      
+      // Update the copy button styling
+      const copyDLBtn = wrapper.querySelector('.preset-header-actions button:nth-child(5)'); // Copy in local file format'
+      if (copyDLBtn) {
+        if (hasChanges) {
+          copyDLBtn.classList.add('btn-warning');
+        } else {
+          copyDLBtn.classList.remove('btn-warning');
+        }
+      }
+    }
+    
+    // Debug logging
+    console.log(`Updated local changes for ${eventName}:`, {
+      code: code.substring(0, 50) + '...',
+      comment: comment.substring(0, 30) + '...',
+      linksCount: links.length
+    });
+  }
+
+  function renderPreset(preset, index) {
+    const wrapper = document.createElement('div');
+    wrapper.className = 'preset-wrapper';
+
+    // Build a header bar containing the event title and action buttons
+    const header = document.createElement('div');
+    header.className = 'preset-header-bar';
+
+    const headerLeft = document.createElement('div');
+    headerLeft.className = 'preset-header-left';
+
+    const collapseBtn = document.createElement('button');
+    collapseBtn.className = 'collapse-toggle';
+    collapseBtn.textContent = '▼';
+    collapseBtn.title = 'Collapse/Expand';
+    collapseBtn.onclick = () => {
+      wrapper.classList.toggle('collapsed');
+      collapseBtn.textContent = wrapper.classList.contains('collapsed') ? '▶' : '▼';
+    };
+
+    const title = document.createElement('span');
+    title.className = 'preset-header-title';
+    const eventName = preset.name || `custom_${index + 1}`;
+    // Determine whether the event is new or modified relative to the loaded source
+    let baseEventForName = loadedEvents.find(ev => ev && ev.name === eventName);
+    let displayName = eventName;
+    if (!baseEventForName) {
+      // New event created in this session/localStorage
+      displayName = eventName;
+    } else {
+      // Check if code/comment differ; reuse the changed calculation logic
+      const normName = (str) => {
+        if (!str) return '';
+        return str
+          .trim()
+          .replace(/\r\n/g, '\n')
+          .replace(/[ \t]+$/gm, '');
+      };
+      const baseCodeForName = normName(baseEventForName.code);
+      const thisCodeForName = normName(preset.code);
+      const baseCommentForName = normName(baseEventForName.comment || '');
+      const thisCommentForName = normName(preset.comment || '');
+      if (baseCodeForName !== thisCodeForName || baseCommentForName !== thisCommentForName) {
+        displayName = `${eventName} (Modified)`;
+      }
+    }
+    title.textContent = displayName;
+
+    // Determine whether this preset has been modified relative to the
+    // original source (loadedEvents).  A preset is considered modified
+    // if it does not exist in loadedEvents or if the code or comment
+    // differs from its counterpart.  Whitespace at the ends of lines
+    // is ignored for comparison.
+    let changed = false;
+    do {
+      const base = loadedEvents.find(ev => ev && ev.name === eventName);
+      if (!base) {
+        // New event not present in the source file
+        changed = true;
+        if (debugLoggingEnabled) {
+          console.log(`Event ${eventName}: No base found, marking as changed`);
+        }
+        break;
+      }
+      // Normalise whitespace for comparison
+      const norm = (str) => {
+        if (!str) return '';
+        return str
+          .trim()
+          .replace(/\r\n/g, '\n')
+          .replace(/[ \t]+$/gm, '');
+      };
+      const baseCode = norm(base.code);
+      const thisCode = norm(preset.code);
+      if (baseCode !== thisCode) {
+        changed = true;
+        if (debugLoggingEnabled) {
+          console.log(`Event ${eventName}: Code differs, marking as changed`);
+          console.log('Base code:', baseCode.substring(0, 100) + '...');
+          console.log('This code:', thisCode.substring(0, 100) + '...');
+        }
+        break;
+      }
+      const baseComment = norm(base.comment || '');
+      const thisComment = norm(preset.comment || '');
+      if (baseComment !== thisComment) {
+        changed = true;
+        if (debugLoggingEnabled) {
+          console.log(`Event ${eventName}: Comment differs, marking as changed`);
+        }
+        break;
+      }
+      if (debugLoggingEnabled) {
+        console.log(`Event ${eventName}: No changes detected`);
+      }
+    } while (false);
+
+    // Primary action: push/run the event code
+    const runBtn = document.createElement('button');
+    runBtn.textContent = 'Push';
+    runBtn.className = 'btn-success';
+
+    // Build left part: collapse button, drag handle, run button, event name
+    
+    headerLeft.appendChild(collapseBtn);
+    
+    // Drag handle for reordering (placed on the left side) - TEMPORARILY DISABLED
+    /*
+    const dragHandle = document.createElement('span');
+    dragHandle.className = 'drag-handle';
+    dragHandle.textContent = '⋮⋮';
+    dragHandle.title = 'Drag to reorder';
+    dragHandle.draggable = true;
+    dragHandle.setAttribute('data-event-name', eventName);
+    
+    if (debugLoggingEnabled) {
+      console.log('Created drag handle for event:', eventName, 'Element:', dragHandle);
+    }
+    
+    // Add drag and drop event listeners to the drag handle
+    dragHandle.addEventListener('dragstart', handleEventDragStart);
+    dragHandle.addEventListener('dragend', handleEventDragEnd);
+    
+    // Make the entire wrapper droppable
+    wrapper.addEventListener('dragover', handleEventDragOver);
+    wrapper.addEventListener('dragleave', handleEventDragLeave);
+    wrapper.addEventListener('drop', handleEventDrop);
+    
+    headerLeft.appendChild(dragHandle);
+    */
+    headerLeft.appendChild(runBtn);
+    headerLeft.appendChild(title);
+
+    // A span used to display a warning when the event differs from the
+    // original source.  Create it once and toggle its visibility later.
+    const warnSpan = document.createElement('span');
+    warnSpan.className = 'change-warning';
+    warnSpan.textContent = '(local changes)';
+    warnSpan.style.display = changed ? 'inline' : 'none';
+    headerLeft.appendChild(warnSpan);
+
+    // Right part: copy as dataLayer.push and in local file format'
+    const actions = document.createElement('div');
+    actions.className = 'preset-header-actions';
+
+    const copyBtn = document.createElement('button');
+    copyBtn.textContent = 'Copy as dataLayer.push';
+    copyBtn.className = 'btn-sm';
+
+    const copyDLBtn = document.createElement('button');
+    copyDLBtn.textContent = 'Copy in local file format';
+    copyDLBtn.className = 'btn-sm';
+
+    // If this preset has local-only changes, visually mark the copy button
+    // and add a subtle warning label to the header.  The warning
+    // indicates that the current event differs from the loaded source
+    // (either a new event or modified code/comment).
+    if (changed) {
+      copyDLBtn.classList.add('btn-warning');
+    }
+
+    // Utility to trim trailing whitespace from the editor content.  This button
+    // begins hidden (via visibility) to preserve layout and will be shown
+    // when trailing whitespace is detected.  A primary-button class is
+    // toggled on demand to emphasise its importance when active.
+    const trimBtn = document.createElement('button');
+    trimBtn.className = 'btn-sm';
+    trimBtn.textContent = 'Trim spaces';
+    trimBtn.style.visibility = 'hidden';
+
+    // Queue button for adding events to journey
+    const queueBtn = document.createElement('button');
+    queueBtn.textContent = 'Add to Journey';
+    queueBtn.className = 'btn-sm queue-btn';
+    queueBtn.onclick = () => addToJourney(eventName, preset.code);
+
+    // Reset button for reverting changes (always create, show/hide based on changes)
+    const resetBtn = document.createElement('button');
+    resetBtn.textContent = '🔄';
+    resetBtn.className = 'btn-sm reset-button';
+    resetBtn.title = 'Revert to original state';
+    resetBtn.onclick = () => resetLoadedEvent(eventName, wrapper);
+    resetBtn.style.display = changed ? 'inline-block' : 'none';
+    
+
+    
+    // Primary actions row: essential buttons
+    actions.appendChild(trimBtn);
+    actions.appendChild(resetBtn);
+    actions.appendChild(queueBtn);
+    actions.appendChild(copyBtn);
+    actions.appendChild(copyDLBtn);
+    
+    // Remove button for deleting events
+    const removeBtn = document.createElement('button');
+    removeBtn.textContent = '🗑️';
+    removeBtn.className = 'btn-sm';
+    removeBtn.title = 'Remove event';
+    removeBtn.onclick = () => removeLoadedEvent(eventName, wrapper);
+    actions.appendChild(removeBtn);
+    
+
+
+    // Construct header
+    header.appendChild(headerLeft);
+    header.appendChild(actions);
+
+    // Hidden textarea to store the event code for persistence and localStorage
+    const textarea = document.createElement('textarea');
+    textarea.dataset.index = index;
+    textarea.dataset.name = eventName;
+    textarea.value = preset.code;
+    textarea.rows = 10;
+    textarea.className = 'preset-textarea';
+    textarea.style.display = 'none';
+    
+    // Also add data-name to the wrapper for easier lookup
+    wrapper.dataset.name = eventName;
+
+    // Visible Ace editor container
+    const editorDiv = document.createElement('div');
+    editorDiv.id = `preset_editor_${index}`;
+    editorDiv.className = 'ace-editor-container';
+    editorDiv.style.height = '150px';
+
+
+
+    // Placeholder for the editor instance
+    let editorInstance;
+
+    // Click handlers referencing the Ace editor when available
+    runBtn.onclick = () => {
+      try {
+        const code = editorInstance ? editorInstance.getValue() : textarea.value;
+        
+        // Replace placeholders before execution
+        const processedCode = replacePlaceholders(code);
+        
+        // Log dataLayer payloads if enabled
+        logDataLayerPayloads(processedCode, eventName);
+        
+        new Function(processedCode)();
+        log(`✅ Executed: ${eventName}`);
+      } catch (e) {
+        log('❌ Error parsing JS: ' + e.message);
+      }
+    };
+    copyBtn.onclick = () => {
+      const code = editorInstance ? editorInstance.getValue() : textarea.value;
+      const processedCode = replacePlaceholders(code);
+      navigator.clipboard.writeText(processedCode).then(() => {
+        log('📋 Copied as dataLayer.push');
+      });
+    };
+    copyDLBtn.onclick = () => {
+      const name = textarea.dataset.name || `custom_${index + 1}`;
+      const code = editorInstance ? editorInstance.getValue() : textarea.value;
+      const processedCode = replacePlaceholders(code);
+      // Retrieve comment from this preset's comment textarea
+      const comment = commentTextarea ? commentTextarea.value : '';
+      // Gather any links associated with this preset
+      let links = [];
+      const wrapperDiv = textarea.closest('.preset-wrapper');
+      if (wrapperDiv) {
+        const linkEls = wrapperDiv.querySelectorAll('.links-list a');
+        links = Array.from(linkEls).map((a) => ({ url: a.getAttribute('href'), text: a.textContent }));
+      }
+      const linkLines = links.map((l, idx) => `  link${idx + 1}: "${l.url} (${l.text})",\n`).join('');
+      const fullBlock = 
+`// ===== START ${name} =====  \n{\n  name: "${name}",\n  comment: \`${comment}\`,\n${linkLines}  code: \`${processedCode}\`\n},\n// ===== END ${name} =====`;
+      navigator.clipboard.writeText(fullBlock).then(() => {
+        log('📋 Copied in local file format');
+      });
+    };
+
+    // Trim trailing spaces and extraneous punctuation when requested
+    trimBtn.onclick = () => {
+      if (editorInstance) {
+        const code = editorInstance.getValue();
+        // Use the same trimming logic as Loaded Events
+        let trimmed = code.replace(/[ \t]+$/gm, '');
+        // Replace non‑breaking or zero‑width spaces with normal spaces
+        trimmed = trimmed.replace(/[\u00a0\u200b]+/g, ' ');
+        // Remove extraneous commas immediately before closing braces or brackets
+        trimmed = trimmed.replace(/,\s*([}\]])/g, '$1');
+        editorInstance.setValue(trimmed, -1);
+        trimBtn.style.visibility = 'hidden';
+        runBtn.className = 'btn-success';
+        log('✂️ Trimmed spaces');
+      }
+    };
+
+    wrapper.appendChild(header);
+    // Create a container for the code and comment areas
+    const contentDiv = document.createElement('div');
+    contentDiv.className = 'preset-content';
+    // Wrap the Ace editor in a code area div to control width
+    const codeWrapper = document.createElement('div');
+    codeWrapper.className = 'code-area';
+    codeWrapper.appendChild(editorDiv);
+    // Create the comment area on the right
+    const commentWrapper = document.createElement('div');
+    commentWrapper.className = 'comment-area';
+    // Container to list added links
+    const linksDiv = document.createElement('div');
+    linksDiv.className = 'links-list';
+    commentWrapper.appendChild(linksDiv);
+    // Button to add new links
+    const addLinkBtn = document.createElement('button');
+    addLinkBtn.textContent = 'Add link';
+    addLinkBtn.className = 'btn-sm add-link-btn';
+    commentWrapper.appendChild(addLinkBtn);
+    // Comment textarea for freeform notes
+    const commentTextarea = document.createElement('textarea');
+    commentTextarea.placeholder = 'Add comment…';
+    commentTextarea.value = preset.comment || '';
+    commentTextarea.dataset.index = index;
+    commentWrapper.appendChild(commentTextarea);
+    // Internal array to store links as objects { url, text }
+    const links = [];
+    
+    // Add event listener for comment changes
+    commentTextarea.addEventListener('input', () => {
+      updateLocalChanges(eventName, editorInstance ? editorInstance.getValue() : textarea.value, commentTextarea.value, links);
+    });
+    // If preset has existing links (e.g., loaded from localStorage), initialise them
+    if (preset.links && Array.isArray(preset.links)) {
+      preset.links.forEach(l => {
+        if (l && l.url) links.push({ url: l.url, text: l.text || l.url });
+      });
+    }
+    // Helper to create a link form for adding/editing a link
+    const createLinkForm = (initialUrl = '', initialText = '', onSave) => {
+      addLinkBtn.style.display = 'none';
+      const form = document.createElement('div');
+      form.className = 'link-form';
+      const urlInput = document.createElement('input');
+      urlInput.type = 'text';
+      urlInput.placeholder = 'URL';
+      urlInput.value = initialUrl;
+      const textInput = document.createElement('input');
+      textInput.type = 'text';
+      textInput.placeholder = 'Description (optional)';
+      textInput.value = initialText;
+      const actions = document.createElement('div');
+      actions.className = 'link-form-actions';
+      const saveBtn = document.createElement('button');
+      saveBtn.textContent = 'Save';
+      saveBtn.className = 'btn-sm';
+      const cancelBtn = document.createElement('button');
+      cancelBtn.textContent = 'Cancel';
+      cancelBtn.className = 'btn-sm';
+      actions.appendChild(saveBtn);
+      actions.appendChild(cancelBtn);
+      form.appendChild(urlInput);
+      form.appendChild(textInput);
+      form.appendChild(actions);
+      commentWrapper.insertBefore(form, commentTextarea);
+      // Save handler
+      saveBtn.onclick = () => {
+        const url = urlInput.value.trim();
+        if (!url) {
+          alert('Please enter a URL.');
+          return;
+        }
+        const txt = textInput.value.trim() || url;
+        onSave(url, txt);
+        // Update local changes storage when links are modified
+        updateLocalChanges(eventName, editorInstance ? editorInstance.getValue() : textarea.value, commentTextarea.value, links);
+        form.remove();
+        addLinkBtn.style.display = '';
+      };
+      // Cancel handler
+      cancelBtn.onclick = () => {
+        form.remove();
+        addLinkBtn.style.display = '';
+      };
+    };
+    // Function to render links list in the UI with edit/delete controls
+    const renderLinks = () => {
+      linksDiv.innerHTML = '';
+      if (links.length > 0) {
+        linksDiv.style.display = 'block';
+        links.forEach((l, idx) => {
+          const item = document.createElement('div');
+          item.className = 'link-item';
+          const linkEl = document.createElement('a');
+          linkEl.href = l.url;
+          linkEl.target = '_blank';
+          linkEl.rel = 'noopener noreferrer';
+          linkEl.textContent = l.text || l.url;
+          linkEl.title = l.url;
+          item.appendChild(linkEl);
+          // Edit button
+          const editBtn = document.createElement('button');
+          editBtn.innerHTML = '✏️';
+          editBtn.title = 'Edit link';
+          editBtn.onclick = () => {
+            createLinkForm(l.url, l.text || '', (newUrl, newText) => {
+              links[idx] = { url: newUrl, text: newText || newUrl };
+              renderLinks();
+              // Update local changes storage when links are modified
+              updateLocalChanges(eventName, editorInstance ? editorInstance.getValue() : textarea.value, commentTextarea.value, links);
+            });
+          };
+          item.appendChild(editBtn);
+          // Delete button
+          const delBtn = document.createElement('button');
+          delBtn.innerHTML = '🗑️';
+          delBtn.title = 'Delete link';
+          delBtn.onclick = () => {
+            links.splice(idx, 1);
+            renderLinks();
+            // Update local changes storage when links are modified
+            updateLocalChanges(eventName, editorInstance ? editorInstance.getValue() : textarea.value, commentTextarea.value, links);
+          };
+          item.appendChild(delBtn);
+          linksDiv.appendChild(item);
+        });
+      } else {
+        linksDiv.style.display = 'none';
+      }
+    };
+    renderLinks();
+    // Show the link form when the add button is clicked
+    addLinkBtn.onclick = () => {
+      createLinkForm('', '', (url, txt) => {
+        links.push({ url: url, text: txt });
+        renderLinks();
+        // Update local changes storage when links are modified
+        updateLocalChanges(eventName, editorInstance ? editorInstance.getValue() : textarea.value, commentTextarea.value, links);
+      });
+    };
+    // Assemble content with a divider between the code and comment areas
+    contentDiv.appendChild(codeWrapper);
+    const dividerEl = document.createElement('div');
+    dividerEl.className = 'divider';
+    contentDiv.appendChild(dividerEl);
+    contentDiv.appendChild(commentWrapper);
+    wrapper.appendChild(contentDiv);
+    wrapper.appendChild(textarea);
+
+    // Instantiate the Ace editor after a short delay to ensure the element exists in the DOM
+    setTimeout(() => {
+      if (window.ace) {
+        editorInstance = ace.edit(editorDiv.id);
+        editorInstance.session.setMode('ace/mode/javascript');
+        editorInstance.setTheme('ace/theme/chrome');
+        editorInstance.setValue(preset.code || '', -1);
+        editorInstance.setOptions({
+          showPrintMargin: false,
+          tabSize: 2,
+          useSoftTabs: true
+        });
+        // Sync the hidden textarea whenever the editor content changes
+        editorInstance.session.on('change', () => {
+          textarea.value = editorInstance.getValue();
+          // Update local changes storage when code is modified
+          updateLocalChanges(eventName, editorInstance.getValue(), commentTextarea.value, links);
+        });
+
+        // Set JSHint options on the worker to allow modern syntax, including trailing commas in function calls
+        if (editorInstance.session.$worker) {
+          editorInstance.session.$worker.call('setOptions', [{ esversion: 10 }]);
+        }
+
+        // Adjust the height of the code and comment areas based on the number of lines
+        const adjustHeight = () => {
+          // Determine how many lines are in the editor
+          const lineCount = editorInstance.session.getLength();
+          // Always display at least 10 lines.  Add one extra line beyond
+          // the actual code to provide breathing room, but cap at 20 lines.
+          // Add two extra blank lines for visual breathing room.  Ensure at
+          // least 10 lines are shown, but cap to avoid excessive height.
+          let lines = lineCount + 2;
+          if (lines < 10) lines = 10;
+          // Use a slightly higher cap so that visually 20 lines are shown in the Ace editor
+          if (lines > 21) lines = 21;
+          const lineHeight = editorInstance.renderer.lineHeight || 16;
+          const newHeight = lines * lineHeight;
+          // Apply height to the Ace editor container and comment textarea
+          editorDiv.style.height = newHeight + 'px';
+          if (commentTextarea) {
+            commentTextarea.style.height = newHeight + 'px';
+          }
+          editorInstance.resize();
+        };
+        adjustHeight();
+        // Recalculate height whenever the content changes
+        editorInstance.session.on('change', adjustHeight);
+
+        // Monitor annotations and content to toggle the run button colour
+        // and display a trim‑spaces button when trailing whitespace is present.
+        const session = editorInstance.getSession();
+        const updateButtonState = () => {
+          // Determine if any syntax errors are present
+          const anns = session.getAnnotations() || [];
+          // Ace may mark some parse issues as warnings rather than errors.  We
+          // consider any annotation an issue that could benefit from trimming.
+          const hasError = anns.some(a => a.type === 'error');
+          const hasAnyIssue = anns.length > 0;
+          // Detect trailing whitespace by scanning each line of the editor contents.
+          const code = editorInstance.getValue();
+          const lines = code.split('\n');
+          const hasTrailing = lines.some(l => /[ \t]+$/.test(l));
+          // Apply visual states: red for errors, yellow for only trailing whitespace.
+          runBtn.classList.toggle('btn-error', hasError);
+          runBtn.classList.toggle('btn-warn', !hasError && hasTrailing);
+          // Show the trim button whenever there is trailing whitespace or any annotation.
+          if (hasTrailing || hasAnyIssue) {
+            trimBtn.style.visibility = 'visible';
+            // Highlight as primary only when the issue is just trailing whitespace (no syntax error).
+            if (hasTrailing && anns.length === 0) {
+              trimBtn.classList.add('btn-primary');
+            } else {
+              trimBtn.classList.remove('btn-primary');
+            }
+          } else {
+            trimBtn.style.visibility = 'hidden';
+            trimBtn.classList.remove('btn-primary');
+          }
+        };
+        updateButtonState();
+        // Listen for changes in annotations (errors/warnings) and editor text
+        session.on('changeAnnotation', updateButtonState);
+        session.on('change', updateButtonState);
+
+        // Function to evaluate whether the current event differs from the
+        // base presets.  If the code or comment has been modified or if
+        // the event did not exist in the original file, this will show
+        // a warning label and highlight the Copy in local file format button.
+        const updateChange = () => {
+          // Find the matching base event by name
+          const baseEvent = basePresets.find(ev => ev && ev.name === eventName);
+          let isChanged = false;
+          const normalise = (str) => {
+            if (!str) return '';
+            return str
+              .trim()
+              .replace(/\r\n/g, '\n')
+              .replace(/[ \t]+$/gm, '');
+          };
+          const currentCode = normalise(editorInstance ? editorInstance.getValue() : textarea.value);
+          const currentComment = normalise(commentTextarea.value || '');
+          if (!baseEvent) {
+            isChanged = true;
+          } else {
+            const baseCode = normalise(baseEvent.code);
+            const baseComment = normalise(baseEvent.comment || '');
+            if (baseCode !== currentCode || baseComment !== currentComment) {
+              isChanged = true;
+            }
+          }
+          // Toggle UI elements accordingly
+          if (warnSpan) {
+            warnSpan.style.display = isChanged ? 'inline' : 'none';
+          }
+          copyDLBtn.classList.toggle('btn-warning', isChanged);
+        };
+        // Initial evaluation
+        updateChange();
+        // Monitor changes to code and comment
+        editorInstance.session.on('change', updateChange);
+        commentTextarea.addEventListener('input', updateChange);
+
+        // Resize the Ace editor when the container is resized by the user
+        editorDiv.addEventListener('mouseup', () => {
+          editorInstance.resize();
+        });
+      }
+    }, 0);
+
+    return wrapper;
+  }
+
+  function resetPresets() {
+    // Clear both split storage areas
+    localStorage.removeItem('events_loaded_js');
+    localStorage.removeItem('events_changes_js');
+    log('♻️ LocalStorage cleared. Reloading examples from GitHub…');
+    // Clear any reference to a previously loaded local file
+    currentLocalFile = null;
+    // Reset the local loader button back to its original state
+    const localBtn = document.querySelector('.local-file-group button');
+    if (localBtn) {
+      localBtn.textContent = 'Use local file';
+      // Restore small-button styling so it appears neutral
+      localBtn.classList.remove('btn-primary');
+      localBtn.classList.add('btn-sm');
+      localBtn.title = 'Use a local file instead of the built‑in examples from GitHub';
+    }
+          // Fetch presets again from the original examples on GitHub
+    const fallbackPresets = window.gtmPresets || [];
+    // Reset base presets to the original source
+    basePresets = fallbackPresets.slice();
+    // Reset global variables
+    loadedEvents = fallbackPresets.slice();
+    localChanges = [];
+    const container = document.getElementById('presetsArea');
+    container.innerHTML = '';
+    fallbackPresets.forEach((preset, i) => {
+      container.appendChild(renderPreset(preset, i));
+    });
+    // Update header to show that events are from GitHub
+    updateLoadedEventsHeader();
+  }
+
+  // Load events from a user‑selected local file.  The file must
+  // assign an array of event definitions to either `window.gtmPresets` or
+  // `window.presetEvents` with elements of the form { name: "eventName", code: "..." }.
+  // When loaded successfully, the events will replace the current presets and
+  // persist in localStorage under `presets_full_js`.  An informational
+  // message is displayed in the log.
+  function loadLocalFile() {
+    const input = document.getElementById('localFileInput');
+    // If a file is explicitly provided (user just chose one via the input), load that file.
+    if (input && input.files && input.files.length > 0) {
+      const file = input.files[0];
+      loadLocalFileFromFile(file);
+    } else if (currentLocalFile) {
+      // If no file is chosen but we have a previously selected file, reload it.
+      loadLocalFileFromFile(currentLocalFile);
+    } else {
+      alert('Please select a .js file first.');
+    }
+  }
+
+  // Load a local file from a File object.  Updates the global
+  // currentLocalFile reference, stores the processed events in localStorage,
+  // updates the local loader button text/style, and renders the presets.
+  function loadLocalFileFromFile(file) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const content = e.target.result;
+      try {
+        const sandbox = {};
+        const wrapper = new Function('window', content + '\n; return window.gtmPresets || window.presetEvents || []');
+        const events = wrapper(sandbox);
+        if (Array.isArray(events) && events.length > 0) {
+          const processed = events.map(ev => {
+            // Extract links from properties named link1, link2, etc.
+            const links = [];
+            Object.keys(ev).forEach((k) => {
+              if (/^link\d+$/.test(k)) {
+                const val = ev[k];
+                if (typeof val === 'string') {
+                  // Expect pattern "url (text)"
+                  const m = val.match(/^(.+)\s+\((.*)\)$/);
+                  if (m) {
+                    links.push({ url: m[1].trim(), text: m[2].trim() });
+                  } else {
+                    links.push({ url: val.trim(), text: val.trim() });
+                  }
+                }
+              }
+            });
+            return {
+              name: ev.name,
+              code: ev.code,
+              comment: ev.comment || '',
+              links: links
+            };
+          });
+          // Save to loaded events storage (this becomes the new base)
+          localStorage.setItem('events_loaded_js', JSON.stringify(processed));
+          // Clear local changes since we're loading a new source
+          localStorage.setItem('events_changes_js', JSON.stringify([]));
+          // Update base presets to reflect the contents of the loaded local file
+          basePresets = processed.slice();
+          // Update global variables
+          loadedEvents = processed.slice();
+          localChanges = [];
+          log('📁 Loaded events from local file');
+          // Remember this file so we can reload it later without asking the user
+          currentLocalFile = file;
+          // Update the local loader button to indicate a local file is in use
+          const localBtn = document.querySelector('.local-file-group button');
+          if (localBtn) {
+            localBtn.textContent = `Reset to local ${file.name}`;
+            // Remove previous small-button class and apply a primary style.  We
+            // deliberately keep the small-button sizing so the control remains
+            // consistent with the other auxiliary buttons, but apply a
+            // primary-button class to colour it blue.
+            localBtn.classList.remove('btn-sm');
+            localBtn.classList.add('btn-sm', 'btn-primary');
+            localBtn.title = `Reload the locally loaded file (${file.name}) - If chnages are made it need to be selected again`;
+          }
+          loadPresets();
+          // Persist that a local file is in use and store its name for display
+          localStorage.setItem('presets_source', 'local');
+          localStorage.setItem('presets_filename', file.name);
+          // Update the header to reflect that presets are from a local file
+          updateLoadedEventsHeader();
+        } else {
+          log('⚠️ The selected file does not define any events (gtmPresets/presetEvents).');
+        }
+      } catch (err) {
+        log('❌ Failed to load local file: ' + err.message);
+      }
+    };
+    reader.readAsText(file);
+  }
+  function copyAllAsDataLayer() {
+  // Get current working presets (loaded events + local changes, excluding removed ones)
+  const currentPresets = mergeEventsWithChanges(loadedEvents, localChanges);
+
+  const eventBlocks = currentPresets.map((preset, i) => {
+    const name = preset.name || `custom_${i + 1}`;
+    const code = preset.code;
+    const processedCode = replacePlaceholders(code);
+    const comment = preset.comment || '';
+    const links = preset.links || [];
+    
+    // Build link properties as link1, link2, etc.
+    const linkLines = links.map((l, idx) => `  link${idx + 1}: "${l.url} (${l.text})",\n`).join('');
+    // Construct the block with comment and link properties.  Use backticks
+    // for both code and comment to preserve formatting and support special characters.
+    return `// ===== START ${name} =====  \n{\n  name: "${name}",\n  comment: \`${comment}\`,\n${linkLines}  code: \`${processedCode}\`\n},\n// ===== END ${name} =====`;
+  });
+
+  const finalCode = `const presetEvents = [\n${eventBlocks.join('\n\n')}\n];\n\nwindow.gtmPresets = presetEvents;`;
+
+  navigator.clipboard.writeText(finalCode).then(() => {
+    log('📋 All events copied in local file format');
+  });
+}
+
+  /*
+   * Create a URL‑friendly slug from a string.  Lowercases and
+   * replaces non‑alphanumeric characters with underscores.  Used to
+   * generate element IDs based on event names.
+   */
+  function slugify(str) {
+    return str
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '_')
+      .replace(/^_+|_+$/g, '');
+  }
+
+  /*
+   * Build the navigation bar of event links.  Each button will scroll
+   * smoothly to the corresponding event card when clicked.
+   */
+  function renderNavigation() {
+    const nav = document.getElementById('eventNav');
+    if (!nav) return;
+    nav.innerHTML = '';
+    const wrappers = document.querySelectorAll('.preset-wrapper');
+    wrappers.forEach((wrapper) => {
+      // Skip wrappers flagged to be ignored by the navigation bar
+      if (wrapper.getAttribute('data-ignore-nav') === 'true') return;
+      const titleEl = wrapper.querySelector('.preset-header-title');
+      if (!titleEl) return;
+      const name = titleEl.textContent.trim();
+      const id = 'event_' + slugify(name);
+      wrapper.id = id;
+
+      const btn = document.createElement('button');
+      btn.className = 'nav-btn go-to-event-btn';
+      btn.textContent = name;
+      btn.onclick = () => {
+        const target = document.getElementById(id);
+        if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      };
+      nav.appendChild(btn);
+    });
+  }
+
+
+  window.addEventListener('load', () => {
+    const lastId = localStorage.getItem('gtm_id');
+    if (lastId) {
+      document.getElementById('gtmId').value = lastId;
+      // Automatically inject the stored GTM container on page load
+      injectGTM(lastId);
+    }
+    
+    // Initialize console logging toggles
+    const actionsToggle = document.getElementById('actionsLogToggle');
+    const consoleToggle = document.getElementById('consoleLogToggle');
+    const debugToggle = document.getElementById('debugLogToggle');
+    
+    if (actionsToggle) {
+      actionsLoggingEnabled = localStorage.getItem('gtm_actions_logging') === 'true';
+      actionsToggle.checked = actionsLoggingEnabled;
+      actionsToggle.addEventListener('change', (e) => {
+        actionsLoggingEnabled = e.target.checked;
+        localStorage.setItem('gtm_actions_logging', actionsLoggingEnabled);
+        log(actionsLoggingEnabled ? '📝 Actions logging enabled' : '🔇 Actions logging disabled');
+      });
+    }
+    
+    if (consoleToggle) {
+      consoleLoggingEnabled = localStorage.getItem('gtm_console_logging') === 'true';
+      consoleToggle.checked = consoleLoggingEnabled;
+      consoleToggle.addEventListener('change', (e) => {
+        consoleLoggingEnabled = e.target.checked;
+        localStorage.setItem('gtm_console_logging', consoleLoggingEnabled);
+        log(consoleLoggingEnabled ? '📝 Console logging enabled' : '🔇 Console logging disabled');
+      });
+    }
+    
+    if (debugToggle) {
+      debugLoggingEnabled = localStorage.getItem('gtm_debug_logging') === 'true';
+      debugToggle.checked = debugLoggingEnabled;
+      debugToggle.addEventListener('change', (e) => {
+        debugLoggingEnabled = e.target.checked;
+        localStorage.setItem('gtm_debug_logging', debugLoggingEnabled);
+        log(debugLoggingEnabled ? '📝 Debug logging enabled' : '🔇 Debug logging disabled');
+      });
+    }
+    
+    // Initialize random user ID
+    const savedUserId = localStorage.getItem('gtm_user_id');
+    if (savedUserId) {
+      currentUserId = savedUserId;
+      document.getElementById('currentUserId').textContent = currentUserId;
+    } else {
+      generateNewUserId();
+    }
+    
+    // Initialize journey delay
+    const savedDelay = localStorage.getItem('gtm_journey_delay');
+    if (savedDelay) {
+      document.getElementById('journeyDelay').value = savedDelay;
+    }
+    
+    // Initialize journey section collapsed state
+    const journeyCollapsed = localStorage.getItem('gtm_journey_collapsed') === 'true';
+    if (journeyCollapsed) {
+      const content = document.getElementById('journeyContent');
+      const toggleBtn = document.querySelector('.section-toggle-btn');
+      if (content && toggleBtn) {
+        content.classList.add('collapsed');
+        toggleBtn.classList.add('collapsed');
+        toggleBtn.textContent = '▶';
+      }
+    }
+
+    // Initialize settings section collapsed state
+    const settingsCollapsed = localStorage.getItem('gtm_settings_collapsed') === 'true';
+    if (settingsCollapsed) {
+      const content = document.getElementById('settingsContent');
+      const toggleBtn = document.querySelector('.section-toggle-btn');
+      if (content && toggleBtn) {
+        content.classList.add('collapsed');
+        toggleBtn.classList.add('collapsed');
+        toggleBtn.textContent = '▶';
+      }
+    }
+
+
+    
+    // Add event listener to file input to change button color when file is selected
+    const localFileInput = document.getElementById('localFileInput');
+    if (localFileInput) {
+      localFileInput.addEventListener('change', (e) => {
+        const localBtn = document.querySelector('.local-file-group button');
+        if (localBtn && e.target.files && e.target.files.length > 0) {
+          localBtn.classList.remove('btn-sm');
+          localBtn.classList.add('btn-sm', 'btn-primary');
+        }
+      });
+    }
+
+    // Save journey delay changes
+    const journeyDelayInput = document.getElementById('journeyDelay');
+    if (journeyDelayInput) {
+      journeyDelayInput.addEventListener('change', (e) => {
+        localStorage.setItem('gtm_journey_delay', e.target.value);
+      });
+    }
+    
+    // Initialize split storage variables
+    const savedLoaded = localStorage.getItem('events_loaded_js');
+    const savedChanges = localStorage.getItem('events_changes_js');
+    
+    if (savedLoaded) {
+      loadedEvents = JSON.parse(savedLoaded);
+      basePresets = loadedEvents.slice();
+    } else {
+      loadedEvents = defaultPresets.slice();
+      basePresets = defaultPresets.slice();
+    }
+    
+    if (savedChanges) {
+      localChanges = JSON.parse(savedChanges);
+    } else {
+      localChanges = [];
+    }
+    
+    loadPresets();
+    
+    // Initialize journey presets display
+    displayJourneyPresets();
+    
+
+  });
+
+  // Toggle loaded events section visibility
+  function toggleEventsSection() {
+    const toggleBtn = document.querySelector('#eventsContent').closest('.section').querySelector('.section-toggle-btn');
+    utils.toggleSection('eventsContent', 'gtm_events_collapsed', toggleBtn);
+  }
+
+  // Initialize events section collapsed state
+  const eventsCollapsed = localStorage.getItem('gtm_events_collapsed') === 'true';
+  if (eventsCollapsed) {
+    const content = document.getElementById('eventsContent');
+    const toggleBtn = document.querySelector('.section-toggle-btn');
+    if (content && toggleBtn) {
+      content.classList.add('collapsed');
+      toggleBtn.classList.add('collapsed');
+      toggleBtn.textContent = '▶';
+    }
+  }
+
+  function expandAllEvents() {
+    document.querySelectorAll('#eventsContent .preset-wrapper.collapsed').forEach(el => {
+      el.classList.remove('collapsed');
+      const btn = el.querySelector('.collapse-toggle');
+      if (btn) btn.textContent = '▼';
+    });
+  }
+
+  function collapseAllEvents() {
+    document.querySelectorAll('#eventsContent .preset-wrapper').forEach(el => {
+      el.classList.add('collapsed');
+      const btn = el.querySelector('.collapse-toggle');
+      if (btn) btn.textContent = '▶';
+    });
+  }
+
+  function togglePlaygroundsSection() {
+    const toggleBtn = document.querySelector('#playgroundsSection .section-toggle-btn');
+    utils.toggleSection('playgroundsContent', 'gtm_playgrounds_collapsed', toggleBtn);
+  }
+
+  function addPlaygroundCard(exampleType = '', initialCode = '', initialComment = '') {
+    const area = document.getElementById('playgroundsArea');
+    if (!area) return;
+    
+    // Hide the "no playgrounds" message if it exists
+    const noPlaygroundsMsg = area.querySelector('.no-playgrounds-message');
+    if (noPlaygroundsMsg) {
+      noPlaygroundsMsg.style.display = 'none';
+    }
+    
+    // Get the actual count of playground cards (excluding the no-playgrounds-message)
+    const playgroundCards = area.querySelectorAll('.preset-wrapper');
+    const idx = playgroundCards.length;
+
+    const wrapper = document.createElement('div');
+    wrapper.className = 'preset-wrapper';
+
+    const header = document.createElement('div');
+    header.className = 'preset-header-bar';
+
+    const headerLeft = document.createElement('div');
+    headerLeft.className = 'preset-header-left';
+
+    const collapseBtn = document.createElement('button');
+    collapseBtn.className = 'collapse-toggle';
+    collapseBtn.textContent = '▼';
+    collapseBtn.title = 'Collapse/Expand';
+    collapseBtn.onclick = () => {
+      wrapper.classList.toggle('collapsed');
+      collapseBtn.textContent = wrapper.classList.contains('collapsed') ? '▶' : '▼';
+    };
+
+    const title = document.createElement('span');
+    title.className = 'preset-header-title';
+    title.textContent = `Playground ${idx + 1}`;
+    
+    // Function to update title with event name if detected
+    const updateTitleWithEventName = (code) => {
+      try {
+        // Try to extract event name from the code
+        const eventMatch = code.match(/event\s*:\s*['"`]([^'"`]+)['"`]/);
+        if (eventMatch && eventMatch[1]) {
+          title.textContent = `Playground ${idx + 1} (${eventMatch[1]})`;
+        } else {
+          title.textContent = `Playground ${idx + 1}`;
+        }
+      } catch (e) {
+        title.textContent = `Playground ${idx + 1}`;
+      }
+    };
+
+    const runBtn = document.createElement('button');
+    runBtn.textContent = 'Push';
+    runBtn.className = 'btn-success';
+
+    headerLeft.appendChild(collapseBtn);
+    headerLeft.appendChild(runBtn);
+    headerLeft.appendChild(title);
+
+    const actions = document.createElement('div');
+    actions.className = 'preset-header-actions';
+
+    const saveBtn = document.createElement('button');
+    saveBtn.className = 'btn-sm';
+    saveBtn.textContent = 'Save as Loaded Event';
+
+    const copyBtn = document.createElement('button');
+    copyBtn.className = 'btn-sm';
+    copyBtn.textContent = 'Copy as dataLayer.push';
+
+    const copyDLBtn = document.createElement('button');
+    copyDLBtn.className = 'btn-sm';
+    copyDLBtn.textContent = 'Copy in local file format';
+
+    const trimBtn = document.createElement('button');
+    trimBtn.className = 'btn-sm';
+    trimBtn.textContent = 'Trim spaces';
+    trimBtn.style.visibility = 'hidden';
+
+    const removeBtn = document.createElement('button');
+    removeBtn.className = 'btn-sm';
+    removeBtn.textContent = '🗑️ Remove';
+
+    actions.appendChild(trimBtn);
+    actions.appendChild(saveBtn);
+    actions.appendChild(copyBtn);
+    actions.appendChild(copyDLBtn);
+    actions.appendChild(removeBtn);
+
+    header.appendChild(headerLeft);
+    header.appendChild(actions);
+
+    const contentDiv = document.createElement('div');
+    contentDiv.className = 'preset-content';
+
+    // Code area
+    const codeWrapper = document.createElement('div');
+    codeWrapper.className = 'code-area';
+
+    const editorDiv = document.createElement('div');
+    editorDiv.id = `playground_editor_${Date.now()}_${Math.random().toString(36).slice(2)}`;
+    editorDiv.className = 'ace-editor-container';
+    editorDiv.style.height = '150px';
+    codeWrapper.appendChild(editorDiv);
+
+    // Comment area
+    const commentWrapper = document.createElement('div');
+    commentWrapper.className = 'comment-area';
+
+    const commentTextarea = document.createElement('textarea');
+    commentTextarea.placeholder = 'Add comment…';
+    commentTextarea.value = initialComment || '';
+    commentWrapper.appendChild(commentTextarea);
+
+    contentDiv.appendChild(codeWrapper);
+    const dividerEl = document.createElement('div');
+    dividerEl.className = 'divider';
+    contentDiv.appendChild(dividerEl);
+    contentDiv.appendChild(commentWrapper);
+
+    wrapper.appendChild(header);
+    wrapper.appendChild(contentDiv);
+
+    area.appendChild(wrapper);
+
+    // Generate example code based on type
+    let exampleCode = '';
+    if (exampleType === 'flat') {
+      exampleCode = `dataLayer.push({
+event: "custom_event",
+property_string: "a text",
+property_number: 123,
+property_boolean: true
+});`;
+    } else if (exampleType === 'object') {
+      exampleCode = `dataLayer.push({
+event: "custom_event",
+object_name: {
+  property_string: "A text",
+  property_number: 123,
+  property_boolean: true
+}
+});`;
+    } else if (exampleType === 'array') {
+      exampleCode = `dataLayer.push({
+event: 'custom_event',
+object_name: {
+  property_string: 'MitID',
+  property_number: 123,
+  property_boolean: true,
+  array_name: [{
+    property_name: 'brand',
+    property_value: 'nokia'
+  }, {
+    property_name: 'color',
+    property_value: 'black'
+  }]
+}
+});`;
+    }
+
+    // Init Ace
+    let editorInstance = null;
+    if (window.ace) {
+      editorInstance = ace.edit(editorDiv.id);
+      editorInstance.session.setMode('ace/mode/javascript');
+      editorInstance.setTheme('ace/theme/chrome');
+      editorInstance.setOptions({ showPrintMargin: false, tabSize: 2, useSoftTabs: true });
+      editorInstance.setValue(exampleCode || initialCode || '', -1);
+      
+      // Add change listener for syntax checking and title updates
+      editorInstance.on('change', () => {
+        checkPlaygroundSyntax(editorInstance, runBtn, trimBtn);
+        updateTitleWithEventName(editorInstance.getValue());
+      });
+      
+      // Initial syntax check and title update
+      checkPlaygroundSyntax(editorInstance, runBtn, trimBtn);
+      updateTitleWithEventName(exampleCode || initialCode || '');
+    }
+
+    runBtn.onclick = () => {
+      try {
+        const code = editorInstance ? editorInstance.getValue() : initialCode || '';
+        const processed = replacePlaceholders(code);
+        logDataLayerPayloads(processed, 'Playground');
+        new Function(processed)();
+        log('✅ Executed playground');
+      } catch (e) {
+        log('❌ Error parsing JS: ' + e.message);
+      }
+    };
+          copyBtn.onclick = () => {
+        const code = editorInstance ? editorInstance.getValue() : initialCode || '';
+        navigator.clipboard.writeText(replacePlaceholders(code)).then(() => log('📋 Copied as dataLayer.push'));
+      };
+    copyDLBtn.onclick = () => {
+      const code = editorInstance ? editorInstance.getValue() : initialCode || '';
+      const block = `// ===== START playground =====  \n{\n  name: "playground",\n  code: \`${replacePlaceholders(code)}\`\n},\n// ===== END playground =====`;
+      navigator.clipboard.writeText(block).then(() => log('📋 Copied as local file event block'));
+    };
+    saveBtn.onclick = () => {
+      // Append new event to local changes storage
+      const code = editorInstance ? editorInstance.getValue() : initialCode || '';
+      
+      // Automatically extract event name from the code
+      let eventName = 'custom_event';
+      const eventMatch = code.match(/event\s*:\s*['"`]([^'"`]+)['"`]/);
+      if (eventMatch) {
+        eventName = eventMatch[1];
+      }
+      
+      // Create the new event with a special flag for playground events
+      const newEvent = { 
+        name: eventName, 
+        code: code, 
+        comment: commentTextarea.value || '', 
+        links: [],
+        isPlaygroundEvent: true  // Flag to identify playground events
+      };
+      
+      // Store the initial state in loadedEvents (for reset functionality)
+      loadedEvents.push({ ...newEvent });
+      
+      // Add to local changes (new events go here)
+      localChanges.push(newEvent);
+      
+      // Save both to localStorage
+      localStorage.setItem('events_loaded_js', JSON.stringify(loadedEvents));
+      localStorage.setItem('events_changes_js', JSON.stringify(localChanges));
+      
+      log(`💾 Playground saved as '${eventName}' in Loaded Events`);
+      loadPresets();
+    };
+    trimBtn.onclick = () => {
+      if (editorInstance) {
+        const code = editorInstance.getValue();
+        // Use the same trimming logic as Loaded Events
+        let trimmed = code.replace(/[ \t]+$/gm, '');
+        // Replace non‑breaking or zero‑width spaces with normal spaces
+        trimmed = trimmed.replace(/[\u00a0\u200b]+/g, ' ');
+        // Remove extraneous commas immediately before closing braces or brackets
+        trimmed = trimmed.replace(/,\s*([}\]])/g, '$1');
+        editorInstance.setValue(trimmed, -1);
+        trimBtn.style.visibility = 'hidden';
+        runBtn.className = 'btn-success';
+        log('✂️ Trimmed spaces');
+      }
+    };
+    removeBtn.onclick = () => {
+      wrapper.remove();
+      
+      // Show the "no playgrounds" message if no playgrounds remain
+      const remainingPlaygrounds = area.querySelectorAll('.preset-wrapper');
+      if (remainingPlaygrounds.length === 0) {
+        const noPlaygroundsMsg = area.querySelector('.no-playgrounds-message');
+        if (noPlaygroundsMsg) {
+          noPlaygroundsMsg.style.display = 'block';
+        }
+      }
+    };
+  }
+
+  function checkPlaygroundSyntax(editor, runBtn, trimBtn) {
+    if (!editor) return;
+    
+    const code = editor.getValue();
+    // Use the same logic as Loaded Events: check for trailing whitespace on each line
+    const lines = code.split('\n');
+    const hasTrailing = lines.some(l => /[ \t]+$/.test(l));
+    
+    // Show/hide trim button and update styling (use visibility like Loaded Events)
+    if (hasTrailing) {
+      trimBtn.style.visibility = 'visible';
+      trimBtn.className = 'btn-sm trim-button';
+      runBtn.className = 'btn-warning';
+    } else {
+      trimBtn.style.visibility = 'hidden';
+      runBtn.className = 'btn-success';
+    }
+    
+    // Check for syntax errors
+    try {
+      new Function(code);
+      runBtn.textContent = 'Push';
+      runBtn.disabled = false;
+    } catch (e) {
+      runBtn.textContent = '❌ Syntax Error';
+      runBtn.className = 'btn-error';
+      runBtn.disabled = true;
+    }
+  }
+
+  // Initialize Playgrounds collapsed state
+  (function initPlaygroundsCollapsed(){
+    const collapsed = localStorage.getItem('gtm_playgrounds_collapsed') === 'true';
+    if (collapsed) {
+      const content = document.getElementById('playgroundsContent');
+      const toggleBtn = document.querySelector('#playgroundsSection .section-toggle-btn');
+      if (content && toggleBtn) {
+        content.classList.add('collapsed');
+        toggleBtn.classList.add('collapsed');
+        toggleBtn.textContent = '▶';
+      }
+    }
+  })();
+
+  // Initialize the application when the page loads
+  window.addEventListener('load', () => {
+    const lastId = localStorage.getItem('gtm_id');
+    if (lastId) document.getElementById('gtmId').value = lastId;
+    loadPresets();
+  });
+
+  function expandAllPlaygrounds() {
+    document.querySelectorAll('#playgroundsSection .preset-wrapper.collapsed').forEach(el => {
+      el.classList.remove('collapsed');
+      const btn = el.querySelector('.collapse-toggle');
+      if (btn) btn.textContent = '▼';
+    });
+  }
+
+  function collapseAllPlaygrounds() {
+    document.querySelectorAll('#playgroundsSection .preset-wrapper').forEach(el => {
+      el.classList.add('collapsed');
+      const btn = el.querySelector('.collapse-toggle');
+      if (btn) btn.textContent = '▶';
+    });
+  }
+</script>
+<footer style="font-size:12px; text-align:center; margin-top:20px; color:#666;">
+  © 2025 Rune Andersen — Free to use, but not to copy or redistribute. See LICENSE.
+</footer>
+</body>
+</html>
