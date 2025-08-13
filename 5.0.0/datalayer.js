@@ -51,10 +51,10 @@ const presetEvents = [
 
 // ===== START page_view_test =====  
 {
-  name: "page_view_test",
+  name: "page_view",
   comment: ``,
   code: `dataLayer.push({
-  event: 'page_view_test'
+  event: 'page_view'
 });`
 },
 // ===== END page_view_test =====
