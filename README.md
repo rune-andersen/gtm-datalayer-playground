@@ -2,6 +2,11 @@
 
 A lightweight, browser-based tool to test Google Tag Manager (GTM) containers and dataLayer events in real-time.
 
+## Version 5.1.0 Features
+
+- **Enhanced Console Logging Options**: Added configurable console logging controls for actions, dataLayer.push operations, and debug information.
+- **Improved Button Styling**: Aligned all button colors to use consistent grey styling for better visual consistency across all sections.
+
 ## Version 5.0.0 Features
 
 - **Journey Builder**: Create and run sequences of events with configurable delays—perfect for testing user journeys and conversion flows.
