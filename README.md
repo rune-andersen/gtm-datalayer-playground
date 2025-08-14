@@ -4,9 +4,7 @@ A lightweight, browser-based tool to test Google Tag Manager (GTM) containers an
 
 ## Version 5.2.0 Features
 
-- **Streamlined Documentation**: Removed Event Format Examples section for cleaner, more focused documentation.
-- **Improved Header Hierarchy**: Enhanced visual hierarchy by making the Documentation & Instructions header smaller and less dominant than the Settings header.
-- **Refined UI Styling**: Adjusted Documentation section header styling for better visual balance and improved user experience.
+- **Documentation & Instructions Section**: Added a comprehensive documentation section with step-by-step usage guides and links to relevant browser extensions for GTM testing.
 
 ## Version 5.1.0 Features
 
