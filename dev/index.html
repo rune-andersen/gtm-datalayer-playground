@@ -8,8 +8,8 @@
   <!-- Application version metadata.  Update these values when you commit new versions.
        app-version holds a simple version string, e.g. 1.2.3, and app-changelog holds
        a short description of what changed. -->
-      <meta name="app-version" content="5.2.0">
-          <meta name="app-changelog" content="Added comprehensive Documentation & Instructions section with usage guides, recommended tools, and event examples">
+                   <meta name="app-version" content="5.3.0">
+      <meta name="app-changelog" content="Added Random user_id for Journey runs feature - toggle to generate new GUID for each event during journey execution">
   <style>
     /*
      * Base layout styling.  A subtle background colour and modern
@@ -956,6 +956,13 @@
       color: #6c757d;
     }
 
+    .journey-settings-section {
+      margin: 15px 0;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
     .journey-controls {
       display: flex;
       gap: 10px;
@@ -1285,11 +1292,11 @@
 
 
 
-        <div class="doc-section">
-          <h4>🔄 Version Information</h4>
-          <p><strong>Current Version:</strong> 5.2.0</p>
-          <p><strong>What's New:</strong> Added comprehensive Documentation & Instructions section with usage guides, recommended tools, and event examples.</p>
-        </div>
+                  <div class="doc-section">
+            <h4>🔄 Version Information</h4>
+            <p><strong>Current Version:</strong> 5.3.0</p>
+            <p><strong>What's New:</strong> Added Random user_id for Journey runs feature - toggle to generate new GUID for each event during journey execution.</p>
+          </div>
       </div>
     </div>
   </div>
@@ -1309,6 +1316,7 @@
           <label for="journeyDelay">Delay (ms):</label>
           <input type="number" id="journeyDelay" value="1000" min="0" max="10000" step="100" />
         </div>
+
         <button class="btn-sm" onclick="saveJourneyPreset()">💾 Save Journey</button>
       </div>
     </div>
@@ -1316,6 +1324,14 @@
     <div class="section-content" id="journeyContent">
       <div class="journey-queue" id="journeyQueue">
         <div class="journey-queue empty">Add events from Playground and Loaded Events to build your journey...</div>
+      </div>
+      
+      <!-- Journey Settings -->
+      <div class="journey-settings-section">
+        <div class="console-toggle">
+          <input type="checkbox" id="randomizeUserId" title="Generate new random user_id for each event during journey execution" />
+          <label for="randomizeUserId">Randomize {{user_id}} during Journey</label>
+        </div>
       </div>
       
       <!-- Journey Status and Progress -->
@@ -1512,20 +1528,36 @@
 
 
   // Replace placeholders in code with actual values
-  function replacePlaceholders(code) {
+  function replacePlaceholders(code, isJourneyExecution = false) {
     if (!code) return code;
     let processedCode = code;
     
-    // Replace user_id placeholders (multiple formats)
-    if (currentUserId) {
-      processedCode = processedCode.replace(/\[user_id\]/g, currentUserId);
-      processedCode = processedCode.replace(/\{\{user_id\}\}/g, currentUserId);
-      processedCode = processedCode.replace(/{{user_id}}/g, currentUserId);
-      processedCode = processedCode.replace(/\[USER_ID\]/g, currentUserId);
-      processedCode = processedCode.replace(/\{\{USER_ID\}\}/g, currentUserId);
+    // Determine which user_id to use
+    let userIdToUse = currentUserId;
+    
+    // If this is journey execution and randomization is enabled, generate new GUID
+    if (isJourneyExecution && document.getElementById('randomizeUserId') && document.getElementById('randomizeUserId').checked) {
+      // Generate new GUID for this specific event
+      userIdToUse = generateRandomGuid();
+    }
+    
+    // Replace user_id placeholders (multiple formats) - only exact matches
+    if (userIdToUse) {
+      // Only replace exact placeholder matches, not normal string values
+      processedCode = processedCode.replace(/\{\{user_id\}\}/g, userIdToUse);
+      processedCode = processedCode.replace(/{{user_id}}/g, userIdToUse);
     }
     
     return processedCode;
+  }
+  
+  // Generate a new random GUID (separate from currentUserId)
+  function generateRandomGuid() {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+      const r = Math.random() * 16 | 0;
+      const v = c === 'x' ? r : (r & 0x3 | 0x8);
+      return v.toString(16);
+    });
   }
 
   // Parse dataLayer.push calls from code and extract payloads
@@ -2102,7 +2134,7 @@
     
     // Execute the event
     try {
-      const processedCode = replacePlaceholders(event.code);
+      const processedCode = replacePlaceholders(event.code, true); // true = isJourneyExecution
       new Function(processedCode)();
       
       if (consoleLoggingEnabled) {
@@ -2770,6 +2802,8 @@
     copyDLBtn.textContent = 'Copy in local file format';
     copyDLBtn.className = 'btn-sm';
 
+
+
     // If this preset has local-only changes, visually mark the copy button
     // and add a subtle warning label to the header.  The warning
     // indicates that the current event differs from the loaded source
@@ -2891,6 +2925,8 @@
         log('📋 Copied in local file format');
       });
     };
+
+
 
     // Trim trailing spaces and extraneous punctuation when requested
     trimBtn.onclick = () => {
@@ -3344,6 +3380,8 @@
   });
 }
 
+
+
   /*
    * Create a URL‑friendly slug from a string.  Lowercases and
    * replaces non‑alphanumeric characters with underscores.  Used to
@@ -3444,6 +3482,12 @@
       document.getElementById('journeyDelay').value = savedDelay;
     }
     
+    // Initialize randomize user_id checkbox
+    const randomizeUserId = localStorage.getItem('gtm_randomize_user_id') === 'true';
+    if (document.getElementById('randomizeUserId')) {
+      document.getElementById('randomizeUserId').checked = randomizeUserId;
+    }
+    
     // Initialize journey section collapsed state
     const journeyCollapsed = localStorage.getItem('gtm_journey_collapsed') === 'true';
     if (journeyCollapsed) {
@@ -3487,6 +3531,14 @@
     if (journeyDelayInput) {
       journeyDelayInput.addEventListener('change', (e) => {
         localStorage.setItem('gtm_journey_delay', e.target.value);
+      });
+    }
+    
+    // Save randomize user_id checkbox changes
+    const randomizeUserIdCheckbox = document.getElementById('randomizeUserId');
+    if (randomizeUserIdCheckbox) {
+      randomizeUserIdCheckbox.addEventListener('change', (e) => {
+        localStorage.setItem('gtm_randomize_user_id', e.target.checked.toString());
       });
     }
     
@@ -3629,6 +3681,8 @@
     copyDLBtn.className = 'btn-sm';
     copyDLBtn.textContent = 'Copy in local file format';
 
+
+
     const trimBtn = document.createElement('button');
     trimBtn.className = 'btn-sm';
     trimBtn.textContent = 'Trim spaces';
@@ -3756,6 +3810,8 @@ object_name: {
       const block = `// ===== START playground =====  \n{\n  name: "playground",\n  code: \`${replacePlaceholders(code)}\`\n},\n// ===== END playground =====`;
       navigator.clipboard.writeText(block).then(() => log('📋 Copied as local file event block'));
     };
+
+
     saveBtn.onclick = () => {
       // Append new event to local changes storage
       const code = editorInstance ? editorInstance.getValue() : initialCode || '';
