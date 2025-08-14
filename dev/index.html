@@ -639,21 +639,59 @@
 
     /* Documentation Section Styling */
     .documentation-section {
-      margin-top: 20px;
-      padding: 20px;
+      margin-top: 15px;
+      padding: 10px;
       background: #f8f9fa;
       border: 1px solid #dee2e6;
       border-radius: 8px;
-      border-left: 4px solid #007bff;
+      border-left: 2px solid #007bff;
+      transition: all 0.3s ease;
     }
     
-    .documentation-section h3 {
-      margin: 0 0 20px 0;
-      color: #495057;
-      font-size: 20px;
-      font-weight: 600;
-      border-bottom: 2px solid #dee2e6;
-      padding-bottom: 10px;
+    .documentation-section.collapsed {
+      padding: 10px;
+    }
+    
+    .documentation-section.collapsed .doc-section {
+      display: none;
+    }
+    
+         .doc-header {
+       display: flex;
+       justify-content: flex-start;
+       align-items: center;
+       margin-bottom: 10px;
+       border-bottom: 1px solid #e9ecef;
+       padding-bottom: 0px;
+       gap: 15px;
+     }
+    
+    .doc-header h3 {
+      margin: 0;
+      color: #6c757d;
+      font-size: 16px;
+      font-weight: 500;
+    }
+    
+    .doc-toggle {
+      background: none;
+      border: none;
+      color: #007bff;
+      cursor: pointer;
+      padding: 8px;
+      border-radius: 4px;
+      transition: all 0.2s ease;
+      font-size: 16px;
+    }
+    
+    .doc-toggle:hover {
+      background-color: #e3f2fd;
+      color: #0056b3;
+    }
+    
+    .toggle-icon {
+      font-weight: bold;
+      transition: transform 0.2s ease;
     }
     
     .doc-section {
@@ -1153,7 +1191,7 @@
     <div class="section-header">
       <div class="section-title">
         <button class="section-toggle-btn" onclick="toggleSettingsSection()">▼</button>
-        ⚙️ Settings
+        ⚙️ Settings & Documentation
       </div>
     </div>
     
@@ -1199,70 +1237,53 @@
         </div>
       </div>
 
-      <!-- Documentation & Instructions Section -->
-      <div class="documentation-section">
-        <h3>📚 Documentation & Instructions</h3>
+                       <!-- Documentation & Instructions Section -->
+        <div class="documentation-section">
+          <div class="doc-header">
+            <button type="button" class="doc-toggle" onclick="toggleDocumentation()">
+              <span class="toggle-icon">▼</span>
+            </button>
+            <h3>📚 Documentation & Instructions</h3>
+          </div>
         
         <div class="doc-section">
           <h4>🎯 Tool Purpose</h4>
-          <p>The GTM & dataLayer Playground is a comprehensive testing environment for Google Tag Manager implementations. It allows you to create, test, and debug dataLayer events before deploying them to production websites.</p>
+          <p>The GTM & dataLayer Playground is a light testing environment for Google Tag Manager and dataLayer implementations. It allows you to create, test, and debug dataLayer events before deploying them to production websites.</p>
         </div>
 
-        <div class="doc-section">
-          <h4>📖 Step-by-Step Usage Guide</h4>
-          <ol>
-            <li><strong>Setup:</strong> Enter your GTM Container ID and click "Load GTM Container" to inject GTM into the page</li>
-            <li><strong>Create Events:</strong> Use the Playgrounds section to build and test new dataLayer events</li>
-            <li><strong>Test Events:</strong> Click "Push" to execute events and see them in the console</li>
-            <li><strong>Build Journeys:</strong> Queue multiple events to test user flows and conversion paths</li>
-            <li><strong>Save & Export:</strong> Save your events locally or export them in the format needed for your GTM implementation</li>
-          </ol>
-        </div>
+                 <div class="doc-section">
+           <h4>📖 Step-by-Step Usage Guide</h4>
+           <ol>
+             <li><strong>Load GTM:</strong> Enter your GTM Container ID and click "Load GTM Container" to inject GTM into the page</li>
+             <li><strong>See Examples:</strong> Pre-built example events are loaded from GitHub and shown in the "Loaded Events" section</li>
+             <li><strong>Create Events:</strong> Use the Playgrounds section to build and test new dataLayer events - you can start by adding a flat event, or an object or an object with an array event.</li>
+             <li><strong>Validate syntax:</strong> The editor will highlights syntax errors and white-space issues</li>
+             <li><strong>Push Events:</strong> Click "Push" to execute events and see them in the console</li>
+             <li><strong>Add to Loaded Events:</strong> Add PLayground events to the "Loaded Events" section for persistance and easier reuse</li>
+             <li><strong>Export Loaded events:</strong> Export your Events to be used in a local file in the format used by the this tool</li>
+           </ol>
+         </div>
 
-        <div class="doc-section">
-          <h4>🔍 Recommended Browser Extensions</h4>
-          <p>To visualize and debug your events effectively, we recommend these browser extensions:</p>
-          <ul>
-            <li><strong><a href="https://chromewebstore.google.com/detail/analytics-debugger/ilnpmccnfdjdjjikgkefkcegefikecdc" target="_blank" rel="noopener noreferrer">Analytics Debugger</a></strong> - Your Single Source of Truth (SSOT) for debugging analytics implementations. Formerly known as "GTM/GA Debugger," this powerful tool supports Google Tag Manager, Google Analytics, Tealium, Piwik Pro/Matomo, Adobe tools, and most commonly used Marketing Pixels.</li>
-            <li><strong>Google Tag Assistant Legacy</strong> - Official Google extension for debugging GTM implementations</li>
-            <li><strong>dataLayer Inspector+</strong> - Visualize and inspect dataLayer objects in real-time</li>
-          </ul>
-          <p><em>💡 These extensions help you verify that events are properly pushed and trigger the expected tracking events.</em></p>
-        </div>
+         <div class="doc-section">
+           <h4>🚀 Journey Builder</h4>
+           <p>The Journey Builder allows you to queue multiple events to test user flows and conversion paths. This is useful for testing complex user journeys before implementing them in production.</p>
+           <ol>
+             <li><strong>Queue Events:</strong> Add multiple events to the journey queue</li>
+             <li><strong>Execute Journey:</strong> Run the entire sequence to simulate user behavior</li>
+             <li><strong>Debug Flow:</strong> Monitor how events trigger and interact with each other</li>
+           </ol>
+         </div>
 
-        <div class="doc-section">
-          <h4>📝 Event Format Examples</h4>
-          <div class="example-grid">
-            <div class="example-item">
-              <h5>Basic Event</h5>
-              <pre><code>dataLayer.push({
-  event: "page_view",
-  page_title: "Homepage",
-  page_location: "https://example.com"
-});</code></pre>
-            </div>
-            <div class="example-item">
-              <h5>Ecommerce Event</h5>
-              <pre><code>dataLayer.push({
-  event: "purchase",
-  ecommerce: {
-    transaction_id: "T_12345",
-    value: 29.99,
-    currency: "USD"
-  }
-});</code></pre>
-            </div>
-            <div class="example-item">
-              <h5>Custom Event with User ID</h5>
-              <pre><code>dataLayer.push({
-  event: "user_action",
-  user_id: "{{user_id}}",
-  action_type: "button_click",
-  button_name: "cta_button"
-});</code></pre>
-            </div>
-          </div>
-        </div>
+                 <div class="doc-section">
+           <h4>🔍 Recommended Browser Extensions</h4>
+           <p>To visualize and debug your events effectively, we recommend this browser extension:</p>
+           <ul>
+             <li><strong><a href="https://chromewebstore.google.com/detail/analytics-debugger/ilnpmccnfdjdjjikgkefkcegefikecdc" target="_blank" rel="noopener noreferrer">Analytics Debugger</a></strong> - Your Single Source of Truth (SSOT) for debugging analytics implementations. Formerly known as "GTM/GA Debugger," this powerful tool supports Google Tag Manager, Google Analytics, Tealium, Piwik Pro/Matomo, Adobe tools, and most commonly used Marketing Pixels.</li>
+           </ul>
+           <p><em>💡 This extension helps you verify that events are properly pushed and trigger the expected tracking events.</em></p>
+         </div>
+
+
 
         <div class="doc-section">
           <h4>🔄 Version Information</h4>
@@ -1373,7 +1394,7 @@
     </div>
   </div>
 
-  <script src="datalayer.js"></script>
+  <script src="../datalayer.js"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
 
@@ -3863,6 +3884,35 @@ object_name: {
       if (btn) btn.textContent = '▶';
     });
   }
+  
+  // Documentation section toggle functionality
+  function toggleDocumentation() {
+    const docSection = document.querySelector('.documentation-section');
+    const toggleIcon = document.querySelector('.toggle-icon');
+    const isCollapsed = docSection.classList.contains('collapsed');
+    
+    if (isCollapsed) {
+      docSection.classList.remove('collapsed');
+      toggleIcon.textContent = '▼';
+      localStorage.setItem('docSectionCollapsed', 'false');
+    } else {
+      docSection.classList.add('collapsed');
+      toggleIcon.textContent = '▶';
+      localStorage.setItem('docSectionCollapsed', 'true');
+    }
+  }
+  
+  // Initialize documentation section state on page load
+  document.addEventListener('DOMContentLoaded', function() {
+    const docSection = document.querySelector('.documentation-section');
+    const toggleIcon = document.querySelector('.toggle-icon');
+    const isCollapsed = localStorage.getItem('docSectionCollapsed') === 'true';
+    
+    if (isCollapsed) {
+      docSection.classList.add('collapsed');
+      toggleIcon.textContent = '▶';
+    }
+  });
 </script>
 <footer style="font-size:12px; text-align:center; margin-top:20px; color:#666;">
   © 2025 Rune Andersen — Free to use, but not to copy or redistribute. See LICENSE.

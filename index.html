@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-              <title>GTM & dataLayer Playground - Version 5.1.0 (Fixed Collapse/Expand Functionality & Temporarily Disabled Drag & Drop & Unified Button Styling with Consistent Grey Color & Enhanced Console Logging)</title>
+  <title>GTM & dataLayer Playground</title>
   <!-- Application version metadata.  Update these values when you commit new versions.
        app-version holds a simple version string, e.g. 1.2.3, and app-changelog holds
        a short description of what changed. -->
@@ -3669,6 +3669,7 @@ object_name: {
     const lastId = localStorage.getItem('gtm_id');
     if (lastId) document.getElementById('gtmId').value = lastId;
     loadPresets();
+    displayJourneyPresets(); // Initialize journey presets display
   });
 
   function expandAllPlaygrounds() {
