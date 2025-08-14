@@ -2,12 +2,12 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-              <title>GTM & dataLayer Playground - Version 5.1.0 (Fixed Collapse/Expand Functionality & Temporarily Disabled Drag & Drop & Unified Button Styling with Consistent Grey Color & Enhanced Console Logging)</title>
+              <title>GTM & dataLayer Playground</title>
   <!-- Application version metadata.  Update these values when you commit new versions.
        app-version holds a simple version string, e.g. 1.2.3, and app-changelog holds
        a short description of what changed. -->
       <meta name="app-version" content="5.1.0">
-          <meta name="app-changelog" content="Fixed Collapse/Expand Functionality & Temporarily Disabled Drag & Drop & Unified Button Styling with Consistent Grey Color & Enhanced Console Logging">
+          <meta name="app-changelog" content="Fixed Collapse/Expand Functionality & Unified Button Styling with Consistent Grey Color & Enhanced Console Logging">
   <style>
     /*
      * Base layout styling.  A subtle background colour and modern
@@ -77,7 +77,7 @@
     }
 
     .btn-secondary {
-      background-color: #e2e6ea; /* Same grey as "Add to Journey" button */
+      background-color: #e2e6ea;
       color: #333;
     }
 
@@ -137,7 +137,7 @@
 
     /* Settings section specific button styling */
     .settings-section .btn-primary {
-      background-color: #e2e6ea; /* Grey by default - same as "Add to Journey" button */
+      background-color: #e2e6ea;
       color: #333;
     }
 
@@ -147,7 +147,7 @@
 
     /* Journey Builder section specific button styling */
     .journey-section .btn-primary {
-      background-color: #e2e6ea; /* Grey by default - same as "Add to Journey" button */
+      background-color: #e2e6ea;
       color: #333;
     }
 
@@ -157,7 +157,7 @@
 
     /* Playground section specific button styling */
     .playground-section .btn-primary {
-      background-color: #e2e6ea; /* Grey by default - same as "Add to Journey" button */
+      background-color: #e2e6ea;
       color: #333;
     }
 
@@ -176,7 +176,7 @@
 
     /* Loaded Events section specific button styling */
     .events-section .btn-primary {
-      background-color: #e2e6ea; /* Grey by default - same as "Add to Journey" button */
+      background-color: #e2e6ea;
       color: #333;
     }
 
@@ -195,7 +195,7 @@
 
     /* Go to event buttons - blue foreground to indicate they are links */
     .go-to-event-btn {
-      background-color: #e2e6ea; /* Same grey as "Add to Journey" button */
+      background-color: #e2e6ea;
       color: #007bff !important; /* Blue text to show they are links */
     }
 
@@ -205,7 +205,7 @@
 
     /* Add link button - grey */
     .add-link-btn {
-      background-color: #e2e6ea; /* Same grey as "Add to Journey" button */
+      background-color: #e2e6ea;
       color: #333;
     }
 
@@ -1036,7 +1036,7 @@
        the meta tag values defined in the document head (see meta[name="app-version"]).
        When deploying a new version, update the meta tags accordingly. -->
   <div class="version-label" id="versionLabel">Version: —</div>
-  <h1>GTM Playground</h1>
+  <h1>GTM & dataLayer Playground</h1>
 
   <!-- Console output at top -->
   <div class="log" id="logOutput">Console output will appear here…</div>
@@ -1055,7 +1055,7 @@
       <div class="gtm-row">
         <div class="gtm-id-group">
           <input type="text" id="gtmId" placeholder="GTM-XXXXXXX" title="Enter your GTM Container ID" />
-          <button id="gtmButton" onclick="loadGTM()">Inject GTM</button>
+          <button id="gtmButton" onclick="loadGTM()">Load GTM Container</button>
         </div>
         <div class="local-file-group">
           <input type="file" id="localFileInput" accept=".js" />
@@ -1084,22 +1084,22 @@
       <div class="user-id-section">
         <div class="user-id-row">
           <span>Current user_id:</span>
+          <button onclick="generateNewUserId()">🔁New User ID</button>
           <span class="user-id-display" id="currentUserId">Generating...</span>
-          <button onclick="generateNewUserId()">🔁 New GUID</button>
         </div>
         <div class="user-id-help">
-          <small>💡 Use <code>{{user_id}}</code> in your events to automatically include this ID. Example: <code>dataLayer.push({event: 'purchase', user_id: '{{user_id}}'})</code></small>
+          <small>💡 Use <code>{{user_id}}</code> in your events to automatically include this ID. Example: <code>dataLayer.push({event: 'data', user_id: '{{user_id}}'})</code></small>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- 2. JOURNEY BUILDER SECTION (Renamed from Journey Queue) -->
+  <!-- 2. JOURNEY BUILDER SECTION -->
   <div class="section journey-section">
     <div class="section-header">
       <div class="section-title">
         <button class="section-toggle-btn" onclick="toggleJourneySection()">▼</button>
-        🚀 Journey Builder
+        Journey Builder
       </div>
       <div class="journey-controls">
         <button class="btn-success btn-sm" onclick="runJourney()" id="runJourneyBtn">▶️ Run Journey</button>
@@ -1109,14 +1109,13 @@
           <label for="journeyDelay">Delay (ms):</label>
           <input type="number" id="journeyDelay" value="1000" min="0" max="10000" step="100" />
         </div>
-        <button class="btn-sm" onclick="saveJourneyPreset()">💾 Save Preset</button>
-        <button class="btn-sm" onclick="loadJourneyPreset()">📁 Load Preset</button>
+        <button class="btn-sm" onclick="saveJourneyPreset()">💾 Save Journey</button>
       </div>
     </div>
     
     <div class="section-content" id="journeyContent">
       <div class="journey-queue" id="journeyQueue">
-        <div class="journey-queue empty">Drop events here to build your journey...</div>
+        <div class="journey-queue empty">Add events from Playground and Loaded Events to build your journey...</div>
       </div>
       
       <!-- Journey Status and Progress -->
@@ -1131,8 +1130,8 @@
       <!-- Preset display area -->
       <div class="journey-presets" id="journeyPresets">
         <div class="presets-header">
-          <h4>💾 Saved Journey Presets</h4>
-          <span class="presets-count" id="presetsCount">No presets saved</span>
+          <h4>💾 Saved Journey</h4>
+          <span class="presets-count" id="presetsCount">No journey saved</span>
         </div>
         <div class="presets-list" id="presetsList">
           <!-- Presets will be displayed here -->
@@ -1143,7 +1142,7 @@
 
 
 
-  <!-- 3b. MULTI PLAYGROUNDS SECTION (New) -->
+  <!-- 3. MULTI PLAYGROUNDS SECTION -->
   <div class="section playground-section" id="playgroundsSection">
     <div class="section-header">
       <div class="section-title">
@@ -1182,8 +1181,8 @@
       <div class="section-actions">
         <button class="btn-sm" onclick="expandAllEvents()">Expand All</button>
         <button class="btn-sm" onclick="collapseAllEvents()">Collapse All</button>
-        <button class="btn-sm" onclick="savePresets()" title="Save changes so they persist on reload">💾 Save Changes (localStorage)</button>
-        <button class="btn-sm" onclick="copyAllAsDataLayer()" title="Copy all events in the format used by local files. Remember to update the file manuel">📋 Copy All (local file format)</button>
+        <button class="btn-sm" onclick="savePresets()" title="Save changes so they persist on reload">💾 Save Changes to localStorage</button>
+        <button class="btn-sm" onclick="copyAllAsDataLayer()" title="Copy all events in the local file format and then update the file manually">📋 Copy All in local file format</button>
       </div>
     </div>
     <div class="section-content" id="eventsContent">
@@ -1191,7 +1190,6 @@
       <div class="event-nav-title" style="margin-top:0;">Go to event:</div>
       <div id="eventNav" class="event-nav"></div>
       <hr>
-      <p id="loadedEventsSubLabel" class="sub-label">(editable in loaded file)</p>
       <div id="presetsArea"></div>
     </div>
   </div>
