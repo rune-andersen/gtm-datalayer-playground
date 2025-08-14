@@ -2,6 +2,12 @@
 
 A lightweight, browser-based tool to test Google Tag Manager (GTM) containers and dataLayer events in real-time.
 
+## Version 5.2.0 Features
+
+- **Streamlined Documentation**: Removed Event Format Examples section for cleaner, more focused documentation.
+- **Improved Header Hierarchy**: Enhanced visual hierarchy by making the Documentation & Instructions header smaller and less dominant than the Settings header.
+- **Refined UI Styling**: Adjusted Documentation section header styling for better visual balance and improved user experience.
+
 ## Version 5.1.0 Features
 
 - **Enhanced Console Logging Options**: Added configurable console logging controls for actions, dataLayer.push operations, and debug information.
