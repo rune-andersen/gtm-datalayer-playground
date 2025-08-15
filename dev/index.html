@@ -1541,7 +1541,7 @@
     if (userIdElement) {
       userIdElement.textContent = currentUserId;
     }
-    localStorage.setItem('gtm_user_id', currentUserId);
+            localStorage.setItem('user_id', currentUserId);
     log('🆔 New User ID generated: ' + currentUserId);
   }
 
@@ -1599,7 +1599,7 @@
       if (section) {
         const toggleBtn = section.querySelector('.section-toggle-btn');
         if (toggleBtn) {
-          utils.toggleSection('journeyContent', 'gtm_journey_collapsed', toggleBtn);
+          utils.toggleSection('journeyContent', 'ui_journey_collapsed', toggleBtn);
         }
       }
     }
@@ -1614,7 +1614,7 @@
       if (section) {
         const toggleBtn = section.querySelector('.section-toggle-btn');
         if (toggleBtn) {
-          utils.toggleSection('settingsContent', 'gtm_settings_collapsed', toggleBtn);
+          utils.toggleSection('settingsContent', 'ui_settings_collapsed', toggleBtn);
         }
       }
     }
@@ -1787,8 +1787,8 @@
     basePresets = loadedEvents.slice();
     
     // Save both storage areas
-    localStorage.setItem('events_loaded_js', JSON.stringify(loadedEvents));
-    localStorage.setItem('events_changes_js', JSON.stringify(localChanges));
+    localStorage.setItem('events_loaded', JSON.stringify(loadedEvents));
+    localStorage.setItem('events_changes', JSON.stringify(localChanges));
     
     renderNavigation();
     updateLoadedEventsHeader();
@@ -1815,7 +1815,7 @@
       }
       
       // Save the updated local changes
-      localStorage.setItem('events_changes_js', JSON.stringify(localChanges));
+      localStorage.setItem('events_changes', JSON.stringify(localChanges));
       
       // Get the Ace editor instance and update it
       const editorId = wrapper.querySelector('.ace-editor-container').id;
@@ -2111,8 +2111,8 @@
     localChanges = newLocalChanges;
     
     // Save to localStorage
-    localStorage.setItem('events_loaded_js', JSON.stringify(loadedEvents));
-    localStorage.setItem('events_changes_js', JSON.stringify(localChanges));
+    localStorage.setItem('events_loaded', JSON.stringify(loadedEvents));
+    localStorage.setItem('events_changes', JSON.stringify(localChanges));
   }
   
 
@@ -2338,9 +2338,9 @@
       timestamp: Date.now()
     };
     
-    let presets = JSON.parse(localStorage.getItem('journey_presets') || '[]');
+    let presets = JSON.parse(localStorage.getItem('journey_saved') || '[]');
     presets.push(preset);
-    localStorage.setItem('journey_presets', JSON.stringify(presets));
+    localStorage.setItem('journey_saved', JSON.stringify(presets));
     
     log(`💾 Saved journey preset: ${presetName}`);
     displayJourneyPresets(); // Refresh the display
@@ -2350,7 +2350,7 @@
   function loadJourneyPreset() {
     // This function is now handled by clicking on preset names or load buttons
     // Keeping it for backward compatibility but it's no longer the primary way to load
-    const presets = JSON.parse(localStorage.getItem('journey_presets') || '[]');
+    const presets = JSON.parse(localStorage.getItem('journey_saved') || '[]');
     
     if (presets.length === 0) {
       alert('No saved journey presets found');
@@ -2381,7 +2381,7 @@
     
     if (!presetsList || !presetsCount) return;
     
-    const presets = JSON.parse(localStorage.getItem('journey_presets') || '[]');
+    const presets = JSON.parse(localStorage.getItem('journey_saved') || '[]');
     
     if (presets.length === 0) {
       presetsCount.textContent = 'No presets saved';
@@ -2437,7 +2437,7 @@
   
   /** @param {string} presetName @returns {void} */
   function loadPresetByName(presetName) {
-    const presets = JSON.parse(localStorage.getItem('journey_presets') || '[]');
+    const presets = JSON.parse(localStorage.getItem('journey_saved') || '[]');
     const preset = presets.find(p => p.name === presetName);
     
     if (preset) {
@@ -2454,9 +2454,9 @@
   /** @param {string} presetName @returns {void} */
   function deletePresetByName(presetName) {
     if (confirm(`Are you sure you want to delete the preset "${presetName}"?`)) {
-      let presets = JSON.parse(localStorage.getItem('journey_presets') || '[]');
+      let presets = JSON.parse(localStorage.getItem('journey_saved') || '[]');
       presets = presets.filter(p => p.name !== presetName);
-      localStorage.setItem('journey_presets', JSON.stringify(presets));
+      localStorage.setItem('journey_saved', JSON.stringify(presets));
       
       log(`🗑️ Deleted journey preset: ${presetName}`);
       displayJourneyPresets(); // Refresh the display
@@ -2471,7 +2471,7 @@
       return;
     }
     // Persist the ID so it is reused on subsequent page loads
-    localStorage.setItem('gtm_id', id);
+    localStorage.setItem('gtm_container_id', id);
     injectGTM(id);
   }
 
@@ -2515,7 +2515,7 @@
   // stored GTM ID and reset the button state.
   /** @returns {void} */
   function clearGTM() {
-    localStorage.removeItem('gtm_id');
+    localStorage.removeItem('gtm_container_id');
     if (gtmScriptTag) {
       gtmScriptTag.remove();
       gtmScriptTag = null;
@@ -2594,8 +2594,8 @@
   /** @returns {void} */
   function loadPresets() {
     // Load original events from source
-    const savedLoaded = localStorage.getItem('events_loaded_js');
-    const savedChanges = localStorage.getItem('events_changes_js');
+    const savedLoaded = localStorage.getItem('events_loaded');
+    const savedChanges = localStorage.getItem('events_changes');
     
     if (savedLoaded) {
       loadedEvents = JSON.parse(savedLoaded);
@@ -2661,8 +2661,8 @@
     const { newLoadedEvents, newLocalChanges } = separateEvents(currentPresets, loadedEvents);
     
     // Save both to localStorage
-    localStorage.setItem('events_loaded_js', JSON.stringify(newLoadedEvents));
-    localStorage.setItem('events_changes_js', JSON.stringify(newLocalChanges));
+    localStorage.setItem('events_loaded', JSON.stringify(newLoadedEvents));
+    localStorage.setItem('events_changes', JSON.stringify(newLocalChanges));
     
     // Update global variables
     loadedEvents = newLoadedEvents;
@@ -2740,7 +2740,7 @@
     }
     
     // Save to localStorage
-    localStorage.setItem('events_changes_js', JSON.stringify(localChanges));
+    localStorage.setItem('events_changes', JSON.stringify(localChanges));
     
     // Immediately update the UI to show/hide reset button and update warning
     const wrapper = document.querySelector(`.preset-wrapper[data-name="${eventName}"]`);
@@ -3374,8 +3374,8 @@
   /** @returns {void} */
   function resetPresets() {
     // Clear both split storage areas
-    localStorage.removeItem('events_loaded_js');
-    localStorage.removeItem('events_changes_js');
+    localStorage.removeItem('events_loaded');
+    localStorage.removeItem('events_changes');
     log('♻️ LocalStorage cleared. Reloading examples from GitHub…');
     // Clear any reference to a previously loaded local file
     currentLocalFile = null;
@@ -3463,9 +3463,9 @@
             };
           });
           // Save to loaded events storage (this becomes the new base)
-          localStorage.setItem('events_loaded_js', JSON.stringify(processed));
+          localStorage.setItem('events_loaded', JSON.stringify(processed));
           // Clear local changes since we're loading a new source
-          localStorage.setItem('events_changes_js', JSON.stringify([]));
+          localStorage.setItem('events_changes', JSON.stringify([]));
           // Update base presets to reflect the contents of the loaded local file
           basePresets = processed.slice();
           // Update global variables
@@ -3488,8 +3488,8 @@
           }
           loadPresets();
           // Persist that a local file is in use and store its name for display
-          localStorage.setItem('presets_source', 'local');
-          localStorage.setItem('presets_filename', file.name);
+                localStorage.setItem('events_source', 'local');
+      localStorage.setItem('events_filename', file.name);
           // Update the header to reflect that presets are from a local file
           updateLoadedEventsHeader();
         } else {
@@ -3574,7 +3574,7 @@
 
 
   window.addEventListener('load', () => {
-    const lastId = localStorage.getItem('gtm_id');
+    const lastId = localStorage.getItem('gtm_container_id');
     if (lastId) {
       document.getElementById('gtmId').value = lastId;
       // Automatically inject the stored GTM container on page load
@@ -3587,37 +3587,37 @@
     const debugToggle = document.getElementById('debugLogToggle');
     
     if (actionsToggle) {
-      actionsLoggingEnabled = localStorage.getItem('gtm_actions_logging') === 'true';
+      actionsLoggingEnabled = localStorage.getItem('logging_actions') === 'true';
       actionsToggle.checked = actionsLoggingEnabled;
       actionsToggle.addEventListener('change', (e) => {
         actionsLoggingEnabled = e.target.checked;
-        localStorage.setItem('gtm_actions_logging', actionsLoggingEnabled);
+        localStorage.setItem('logging_actions', actionsLoggingEnabled);
         log(actionsLoggingEnabled ? '📝 Actions logging enabled' : '🔇 Actions logging disabled');
       });
     }
     
     if (consoleToggle) {
-      consoleLoggingEnabled = localStorage.getItem('gtm_console_logging') === 'true';
+      consoleLoggingEnabled = localStorage.getItem('logging_console') === 'true';
       consoleToggle.checked = consoleLoggingEnabled;
       consoleToggle.addEventListener('change', (e) => {
         consoleLoggingEnabled = e.target.checked;
-        localStorage.setItem('gtm_console_logging', consoleLoggingEnabled);
+        localStorage.setItem('logging_console', consoleLoggingEnabled);
         log(consoleLoggingEnabled ? '📝 Console logging enabled' : '🔇 Console logging disabled');
       });
     }
     
     if (debugToggle) {
-      debugLoggingEnabled = localStorage.getItem('gtm_debug_logging') === 'true';
+      debugLoggingEnabled = localStorage.getItem('logging_debug') === 'true';
       debugToggle.checked = debugLoggingEnabled;
       debugToggle.addEventListener('change', (e) => {
         debugLoggingEnabled = e.target.checked;
-        localStorage.setItem('gtm_debug_logging', debugLoggingEnabled);
+        localStorage.setItem('logging_debug', debugLoggingEnabled);
         log(debugLoggingEnabled ? '📝 Debug logging enabled' : '🔇 Debug logging disabled');
       });
     }
     
     // Initialize random user ID
-    const savedUserId = localStorage.getItem('gtm_user_id');
+    const savedUserId = localStorage.getItem('user_id');
     if (savedUserId) {
       currentUserId = savedUserId;
       document.getElementById('currentUserId').textContent = currentUserId;
@@ -3626,19 +3626,19 @@
     }
     
     // Initialize journey delay
-    const savedDelay = localStorage.getItem('gtm_journey_delay');
+    const savedDelay = localStorage.getItem('journey_delay');
     if (savedDelay) {
       document.getElementById('journeyDelay').value = savedDelay;
     }
     
     // Initialize randomize user_id checkbox
-    const randomizeUserId = localStorage.getItem('gtm_randomize_user_id') === 'true';
+    const randomizeUserId = localStorage.getItem('journey_randomize_user') === 'true';
     if (document.getElementById('randomizeUserId')) {
       document.getElementById('randomizeUserId').checked = randomizeUserId;
     }
     
     // Initialize journey section collapsed state
-    const journeyCollapsed = localStorage.getItem('gtm_journey_collapsed') === 'true';
+    const journeyCollapsed = localStorage.getItem('ui_journey_collapsed') === 'true';
     if (journeyCollapsed) {
       const content = document.getElementById('journeyContent');
       const toggleBtn = document.querySelector('.section-toggle-btn');
@@ -3650,7 +3650,7 @@
     }
 
     // Initialize settings section collapsed state
-    const settingsCollapsed = localStorage.getItem('gtm_settings_collapsed') === 'true';
+    const settingsCollapsed = localStorage.getItem('ui_settings_collapsed') === 'true';
     if (settingsCollapsed) {
       const content = document.getElementById('settingsContent');
       const toggleBtn = document.querySelector('.section-toggle-btn');
@@ -3679,7 +3679,7 @@
     const journeyDelayInput = document.getElementById('journeyDelay');
     if (journeyDelayInput) {
       journeyDelayInput.addEventListener('change', (e) => {
-        localStorage.setItem('gtm_journey_delay', e.target.value);
+        localStorage.setItem('journey_delay', e.target.value);
       });
     }
     
@@ -3687,13 +3687,13 @@
     const randomizeUserIdCheckbox = document.getElementById('randomizeUserId');
     if (randomizeUserIdCheckbox) {
       randomizeUserIdCheckbox.addEventListener('change', (e) => {
-        localStorage.setItem('gtm_randomize_user_id', e.target.checked.toString());
+        localStorage.setItem('journey_randomize_user', e.target.checked.toString());
       });
     }
     
     // Initialize split storage variables
-    const savedLoaded = localStorage.getItem('events_loaded_js');
-    const savedChanges = localStorage.getItem('events_changes_js');
+    const savedLoaded = localStorage.getItem('events_loaded');
+    const savedChanges = localStorage.getItem('events_changes');
     
     if (savedLoaded) {
       loadedEvents = JSON.parse(savedLoaded);
@@ -3721,11 +3721,11 @@
   /** @returns {void} */
   function toggleEventsSection() {
     const toggleBtn = document.querySelector('#eventsContent').closest('.section').querySelector('.section-toggle-btn');
-    utils.toggleSection('eventsContent', 'gtm_events_collapsed', toggleBtn);
+    utils.toggleSection('eventsContent', 'ui_events_collapsed', toggleBtn);
   }
 
   // Initialize events section collapsed state
-  const eventsCollapsed = localStorage.getItem('gtm_events_collapsed') === 'true';
+      const eventsCollapsed = localStorage.getItem('ui_events_collapsed') === 'true';
   if (eventsCollapsed) {
     const content = document.getElementById('eventsContent');
     const toggleBtn = document.querySelector('.section-toggle-btn');
@@ -3757,7 +3757,7 @@
   /** @returns {void} */
   function togglePlaygroundsSection() {
     const toggleBtn = document.querySelector('#playgroundsSection .section-toggle-btn');
-    utils.toggleSection('playgroundsContent', 'gtm_playgrounds_collapsed', toggleBtn);
+    utils.toggleSection('playgroundsContent', 'ui_playgrounds_collapsed', toggleBtn);
   }
 
   /** @param {string} exampleType @param {string} initialCode @param {string} initialComment @returns {void} */
@@ -3993,8 +3993,8 @@ object_name: {
       localChanges.push(newEvent);
       
       // Save both to localStorage
-      localStorage.setItem('events_loaded_js', JSON.stringify(loadedEvents));
-      localStorage.setItem('events_changes_js', JSON.stringify(localChanges));
+      localStorage.setItem('events_loaded', JSON.stringify(loadedEvents));
+      localStorage.setItem('events_changes', JSON.stringify(localChanges));
       
       log(`💾 Playground saved as '${eventName}' in Loaded Events`);
       loadPresets();
@@ -4061,7 +4061,7 @@ object_name: {
 
   // Initialize Playgrounds collapsed state
   (function initPlaygroundsCollapsed(){
-    const collapsed = localStorage.getItem('gtm_playgrounds_collapsed') === 'true';
+    const collapsed = localStorage.getItem('ui_playgrounds_collapsed') === 'true';
     if (collapsed) {
       const content = document.getElementById('playgroundsContent');
       const toggleBtn = document.querySelector('#playgroundsSection .section-toggle-btn');
@@ -4075,7 +4075,7 @@ object_name: {
 
   // Initialize the application when the page loads
   window.addEventListener('load', () => {
-    const lastId = localStorage.getItem('gtm_id');
+    const lastId = localStorage.getItem('gtm_container_id');
     if (lastId) document.getElementById('gtmId').value = lastId;
     loadPresets();
   });
@@ -4108,11 +4108,11 @@ object_name: {
     if (isCollapsed) {
       docSection.classList.remove('collapsed');
       toggleIcon.textContent = '▼';
-      localStorage.setItem('docSectionCollapsed', 'false');
+      localStorage.setItem('ui_documentation_collapsed', 'false');
     } else {
       docSection.classList.add('collapsed');
       toggleIcon.textContent = '▶';
-      localStorage.setItem('docSectionCollapsed', 'true');
+      localStorage.setItem('ui_documentation_collapsed', 'true');
     }
   }
   
@@ -4120,7 +4120,7 @@ object_name: {
   document.addEventListener('DOMContentLoaded', function() {
     const docSection = document.querySelector('.documentation-section');
     const toggleIcon = document.querySelector('.toggle-icon');
-    const isCollapsed = localStorage.getItem('docSectionCollapsed') === 'true';
+    const isCollapsed = localStorage.getItem('ui_documentation_collapsed') === 'true';
     
     if (isCollapsed) {
       docSection.classList.add('collapsed');
