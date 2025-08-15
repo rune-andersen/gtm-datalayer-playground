@@ -2,6 +2,12 @@
 
 A lightweight, browser-based tool to test Google Tag Manager (GTM) containers and dataLayer events in real-time.
 
+## Version 5.4.0 Features
+
+- **Comprehensive TypeScript Type Checking**: Added JSDoc annotations and type checking for better code reliability and developer experience.
+- **Enhanced Code Quality**: All major functions now have proper type annotations and null checks for DOM elements.
+- **Improved Developer Experience**: Better IntelliSense support and error detection during development.
+
 ## Version 5.3.0 Features
 
 - **Random user_id for Journey runs**: Added toggle to generate new GUID for each event during journey execution, providing more realistic testing scenarios.
