@@ -3,11 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <title>GTM & dataLayer Playground</title>
+  <link rel="icon" type="image/png" href="../favicon.png" />
+  <link rel="icon" type="image/x-icon" href="../favicon.ico" />
   <!-- Application version metadata.  Update these values when you commit new versions.
        app-version holds a simple version string, e.g. 1.2.3, and app-changelog holds
        a short description of what changed. -->
-      <meta name="app-version" content="5.2.0">
-          <meta name="app-changelog" content="Streamlined Documentation & Improved Header Hierarchy & Refined UI Styling">
+                   <meta name="app-version" content="5.3.0">
+      <meta name="app-changelog" content="Added Random user_id for Journey runs feature - toggle to generate new GUID for each event during journey execution">
   <style>
     /*
      * Base layout styling.  A subtle background colour and modern
@@ -77,7 +79,7 @@
     }
 
     .btn-secondary {
-      background-color: #e2e6ea; /* Same grey as "Add to Journey" button */
+      background-color: #e2e6ea;
       color: #333;
     }
 
@@ -137,7 +139,7 @@
 
     /* Settings section specific button styling */
     .settings-section .btn-primary {
-      background-color: #e2e6ea; /* Grey by default - same as "Add to Journey" button */
+      background-color: #e2e6ea;
       color: #333;
     }
 
@@ -147,7 +149,7 @@
 
     /* Journey Builder section specific button styling */
     .journey-section .btn-primary {
-      background-color: #e2e6ea; /* Grey by default - same as "Add to Journey" button */
+      background-color: #e2e6ea;
       color: #333;
     }
 
@@ -157,7 +159,7 @@
 
     /* Playground section specific button styling */
     .playground-section .btn-primary {
-      background-color: #e2e6ea; /* Grey by default - same as "Add to Journey" button */
+      background-color: #e2e6ea;
       color: #333;
     }
 
@@ -176,7 +178,7 @@
 
     /* Loaded Events section specific button styling */
     .events-section .btn-primary {
-      background-color: #e2e6ea; /* Grey by default - same as "Add to Journey" button */
+      background-color: #e2e6ea;
       color: #333;
     }
 
@@ -195,7 +197,7 @@
 
     /* Go to event buttons - blue foreground to indicate they are links */
     .go-to-event-btn {
-      background-color: #e2e6ea; /* Same grey as "Add to Journey" button */
+      background-color: #e2e6ea;
       color: #007bff !important; /* Blue text to show they are links */
     }
 
@@ -205,7 +207,7 @@
 
     /* Add link button - grey */
     .add-link-btn {
-      background-color: #e2e6ea; /* Same grey as "Add to Journey" button */
+      background-color: #e2e6ea;
       color: #333;
     }
 
@@ -635,6 +637,149 @@
       font-size: 12px;
     }
 
+    /* Documentation Section Styling */
+    .documentation-section {
+      margin-top: 15px;
+      padding: 10px;
+      background: #f8f9fa;
+      border: 1px solid #dee2e6;
+      border-radius: 8px;
+      border-left: 2px solid #007bff;
+      transition: all 0.3s ease;
+    }
+    
+    .documentation-section.collapsed {
+      padding: 10px;
+    }
+    
+    .documentation-section.collapsed .doc-section {
+      display: none;
+    }
+    
+         .doc-header {
+       display: flex;
+       justify-content: flex-start;
+       align-items: center;
+       margin-bottom: 10px;
+       border-bottom: 1px solid #e9ecef;
+       padding-bottom: 0px;
+       gap: 15px;
+     }
+    
+    .doc-header h3 {
+      margin: 0;
+      color: #6c757d;
+      font-size: 16px;
+      font-weight: 500;
+    }
+    
+    .doc-toggle {
+      background: none;
+      border: none;
+      color: #007bff;
+      cursor: pointer;
+      padding: 8px;
+      border-radius: 4px;
+      transition: all 0.2s ease;
+      font-size: 16px;
+    }
+    
+    .doc-toggle:hover {
+      background-color: #e3f2fd;
+      color: #0056b3;
+    }
+    
+    .toggle-icon {
+      font-weight: bold;
+      transition: transform 0.2s ease;
+    }
+    
+    .doc-section {
+      margin-bottom: 25px;
+    }
+    
+    .doc-section h4 {
+      margin: 0 0 12px 0;
+      color: #007bff;
+      font-size: 16px;
+      font-weight: 600;
+    }
+    
+    .doc-section p {
+      margin: 0 0 12px 0;
+      line-height: 1.6;
+      color: #495057;
+    }
+    
+    .doc-section ol, .doc-section ul {
+      margin: 0 0 12px 0;
+      padding-left: 20px;
+      line-height: 1.6;
+      color: #495057;
+    }
+    
+    .doc-section li {
+      margin-bottom: 8px;
+    }
+    
+    .doc-section strong {
+      color: #212529;
+    }
+    
+    .doc-section a {
+      color: #007bff;
+      text-decoration: none;
+      font-weight: 500;
+    }
+    
+    .doc-section a:hover {
+      text-decoration: underline;
+      color: #0056b3;
+    }
+    
+    .doc-section em {
+      color: #6c757d;
+      font-style: italic;
+    }
+    
+    .example-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 15px;
+      margin-top: 15px;
+    }
+    
+    .example-item {
+      background: #fff;
+      border: 1px solid #dee2e6;
+      border-radius: 6px;
+      padding: 15px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+    
+    .example-item h5 {
+      margin: 0 0 10px 0;
+      color: #495057;
+      font-size: 14px;
+      font-weight: 600;
+    }
+    
+    .example-item pre {
+      margin: 0;
+      background: #f8f9fa;
+      border: 1px solid #e9ecef;
+      border-radius: 4px;
+      padding: 10px;
+      overflow-x: auto;
+    }
+    
+    .example-item code {
+      font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+      font-size: 12px;
+      line-height: 1.4;
+      color: #495057;
+    }
+
     /* Unified section styling */
     .section {
       margin: 20px 0;
@@ -809,6 +954,13 @@
     .journey-delay label {
       font-size: 14px;
       color: #6c757d;
+    }
+
+    .journey-settings-section {
+      margin: 15px 0;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
     }
 
     .journey-controls {
@@ -1036,7 +1188,7 @@
        the meta tag values defined in the document head (see meta[name="app-version"]).
        When deploying a new version, update the meta tags accordingly. -->
   <div class="version-label" id="versionLabel">Version: —</div>
-  <h1>GTM Playground</h1>
+  <h1>GTM & dataLayer Playground</h1>
 
   <!-- Console output at top -->
   <div class="log" id="logOutput">Console output will appear here…</div>
@@ -1046,7 +1198,7 @@
     <div class="section-header">
       <div class="section-title">
         <button class="section-toggle-btn" onclick="toggleSettingsSection()">▼</button>
-        ⚙️ Settings
+        ⚙️ Settings & Documentation
       </div>
     </div>
     
@@ -1055,7 +1207,7 @@
       <div class="gtm-row">
         <div class="gtm-id-group">
           <input type="text" id="gtmId" placeholder="GTM-XXXXXXX" title="Enter your GTM Container ID" />
-          <button id="gtmButton" onclick="loadGTM()">Inject GTM</button>
+          <button id="gtmButton" onclick="loadGTM()">Load GTM Container</button>
         </div>
         <div class="local-file-group">
           <input type="file" id="localFileInput" accept=".js" />
@@ -1084,22 +1236,77 @@
       <div class="user-id-section">
         <div class="user-id-row">
           <span>Current user_id:</span>
+          <button onclick="generateNewUserId()">🔁New User ID</button>
           <span class="user-id-display" id="currentUserId">Generating...</span>
-          <button onclick="generateNewUserId()">🔁 New GUID</button>
         </div>
         <div class="user-id-help">
-          <small>💡 Use <code>{{user_id}}</code> in your events to automatically include this ID. Example: <code>dataLayer.push({event: 'purchase', user_id: '{{user_id}}'})</code></small>
+          <small>💡 Use <code>{{user_id}}</code> in your events to automatically include this ID. Example: <code>dataLayer.push({event: 'data', user_id: '{{user_id}}'})</code></small>
         </div>
+      </div>
+
+                       <!-- Documentation & Instructions Section -->
+        <div class="documentation-section">
+          <div class="doc-header">
+            <button type="button" class="doc-toggle" onclick="toggleDocumentation()">
+              <span class="toggle-icon">▼</span>
+            </button>
+            <h3>📚 Documentation & Instructions</h3>
+          </div>
+        
+        <div class="doc-section">
+          <h4>🎯 Tool Purpose</h4>
+          <p>The GTM & dataLayer Playground is a light testing environment for Google Tag Manager and dataLayer implementations. It allows you to create, test, and debug dataLayer events before deploying them to production websites.</p>
+        </div>
+
+                 <div class="doc-section">
+           <h4>📖 Step-by-Step Usage Guide</h4>
+           <ol>
+             <li><strong>Load GTM:</strong> Enter your GTM Container ID and click "Load GTM Container" to inject GTM into the page</li>
+             <li><strong>See Examples:</strong> Pre-built example events are loaded from GitHub and shown in the "Loaded Events" section</li>
+             <li><strong>Create Events:</strong> Use the Playgrounds section to build and test new dataLayer events - you can start by adding a flat event, or an object or an object with an array event.</li>
+             <li><strong>Validate syntax:</strong> The editor will highlights syntax errors and white-space issues</li>
+             <li><strong>Push Events:</strong> Click "Push" to execute events and see them in the console</li>
+             <li><strong>Add to Loaded Events:</strong> Add PLayground events to the "Loaded Events" section for persistance and easier reuse</li>
+             <li><strong>Export Loaded events:</strong> Export your Events to be used in a local file in the format used by the this tool</li>
+           </ol>
+         </div>
+
+         <div class="doc-section">
+           <h4>🚀 Journey Builder</h4>
+           <p>The Journey Builder allows you to queue multiple events to test user flows and conversion paths. This is useful for testing complex user journeys before implementing them in production.</p>
+           <ol>
+             <li><strong>Queue Events:</strong> Add multiple events to the journey queue</li>
+             <li><strong>Execute Journey:</strong> Run the entire sequence to simulate user behavior</li>
+             <li><strong>Debug Flow:</strong> Monitor how events trigger and interact with each other</li>
+           </ol>
+         </div>
+
+                 <div class="doc-section">
+           <h4>🔍 Recommended Browser Extensions</h4>
+           <p>To visualize and debug your events effectively, we recommend this browser extension:</p>
+           <ul>
+             <li><strong><a href="https://chromewebstore.google.com/detail/analytics-debugger/ilnpmccnfdjdjjikgkefkcegefikecdc" target="_blank" rel="noopener noreferrer">Analytics Debugger</a></strong> - Your Single Source of Truth (SSOT) for debugging analytics implementations. Formerly known as "GTM/GA Debugger," this powerful tool supports Google Tag Manager, Google Analytics, Tealium, Piwik Pro/Matomo, Adobe tools, and most commonly used Marketing Pixels.</li>
+           </ul>
+           <p><em>💡 This extension helps you verify that events are properly pushed and trigger the expected tracking events.</em></p>
+         </div>
+
+
+
+                  <div class="doc-section">
+            <h4>🔄 Version Information</h4>
+            <p><strong>Current Version:</strong> 5.3.0</p>
+            <p><strong>What's New:</strong> Added Random user_id for Journey runs feature - toggle to generate new GUID for each event during journey execution.</p>
+          </div>
       </div>
     </div>
   </div>
 
-  <!-- 2. JOURNEY BUILDER SECTION (Renamed from Journey Queue) -->
+  <!-- 2. JOURNEY BUILDER SECTION -->
   <div class="section journey-section">
     <div class="section-header">
       <div class="section-title">
         <button class="section-toggle-btn" onclick="toggleJourneySection()">▼</button>
-        🚀 Journey Builder
+        Journey Builder
       </div>
       <div class="journey-controls">
         <button class="btn-success btn-sm" onclick="runJourney()" id="runJourneyBtn">▶️ Run Journey</button>
@@ -1109,14 +1316,22 @@
           <label for="journeyDelay">Delay (ms):</label>
           <input type="number" id="journeyDelay" value="1000" min="0" max="10000" step="100" />
         </div>
-        <button class="btn-sm" onclick="saveJourneyPreset()">💾 Save Preset</button>
-        <button class="btn-sm" onclick="loadJourneyPreset()">📁 Load Preset</button>
+
+        <button class="btn-sm" onclick="saveJourneyPreset()">💾 Save Journey</button>
       </div>
     </div>
     
     <div class="section-content" id="journeyContent">
       <div class="journey-queue" id="journeyQueue">
-        <div class="journey-queue empty">Drop events here to build your journey...</div>
+        <div class="journey-queue empty">Add events from Playground and Loaded Events to build your journey...</div>
+      </div>
+      
+      <!-- Journey Settings -->
+      <div class="journey-settings-section">
+        <div class="console-toggle">
+          <input type="checkbox" id="randomizeUserId" title="Generate new random user_id for each event during journey execution" />
+          <label for="randomizeUserId">Randomize {{user_id}} during Journey</label>
+        </div>
       </div>
       
       <!-- Journey Status and Progress -->
@@ -1131,8 +1346,8 @@
       <!-- Preset display area -->
       <div class="journey-presets" id="journeyPresets">
         <div class="presets-header">
-          <h4>💾 Saved Journey Presets</h4>
-          <span class="presets-count" id="presetsCount">No presets saved</span>
+          <h4>💾 Saved Journey</h4>
+          <span class="presets-count" id="presetsCount">No journey saved</span>
         </div>
         <div class="presets-list" id="presetsList">
           <!-- Presets will be displayed here -->
@@ -1143,7 +1358,7 @@
 
 
 
-  <!-- 3b. MULTI PLAYGROUNDS SECTION (New) -->
+  <!-- 3. MULTI PLAYGROUNDS SECTION -->
   <div class="section playground-section" id="playgroundsSection">
     <div class="section-header">
       <div class="section-title">
@@ -1182,8 +1397,8 @@
       <div class="section-actions">
         <button class="btn-sm" onclick="expandAllEvents()">Expand All</button>
         <button class="btn-sm" onclick="collapseAllEvents()">Collapse All</button>
-        <button class="btn-sm" onclick="savePresets()" title="Save changes so they persist on reload">💾 Save Changes (localStorage)</button>
-        <button class="btn-sm" onclick="copyAllAsDataLayer()" title="Copy all events in the format used by local files. Remember to update the file manuel">📋 Copy All (local file format)</button>
+        <button class="btn-sm" onclick="savePresets()" title="Save changes so they persist on reload">💾 Save Changes to localStorage</button>
+        <button class="btn-sm" onclick="copyAllAsDataLayer()" title="Copy all events in the local file format and then update the file manually">📋 Copy All in local file format</button>
       </div>
     </div>
     <div class="section-content" id="eventsContent">
@@ -1191,12 +1406,11 @@
       <div class="event-nav-title" style="margin-top:0;">Go to event:</div>
       <div id="eventNav" class="event-nav"></div>
       <hr>
-      <p id="loadedEventsSubLabel" class="sub-label">(editable in loaded file)</p>
       <div id="presetsArea"></div>
     </div>
   </div>
 
-  <script src="datalayer.js"></script>
+  <script src="../datalayer.js"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
 
@@ -1314,20 +1528,36 @@
 
 
   // Replace placeholders in code with actual values
-  function replacePlaceholders(code) {
+  function replacePlaceholders(code, isJourneyExecution = false) {
     if (!code) return code;
     let processedCode = code;
     
-    // Replace user_id placeholders (multiple formats)
-    if (currentUserId) {
-      processedCode = processedCode.replace(/\[user_id\]/g, currentUserId);
-      processedCode = processedCode.replace(/\{\{user_id\}\}/g, currentUserId);
-      processedCode = processedCode.replace(/{{user_id}}/g, currentUserId);
-      processedCode = processedCode.replace(/\[USER_ID\]/g, currentUserId);
-      processedCode = processedCode.replace(/\{\{USER_ID\}\}/g, currentUserId);
+    // Determine which user_id to use
+    let userIdToUse = currentUserId;
+    
+    // If this is journey execution and randomization is enabled, generate new GUID
+    if (isJourneyExecution && document.getElementById('randomizeUserId') && document.getElementById('randomizeUserId').checked) {
+      // Generate new GUID for this specific event
+      userIdToUse = generateRandomGuid();
+    }
+    
+    // Replace user_id placeholders (multiple formats) - only exact matches
+    if (userIdToUse) {
+      // Only replace exact placeholder matches, not normal string values
+      processedCode = processedCode.replace(/\{\{user_id\}\}/g, userIdToUse);
+      processedCode = processedCode.replace(/{{user_id}}/g, userIdToUse);
     }
     
     return processedCode;
+  }
+  
+  // Generate a new random GUID (separate from currentUserId)
+  function generateRandomGuid() {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+      const r = Math.random() * 16 | 0;
+      const v = c === 'x' ? r : (r & 0x3 | 0x8);
+      return v.toString(16);
+    });
   }
 
   // Parse dataLayer.push calls from code and extract payloads
@@ -1904,7 +2134,7 @@
     
     // Execute the event
     try {
-      const processedCode = replacePlaceholders(event.code);
+      const processedCode = replacePlaceholders(event.code, true); // true = isJourneyExecution
       new Function(processedCode)();
       
       if (consoleLoggingEnabled) {
@@ -2572,6 +2802,8 @@
     copyDLBtn.textContent = 'Copy in local file format';
     copyDLBtn.className = 'btn-sm';
 
+
+
     // If this preset has local-only changes, visually mark the copy button
     // and add a subtle warning label to the header.  The warning
     // indicates that the current event differs from the loaded source
@@ -2693,6 +2925,8 @@
         log('📋 Copied in local file format');
       });
     };
+
+
 
     // Trim trailing spaces and extraneous punctuation when requested
     trimBtn.onclick = () => {
@@ -3146,6 +3380,8 @@
   });
 }
 
+
+
   /*
    * Create a URL‑friendly slug from a string.  Lowercases and
    * replaces non‑alphanumeric characters with underscores.  Used to
@@ -3246,6 +3482,12 @@
       document.getElementById('journeyDelay').value = savedDelay;
     }
     
+    // Initialize randomize user_id checkbox
+    const randomizeUserId = localStorage.getItem('gtm_randomize_user_id') === 'true';
+    if (document.getElementById('randomizeUserId')) {
+      document.getElementById('randomizeUserId').checked = randomizeUserId;
+    }
+    
     // Initialize journey section collapsed state
     const journeyCollapsed = localStorage.getItem('gtm_journey_collapsed') === 'true';
     if (journeyCollapsed) {
@@ -3289,6 +3531,14 @@
     if (journeyDelayInput) {
       journeyDelayInput.addEventListener('change', (e) => {
         localStorage.setItem('gtm_journey_delay', e.target.value);
+      });
+    }
+    
+    // Save randomize user_id checkbox changes
+    const randomizeUserIdCheckbox = document.getElementById('randomizeUserId');
+    if (randomizeUserIdCheckbox) {
+      randomizeUserIdCheckbox.addEventListener('change', (e) => {
+        localStorage.setItem('gtm_randomize_user_id', e.target.checked.toString());
       });
     }
     
@@ -3431,6 +3681,8 @@
     copyDLBtn.className = 'btn-sm';
     copyDLBtn.textContent = 'Copy in local file format';
 
+
+
     const trimBtn = document.createElement('button');
     trimBtn.className = 'btn-sm';
     trimBtn.textContent = 'Trim spaces';
@@ -3558,6 +3810,8 @@ object_name: {
       const block = `// ===== START playground =====  \n{\n  name: "playground",\n  code: \`${replacePlaceholders(code)}\`\n},\n// ===== END playground =====`;
       navigator.clipboard.writeText(block).then(() => log('📋 Copied as local file event block'));
     };
+
+
     saveBtn.onclick = () => {
       // Append new event to local changes storage
       const code = editorInstance ? editorInstance.getValue() : initialCode || '';
@@ -3669,7 +3923,6 @@ object_name: {
     const lastId = localStorage.getItem('gtm_id');
     if (lastId) document.getElementById('gtmId').value = lastId;
     loadPresets();
-    displayJourneyPresets(); // Initialize journey presets display
   });
 
   function expandAllPlaygrounds() {
@@ -3687,6 +3940,35 @@ object_name: {
       if (btn) btn.textContent = '▶';
     });
   }
+  
+  // Documentation section toggle functionality
+  function toggleDocumentation() {
+    const docSection = document.querySelector('.documentation-section');
+    const toggleIcon = document.querySelector('.toggle-icon');
+    const isCollapsed = docSection.classList.contains('collapsed');
+    
+    if (isCollapsed) {
+      docSection.classList.remove('collapsed');
+      toggleIcon.textContent = '▼';
+      localStorage.setItem('docSectionCollapsed', 'false');
+    } else {
+      docSection.classList.add('collapsed');
+      toggleIcon.textContent = '▶';
+      localStorage.setItem('docSectionCollapsed', 'true');
+    }
+  }
+  
+  // Initialize documentation section state on page load
+  document.addEventListener('DOMContentLoaded', function() {
+    const docSection = document.querySelector('.documentation-section');
+    const toggleIcon = document.querySelector('.toggle-icon');
+    const isCollapsed = localStorage.getItem('docSectionCollapsed') === 'true';
+    
+    if (isCollapsed) {
+      docSection.classList.add('collapsed');
+      toggleIcon.textContent = '▶';
+    }
+  });
 </script>
 <footer style="font-size:12px; text-align:center; margin-top:20px; color:#666;">
   © 2025 Rune Andersen — Free to use, but not to copy or redistribute. See LICENSE.

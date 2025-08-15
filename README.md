@@ -2,6 +2,10 @@
 
 A lightweight, browser-based tool to test Google Tag Manager (GTM) containers and dataLayer events in real-time.
 
+## Version 5.3.0 Features
+
+- **Random user_id for Journey runs**: Added toggle to generate new GUID for each event during journey execution, providing more realistic testing scenarios.
+
 ## Version 5.2.0 Features
 
 - **Documentation & Instructions Section**: Added a comprehensive documentation section with step-by-step usage guides and links to relevant browser extensions for GTM testing.
