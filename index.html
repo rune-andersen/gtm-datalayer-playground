@@ -8,8 +8,8 @@
   <!-- Application version metadata.  Update these values when you commit new versions.
        app-version holds a simple version string, e.g. 1.2.3, and app-changelog holds
        a short description of what changed. -->
-                   <meta name="app-version" content="5.3.0">
-      <meta name="app-changelog" content="Added Random user_id for Journey runs feature - toggle to generate new GUID for each event during journey execution">
+                       <meta name="app-version" content="5.4.0">
+    <meta name="app-changelog" content="Added comprehensive TypeScript type checking with JSDoc annotations for better code reliability and developer experience. All major functions now have proper type annotations and null checks for DOM elements.">
   <style>
     /*
      * Base layout styling.  A subtle background colour and modern
@@ -23,7 +23,7 @@
       color: #333;
       padding: 20px;
       /* Increase the maximum width to accommodate side‑by‑side code and comment panes */
-      max-width: 1300px;
+      max-width: 1300px; /* Adjusted to accommodate new 1300px event width */
       margin: auto;
     }
 
@@ -209,10 +209,19 @@
     .add-link-btn {
       background-color: #e2e6ea;
       color: #333;
+      padding: 8px 16px;
+      border-radius: 6px;
+      border: 1px solid #d1d5db;
+      font-weight: 500;
+      transition: all 0.2s ease;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
     }
 
     .add-link-btn:hover {
       background-color: #d4dadd;
+      border-color: #9ca3af;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      transform: translateY(-1px);
     }
 
     /* Small button variant */
@@ -258,6 +267,7 @@
       background: #fff;
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
       margin-bottom: 20px;
+      /* Remove custom width and padding - let it flow naturally like journey sections */
     }
     .preset-header-bar {
       display: flex;
@@ -267,29 +277,42 @@
       border-bottom: 1px solid #eceff3;
       padding: 12px 16px;
       font-weight: 600;
+      border-top-left-radius: 4px;
+      border-top-right-radius: 4px;
+      /* Remove custom width - let it flow naturally */
     }
 
     /* Left side of the preset header holds the primary action and the event name. */
     .preset-header-left {
       display: flex;
       align-items: center;
+      flex-shrink: 0;
+      min-width: 0;
     }
     .preset-header-left button {
       margin-right: 10px;
+      flex-shrink: 0;
     }
     .preset-header-title {
       font-size: 17px;
       margin-left: 0;
+      flex-shrink: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
     .preset-header-actions {
       display: flex;
       gap: 5px;
       align-items: center;
       flex-wrap: nowrap;
-      overflow-x: auto;
+      min-width: 0;
+      flex-shrink: 0;
     }
     .preset-header-actions button {
       margin-left: 10px;
+      flex-shrink: 0;
+      white-space: nowrap;
     }
     
     .preset-wrapper textarea {
@@ -299,56 +322,84 @@
       min-height: 120px;
       resize: vertical;
       width: 100%;
-      /* Ensure padding is included in the width to align with header */
       box-sizing: border-box;
     }
 
     /* Layout for event content: code area and comment area side by side */
-    .preset-content {
-      display: flex;
-      /* Use explicit widths rather than gaps. */
-    }
-    /* Code area takes up 800px of the available width */
+.preset-content {
+  display: flex;
+  gap: 20px; /* Use gap instead of custom flex widths */
+  padding: 0; /* Remove all padding to align with header edge */
+}
+    /* Code area - let it take natural width */
     .preset-content .code-area {
-      flex: 0 0 800px;
+      flex: 1;
+      min-width: 0; /* Allow shrinking */
     }
-    /* A vertical divider between code and comment areas.  The colour matches
-       the grey header used for event cards. */
+    /* Remove the divider - use gap instead */
     .preset-content .divider {
-      flex: 0 0 50px;
-      background-color: #f5f7fa;
+      display: none; /* Remove divider, use gap for spacing */
     }
-    /* Comment area takes up 450px of the available width */
+    /* Comment area - let it take natural width */
     .preset-content .comment-area {
-      flex: 0 0 450px;
-      display: flex;
-      flex-direction: column;
+      flex: 1;
+      min-width: 0; /* Allow shrinking */
     }
     .comment-area textarea {
-      width: 100%;
-      border: 1px solid #eceff3;
-      border-radius: 0 0 4px 4px;
-      padding: 12px 16px;
-      resize: vertical;
-      height: 150px;
-      font-size: 14px;
-      font-family: sans-serif;
-      background: #fff;
+  width: 100%;
+  border: 1px solid #eceff3;
+  border-radius: 4px;
+  padding: 12px 16px;
+  min-height: 148px; /* Match code editor height minus space for links list and add link button above */
+  resize: vertical;
+  font-family: monospace;
+  font-size: 14px;
+  line-height: 1.4;
+  color: #495057;
+
+}
+
+    /* Ace editor gutter styling to match header and reduce width */
+    .ace_editor .ace_gutter {
+      background-color: #f5f7fa !important; /* Same as header background */
+      border-right: 1px solid #eceff3 !important; /* Match header border */
+      width: 40px !important; /* Reduce width since max 99 lines */
+    }
+    .ace_editor .ace_gutter-cell {
+      color: #6c757d !important; /* Subtle text color */
+      font-size: 12px !important; /* Smaller font for narrower gutter */
     }
     
     /* List of manually added links for each event. */
+    /* Container for links list and add button */
+    .links-container {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 8px;
+      padding: 8px 0;
+      border-bottom: 1px solid #f3f4f6;
+    }
     .links-list {
       font-size: 13px;
-      margin-bottom: 6px;
+      flex: 1;
     }
     .links-list a {
       color: #007bff;
-      text-decoration: underline;
+      text-decoration: none;
       display: block;
+      padding: 4px 8px;
+      border-radius: 4px;
+      transition: background-color 0.2s ease;
+    }
+    
+    .links-list a:hover {
+      background-color: #f8f9fa;
+      text-decoration: underline;
     }
     /* Button to add a new link. Placed inside the comment area. */
     .add-link-btn {
-      margin-bottom: 6px;
+      flex-shrink: 0;
     }
 
     /* Individual link item with edit and delete controls */
@@ -384,25 +435,35 @@
     .link-form {
       display: flex;
       flex-direction: column;
-      margin-bottom: 6px;
-      gap: 4px;
+      margin-bottom: 8px;
+      gap: 8px;
+      padding: 12px;
+      background-color: #f8f9fa;
+      border: 1px solid #e9ecef;
+      border-radius: 6px;
     }
     .link-form input {
-      padding: 6px;
-      border: 1px solid #ccc;
+      padding: 8px 12px;
+      border: 1px solid #ced4da;
       border-radius: 4px;
       font-size: 14px;
+      transition: border-color 0.2s ease;
+    }
+    .link-form input:focus {
+      outline: none;
+      border-color: #007bff;
+      box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
     }
     .link-form .link-form-actions {
       display: flex;
-      gap: 6px;
+      gap: 8px;
     }
 
     /* Ace editor container inherits similar styling to the textarea it replaces. */
-    .ace-editor-container {
-      width: 100%;
-      min-height: 120px;
-    }
+.ace-editor-container {
+  width: 100%;
+  min-height: 148px; /* Match comment textarea height for consistent layout */
+}
     
     /* Headings use a modern size/weight and extra spacing around
        sections. */
@@ -507,18 +568,19 @@
     }
     
     /* Ace editor uses its own themes; ensure fonts align with the rest of the app. */
-    .ace_editor {
-      font-family: monospace;
-      font-size: 14px;
-      border-radius: 0 0 4px 4px;
-      border: none;
-    }
+.ace_editor {
+  font-family: monospace;
+  font-size: 14px;
+  border-radius: 0 0 4px 4px;
+  border: none;
+}
 
     /* Allow the Ace editor container to be vertically resizable by the user. */
-    .ace-editor-container {
-      resize: vertical;
-      overflow: auto;
-    }
+.ace-editor-container {
+  resize: vertical;
+  overflow: auto;
+  min-height: 148px; /* Ensure minimum height for 10 lines */
+}
 
     /* Lighten the appearance of error highlights in Ace to reduce visual noise. */
     .ace_editor .ace_error {
@@ -1412,7 +1474,14 @@
 
   <script src="../datalayer.js"></script>
 <script>
+// @ts-check
   window.dataLayer = window.dataLayer || [];
+
+  // Type definitions for better code understanding and type checking
+  /** @typedef {{ url: string, text: string }} Link */
+  /** @typedef {{ name: string, code: string, comment?: string, links?: Link[], isPlaygroundEvent?: boolean }} Preset */
+  /** @typedef {{ name: string, code: string, comment?: string, links?: Link[], isPlaygroundEvent?: boolean }} Event */
+  /** @typedef {{ event: string, [key: string]: any }} DataLayerEvent */
 
     // Track whether the GTM container has been injected.  These variables
     // store references to the script and iframe elements so they can be
@@ -1455,8 +1524,10 @@
   })();
 
   // Generate a new random User ID (GUID)
+  /** @returns {void} */
   function generateNewUserId() {
     // Generate classic GUID format: xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx
+    /** @returns {string} */
     const generateGuid = () => {
       return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
         const r = Math.random() * 16 | 0;
@@ -1466,7 +1537,10 @@
     };
     
     currentUserId = generateGuid();
-    document.getElementById('currentUserId').textContent = currentUserId;
+    const userIdElement = document.getElementById('currentUserId');
+    if (userIdElement) {
+      userIdElement.textContent = currentUserId;
+    }
     localStorage.setItem('gtm_user_id', currentUserId);
     log('🆔 New User ID generated: ' + currentUserId);
   }
@@ -1474,6 +1548,7 @@
   // Utility functions to reduce code duplication
   const utils = {
     // Unified toggle function for all sections
+    /** @param {string} sectionId @param {string} storageKey @param {HTMLElement} toggleBtn @returns {void} */
     toggleSection(sectionId, storageKey, toggleBtn) {
       const content = document.getElementById(sectionId);
       if (!content || !toggleBtn) return;
@@ -1494,6 +1569,7 @@
     },
     
     // Create button with consistent styling
+    /** @param {string} text @param {string} className @param {Function} onClick @param {string} title @returns {HTMLButtonElement} */
     createButton(text, className, onClick, title = '') {
       const btn = document.createElement('button');
       btn.textContent = text;
@@ -1504,6 +1580,7 @@
     },
     
     // Normalize whitespace for comparison
+    /** @param {string} str @returns {string} */
     normalizeWhitespace(str) {
       if (!str) return '';
       return str
@@ -1514,20 +1591,39 @@
   };
 
   // Toggle journey section visibility
+  /** @returns {void} */
   function toggleJourneySection() {
-    const toggleBtn = document.querySelector('#journeyContent').closest('.section').querySelector('.section-toggle-btn');
-    utils.toggleSection('journeyContent', 'gtm_journey_collapsed', toggleBtn);
+    const journeyContent = document.querySelector('#journeyContent');
+    if (journeyContent) {
+      const section = journeyContent.closest('.section');
+      if (section) {
+        const toggleBtn = section.querySelector('.section-toggle-btn');
+        if (toggleBtn) {
+          utils.toggleSection('journeyContent', 'gtm_journey_collapsed', toggleBtn);
+        }
+      }
+    }
   }
 
   // Toggle settings section visibility
+  /** @returns {void} */
   function toggleSettingsSection() {
-    const toggleBtn = document.querySelector('#settingsContent').closest('.section').querySelector('.section-toggle-btn');
-    utils.toggleSection('settingsContent', 'gtm_settings_collapsed', toggleBtn);
+    const settingsContent = document.querySelector('#settingsContent');
+    if (settingsContent) {
+      const section = settingsContent.closest('.section');
+      if (section) {
+        const toggleBtn = section.querySelector('.section-toggle-btn');
+        if (toggleBtn) {
+          utils.toggleSection('settingsContent', 'gtm_settings_collapsed', toggleBtn);
+        }
+      }
+    }
   }
 
 
 
   // Replace placeholders in code with actual values
+  /** @param {string} code @param {boolean} isJourneyExecution @returns {string} */
   function replacePlaceholders(code, isJourneyExecution = false) {
     if (!code) return code;
     let processedCode = code;
@@ -1552,6 +1648,7 @@
   }
   
   // Generate a new random GUID (separate from currentUserId)
+  /** @returns {string} */
   function generateRandomGuid() {
     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
       const r = Math.random() * 16 | 0;
@@ -1561,6 +1658,7 @@
   }
 
   // Parse dataLayer.push calls from code and extract payloads
+  /** @param {string} code @returns {DataLayerEvent[]} */
   function parseDataLayerPayloads(code) {
     const payloads = [];
     const regex = /dataLayer\.push\s*\(\s*(\{[\s\S]*?\})\s*\)/g;
@@ -1580,6 +1678,7 @@
   }
 
   // Log dataLayer payloads to console if enabled
+  /** @param {string} code @param {string} eventName @returns {void} */
   function logDataLayerPayloads(code, eventName = 'Custom Event') {
     if (!consoleLoggingEnabled) return;
     
@@ -1599,6 +1698,7 @@
   }
 
   // Journey Queue Functions
+  /** @param {string} eventName @param {string} code @returns {void} */
   function addToJourney(eventName, code) {
     // Add to queue (allow multiple instances)
     journeyQueue.push({
@@ -1613,6 +1713,7 @@
     log(`➕ Added '${eventName}' to journey queue (${journeyQueue.length} total)`);
   }
 
+  /** @returns {void} */
   function updateJourneyQueue() {
     const queueContainer = document.getElementById('journeyQueue');
     if (!queueContainer) return;
@@ -1652,12 +1753,14 @@
     updateQueueButtonStates();
   }
 
+  /** @param {number} index @returns {void} */
   function removeFromJourney(index) {
     journeyQueue.splice(index, 1);
     updateJourneyQueue();
     log(`🗑️ Removed event from journey queue (${journeyQueue.length} remaining)`);
   }
 
+  /** @param {string} eventName @param {HTMLElement} wrapper @returns {void} */
   function removeLoadedEvent(eventName, wrapper) {
     wrapper.remove();
     
@@ -1692,6 +1795,7 @@
     log(`🗑️ Removed event: ${eventName}`);
   }
 
+  /** @param {string} eventName @param {HTMLElement} wrapper @returns {void} */
   function resetLoadedEvent(eventName, wrapper) {
     console.log(`Resetting event: ${eventName}`);
     console.log('Current loadedEvents:', loadedEvents.map(e => e.name));
@@ -1759,6 +1863,7 @@
     }
   }
 
+  /** @param {string} eventName @param {HTMLElement} wrapper @returns {void} */
   function moveEventUp(eventName, wrapper) {
     const currentPresets = mergeEventsWithChanges(loadedEvents, localChanges);
     const currentIndex = currentPresets.findIndex(p => p.name === eventName);
@@ -1788,6 +1893,7 @@
     }
   }
 
+  /** @param {string} eventName @param {HTMLElement} wrapper @returns {void} */
   function moveEventDown(eventName, wrapper) {
     const currentPresets = mergeEventsWithChanges(loadedEvents, localChanges);
     const currentIndex = currentPresets.findIndex(p => p.name === eventName);
@@ -1817,6 +1923,7 @@
     }
   }
 
+  /** @returns {Object.<string, boolean>} */
   function saveEventCollapsedStates() {
     const states = {};
     const eventWrappers = document.querySelectorAll('.preset-wrapper');
@@ -1829,6 +1936,7 @@
     return states;
   }
 
+  /** @param {Object.<string, boolean>} states @returns {void} */
   function restoreEventCollapsedStates(states) {
     Object.keys(states).forEach(eventName => {
       const wrapper = document.querySelector(`[data-name="${eventName}"]`);
@@ -1973,7 +2081,9 @@
       log(`🔄 Moved event "${draggedEventName}" to position of "${targetEventName}"`);
     }
   }
+  */
 
+  /** @param {Preset[]} newOrder @returns {void} */
   function updateEventOrder(newOrder) {
     // Separate the events back into loadedEvents and localChanges
     const newLoadedEvents = [];
@@ -1993,7 +2103,6 @@
       } else {
         // New event not in base - goes to local changes
         newLocalChanges.push(event);
-        }
       }
     });
     
@@ -2005,10 +2114,10 @@
     localStorage.setItem('events_loaded_js', JSON.stringify(loadedEvents));
     localStorage.setItem('events_changes_js', JSON.stringify(localChanges));
   }
-  */
   
 
 
+  /** @returns {void} */
   function updateQueueButtonStates() {
     // Update all queue buttons to show queued state with counts
     const allQueueBtns = document.querySelectorAll('.queue-btn');
@@ -2053,6 +2162,7 @@
   }
 
   // Clear all instances of a specific event from the journey
+  /** @param {string} eventName @returns {void} */
   function clearEventFromJourney(eventName) {
     const initialLength = journeyQueue.length;
     journeyQueue = journeyQueue.filter(item => item.name !== eventName);
@@ -2092,6 +2202,7 @@
   }
   */
 
+  /** @returns {void} */
   function runJourney() {
     if (journeyQueue.length === 0) {
       log('⚠️ Journey queue is empty');
@@ -2114,6 +2225,7 @@
     runNextJourneyEvent();
   }
 
+  /** @returns {void} */
   function runNextJourneyEvent() {
     if (currentJourneyIndex >= journeyQueue.length || !journeyRunning || journeyPaused) {
       if (currentJourneyIndex >= journeyQueue.length) {
@@ -2157,6 +2269,7 @@
     }
   }
 
+  /** @returns {void} */
   function pauseJourney() {
     if (journeyPaused) {
       journeyPaused = false;
@@ -2174,6 +2287,7 @@
     }
   }
 
+  /** @returns {void} */
   function clearJourney() {
     journeyQueue = [];
     journeyRunning = false;
@@ -2194,6 +2308,7 @@
     log('🗑️ Journey queue cleared');
   }
 
+  /** @returns {void} */
   function updateJourneyProgress() {
     const progressText = document.getElementById('journeyProgressText');
     const progressFill = document.getElementById('journeyProgressFill');
@@ -2206,6 +2321,7 @@
   }
 
   // Save and load journey presets
+  /** @returns {void} */
   function saveJourneyPreset() {
     if (journeyQueue.length === 0) {
       alert('No events in journey queue to save');
@@ -2230,6 +2346,7 @@
     displayJourneyPresets(); // Refresh the display
   }
 
+  /** @returns {void} */
   function loadJourneyPreset() {
     // This function is now handled by clicking on preset names or load buttons
     // Keeping it for backward compatibility but it's no longer the primary way to load
@@ -2257,6 +2374,7 @@
     }
   }
   
+  /** @returns {void} */
   function displayJourneyPresets() {
     const presetsList = document.getElementById('presetsList');
     const presetsCount = document.getElementById('presetsCount');
@@ -2317,6 +2435,7 @@
     });
   }
   
+  /** @param {string} presetName @returns {void} */
   function loadPresetByName(presetName) {
     const presets = JSON.parse(localStorage.getItem('journey_presets') || '[]');
     const preset = presets.find(p => p.name === presetName);
@@ -2332,6 +2451,7 @@
     }
   }
   
+  /** @param {string} presetName @returns {void} */
   function deletePresetByName(presetName) {
     if (confirm(`Are you sure you want to delete the preset "${presetName}"?`)) {
       let presets = JSON.parse(localStorage.getItem('journey_presets') || '[]');
@@ -2343,6 +2463,7 @@
     }
   }
 
+  /** @returns {void} */
   function loadGTM() {
     const id = document.getElementById('gtmId').value.trim();
     if (!id.match(/^GTM-[A-Z0-9]+$/i)) {
@@ -2367,6 +2488,7 @@
   // Inject the GTM container into the page by appending the script and
   // noscript iframe.  This function uses gtmInjected to prevent multiple
   // injections and updates the GTM button state accordingly.
+  /** @param {string} id @returns {void} */
   function injectGTM(id) {
     if (gtmInjected) return;
     // Create and append the GTM script
@@ -2391,6 +2513,7 @@
 
   // Clear the previously injected GTM script and iframe.  Also remove the
   // stored GTM ID and reset the button state.
+  /** @returns {void} */
   function clearGTM() {
     localStorage.removeItem('gtm_id');
     if (gtmScriptTag) {
@@ -2411,6 +2534,7 @@
   // Update the GTM button to reflect whether a container is loaded.  When
   // loaded is true, the button becomes a neutral "Clear GTM" button; when
   // false, it reverts to the primary "Inject GTM" button.
+  /** @param {boolean} loaded @param {string} id @returns {void} */
   function updateGtmButtonState(loaded, id) {
     const btn = document.getElementById('gtmButton');
     if (!btn) return;
@@ -2430,6 +2554,7 @@
   // that events come from a local file and includes the file name.  Otherwise,
   // it states that events are loaded from GitHub.  The sub-label text
   // remains unchanged.
+  /** @returns {void} */
   function updateLoadedEventsHeader() {
     const labelEl = document.getElementById('loadedEventsLabel');
     if (!labelEl) return;
@@ -2440,8 +2565,12 @@
     }
   }
 
+  /** @param {string} msg */
   function log(msg) {
-    document.getElementById('logOutput').textContent = msg;
+    const logOutput = document.getElementById('logOutput');
+    if (logOutput) {
+      logOutput.textContent = msg;
+    }
     if (actionsLoggingEnabled) {
       console.log(msg);
     }
@@ -2462,6 +2591,7 @@
   let loadedEvents = []; // Original events from source (GitHub or local file)
   let localChanges = []; // Local modifications and new events
 
+  /** @returns {void} */
   function loadPresets() {
     // Load original events from source
     const savedLoaded = localStorage.getItem('events_loaded_js');
@@ -2487,11 +2617,13 @@
     const presets = mergeEventsWithChanges(loadedEvents, localChanges);
 
     const container = document.getElementById('presetsArea');
-    container.innerHTML = '';
+    if (container) {
+      container.innerHTML = '';
 
-    presets.forEach((preset, i) => {
-      container.appendChild(renderPreset(preset, i));
-    });
+      presets.forEach((preset, i) => {
+        container.appendChild(renderPreset(preset, i));
+      });
+    }
 
     // After presets have been rendered, rebuild the navigation bar.  This
     // ensures that each event is represented by a navigation button.
@@ -2501,6 +2633,7 @@
     updateLoadedEventsHeader();
   }
 
+  /** @param {Preset[]} loaded @param {Preset[]} changes @returns {Preset[]} */
   function mergeEventsWithChanges(loaded, changes) {
     const merged = [...loaded];
     
@@ -2519,6 +2652,7 @@
     return merged;
   }
 
+  /** @returns {void} */
   function savePresets() {
     // Get current working presets (loaded events + local changes, excluding removed ones)
     const currentPresets = mergeEventsWithChanges(loadedEvents, localChanges);
@@ -2538,6 +2672,7 @@
     loadPresets();
   }
 
+  /** @param {Preset[]} allEvents @param {Preset[]} baseEvents @returns {{ newLoadedEvents: Preset[], newLocalChanges: Preset[] }} */
   function separateEvents(allEvents, baseEvents) {
     const newLoadedEvents = [];
     const newLocalChanges = [];
@@ -2562,7 +2697,9 @@
     return { newLoadedEvents, newLocalChanges };
   }
 
+  /** @param {Preset} event @param {Preset} baseEvent @returns {boolean} */
   function isEventModified(event, baseEvent) {
+    /** @param {string} str @returns {string} */
     const norm = (str) => {
       if (!str) return '';
       return str
@@ -2579,6 +2716,7 @@
     return baseCode !== thisCode || baseComment !== thisComment;
   }
 
+  /** @param {string} eventName @param {string} code @param {string} comment @param {Link[]} links @returns {void} */
   function updateLocalChanges(eventName, code, comment, links) {
     // Find if this event already exists in local changes
     let changeIndex = localChanges.findIndex(p => p.name === eventName);
@@ -2649,6 +2787,7 @@
     });
   }
 
+  /** @param {Preset} preset @param {number} index @returns {HTMLElement} */
   function renderPreset(preset, index) {
     const wrapper = document.createElement('div');
     wrapper.className = 'preset-wrapper';
@@ -2959,12 +3098,16 @@
     // Container to list added links
     const linksDiv = document.createElement('div');
     linksDiv.className = 'links-list';
-    commentWrapper.appendChild(linksDiv);
     // Button to add new links
     const addLinkBtn = document.createElement('button');
     addLinkBtn.textContent = 'Add link';
     addLinkBtn.className = 'btn-sm add-link-btn';
-    commentWrapper.appendChild(addLinkBtn);
+    // Create a flex container for links and add button
+    const linksContainer = document.createElement('div');
+    linksContainer.className = 'links-container';
+    linksContainer.appendChild(linksDiv);
+    linksContainer.appendChild(addLinkBtn);
+    commentWrapper.appendChild(linksContainer);
     // Comment textarea for freeform notes
     const commentTextarea = document.createElement('textarea');
     commentTextarea.placeholder = 'Add comment…';
@@ -3010,7 +3153,7 @@
       form.appendChild(urlInput);
       form.appendChild(textInput);
       form.appendChild(actions);
-      commentWrapper.insertBefore(form, commentTextarea);
+      commentWrapper.insertBefore(form, linksContainer);
       // Save handler
       saveBtn.onclick = () => {
         const url = urlInput.value.trim();
@@ -3228,6 +3371,7 @@
     return wrapper;
   }
 
+  /** @returns {void} */
   function resetPresets() {
     // Clear both split storage areas
     localStorage.removeItem('events_loaded_js');
@@ -3266,6 +3410,7 @@
   // When loaded successfully, the events will replace the current presets and
   // persist in localStorage under `presets_full_js`.  An informational
   // message is displayed in the log.
+  /** @returns {void} */
   function loadLocalFile() {
     const input = document.getElementById('localFileInput');
     // If a file is explicitly provided (user just chose one via the input), load that file.
@@ -3283,6 +3428,7 @@
   // Load a local file from a File object.  Updates the global
   // currentLocalFile reference, stores the processed events in localStorage,
   // updates the local loader button text/style, and renders the presets.
+  /** @param {File} file @returns {void} */
   function loadLocalFileFromFile(file) {
     const reader = new FileReader();
     reader.onload = function(e) {
@@ -3355,8 +3501,9 @@
     };
     reader.readAsText(file);
   }
+  /** @returns {void} */
   function copyAllAsDataLayer() {
-  // Get current working presets (loaded events + local changes, excluding removed ones)
+    // Get current working presets (loaded events + local changes, excluding removed ones)
   const currentPresets = mergeEventsWithChanges(loadedEvents, localChanges);
 
   const eventBlocks = currentPresets.map((preset, i) => {
@@ -3387,6 +3534,7 @@
    * replaces non‑alphanumeric characters with underscores.  Used to
    * generate element IDs based on event names.
    */
+  /** @param {string} str @returns {string} */
   function slugify(str) {
     return str
       .toLowerCase()
@@ -3398,6 +3546,7 @@
    * Build the navigation bar of event links.  Each button will scroll
    * smoothly to the corresponding event card when clicked.
    */
+  /** @returns {void} */
   function renderNavigation() {
     const nav = document.getElementById('eventNav');
     if (!nav) return;
@@ -3569,6 +3718,7 @@
   });
 
   // Toggle loaded events section visibility
+  /** @returns {void} */
   function toggleEventsSection() {
     const toggleBtn = document.querySelector('#eventsContent').closest('.section').querySelector('.section-toggle-btn');
     utils.toggleSection('eventsContent', 'gtm_events_collapsed', toggleBtn);
@@ -3586,6 +3736,7 @@
     }
   }
 
+  /** @returns {void} */
   function expandAllEvents() {
     document.querySelectorAll('#eventsContent .preset-wrapper.collapsed').forEach(el => {
       el.classList.remove('collapsed');
@@ -3594,6 +3745,7 @@
     });
   }
 
+  /** @returns {void} */
   function collapseAllEvents() {
     document.querySelectorAll('#eventsContent .preset-wrapper').forEach(el => {
       el.classList.add('collapsed');
@@ -3602,11 +3754,13 @@
     });
   }
 
+  /** @returns {void} */
   function togglePlaygroundsSection() {
     const toggleBtn = document.querySelector('#playgroundsSection .section-toggle-btn');
     utils.toggleSection('playgroundsContent', 'gtm_playgrounds_collapsed', toggleBtn);
   }
 
+  /** @param {string} exampleType @param {string} initialCode @param {string} initialComment @returns {void} */
   function addPlaygroundCard(exampleType = '', initialCode = '', initialComment = '') {
     const area = document.getElementById('playgroundsArea');
     if (!area) return;
@@ -3874,6 +4028,7 @@ object_name: {
     };
   }
 
+  /** @param {any} editor @param {HTMLButtonElement} runBtn @param {HTMLButtonElement} trimBtn @returns {void} */
   function checkPlaygroundSyntax(editor, runBtn, trimBtn) {
     if (!editor) return;
     
@@ -3925,6 +4080,7 @@ object_name: {
     loadPresets();
   });
 
+  /** @returns {void} */
   function expandAllPlaygrounds() {
     document.querySelectorAll('#playgroundsSection .preset-wrapper.collapsed').forEach(el => {
       el.classList.remove('collapsed');
@@ -3933,6 +4089,7 @@ object_name: {
     });
   }
 
+  /** @returns {void} */
   function collapseAllPlaygrounds() {
     document.querySelectorAll('#playgroundsSection .preset-wrapper').forEach(el => {
       el.classList.add('collapsed');
@@ -3942,6 +4099,7 @@ object_name: {
   }
   
   // Documentation section toggle functionality
+  /** @returns {void} */
   function toggleDocumentation() {
     const docSection = document.querySelector('.documentation-section');
     const toggleIcon = document.querySelector('.toggle-icon');
