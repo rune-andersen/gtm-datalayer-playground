@@ -5,14 +5,11 @@ A lightweight, browser-based tool to test Google Tag Manager (GTM) containers an
 ## Version 5.5.0 Features
 
 - **LocalStorage Naming Standardization**: Improved code maintainability by standardizing all localStorage keys with clear, descriptive names that indicate their purpose.
-- **Enhanced Code Organization**: Replaced legacy localStorage keys with semantic naming conventions for better developer experience and code clarity.
-- **Improved Data Persistence**: Cleaner localStorage structure makes it easier to understand what data is being stored and where.
 
 ## Version 5.4.0 Features
 
 - **Comprehensive TypeScript Type Checking**: Added JSDoc annotations and type checking for better code reliability and developer experience.
 - **Enhanced Code Quality**: All major functions now have proper type annotations and null checks for DOM elements.
-- **Improved Developer Experience**: Better IntelliSense support and error detection during development.
 
 ## Version 5.3.0 Features
 
