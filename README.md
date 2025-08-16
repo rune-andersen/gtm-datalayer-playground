@@ -2,8 +2,9 @@
 
 A lightweight, browser-based tool to test Google Tag Manager (GTM) containers and dataLayer events in real-time.
 
-## Version 5.5.0 Features
+## Version 5.5.1 Features
 
+- **Bug Fix**: Fixed critical issue where default events from datalayer.js were not loading for new users due to script loading order.
 - **LocalStorage Naming Standardization**: Improved code maintainability by standardizing all localStorage keys with clear, descriptive names that indicate their purpose.
 
 ## Version 5.5.0 Features
