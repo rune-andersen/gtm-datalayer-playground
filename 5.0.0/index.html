@@ -1901,7 +1901,7 @@
     console.log(msg);
   }
 
-  const defaultPresets = window.gtmPresets || [];
+  let defaultPresets = [];
   // Track the base presets loaded from the source file (GitHub or
   // local file).  This array is used to determine whether an event
   // in localStorage has diverged from the original source (changed
@@ -1910,7 +1910,7 @@
       // local file is loaded the basePresets will be updated to
   // that processed list.  When the presets are reset, basePresets
   // reverts to the default presets.
-  let basePresets = window.gtmPresets || [];
+  let basePresets = [];
 
   // Split storage solution: separate original loaded events from local changes
   let loadedEvents = []; // Original events from source (GitHub or local file)
@@ -2898,6 +2898,10 @@
         localStorage.setItem('gtm_journey_delay', e.target.value);
       });
     }
+    
+    // Initialize default presets from datalayer.js (now that it's loaded)
+    defaultPresets = window.gtmPresets || [];
+    basePresets = defaultPresets.slice();
     
     // Initialize split storage variables
     const savedLoaded = localStorage.getItem('events_loaded_js');
